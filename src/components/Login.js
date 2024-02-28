@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import axios from 'axios';
+import axios from 'axios';
 import "./Login.css";
 
 function Login() {
@@ -13,20 +13,17 @@ function Login() {
       e.preventDefault();
             
       try {
-        // const data = {
-        //   username: 'username',
-        //   password: 'Qwert@123',
-        // };
         // Send a request to your backend to authenticate the user and get a token
-        // const response = await axios.post('https://hisab-kitab-api-v2.onrender.com/users/login', {
-        //   data
-        // });
-        const response = {
-            "data": {
-                "token": "your_access_token_here"
-              },
-            "status_code": 200
-        }
+        const response = await axios.post('https://hisab-kitab-api-v2.onrender.com/users/login', {
+          "username": username,
+          "password": password,
+        });
+        // const response = {
+        //     "data": {
+        //         "token": "your_access_token_here"
+        //       },
+        //     "status_code": 200
+        // }
         console.log(response);
 
         if ('token' in response) {
