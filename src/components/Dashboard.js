@@ -1,20 +1,15 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import Navbar from './Navbar';
 import React from 'react';
+// import SideNav from './SideNav.js';
+// import Sidebar from './Sidebar.js';
+import Navbar from './Navbar.js';
 
 function Dashboard() {
   // const [userData, setUserData] = useState({});
   // const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-      // Clear the token from localStorage
-      localStorage.removeItem('token');
-      // Redirect the user to the login page
-      navigate('/');
-    };
-    
     // useEffect(() => {
     //     const fetchProtectedData = async () => {
     //       const token = localStorage.getItem('token');
@@ -76,9 +71,16 @@ function Dashboard() {
 
     return (
       <div> 
-        Dashboard Page
-        <button onClick={handleLogout}> Logout </button>
-        {/* <Navbar /> */}
+        <Navbar />
+        <header className="bg-white shadow">
+          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
+          </div>
+        </header>
+        <main>
+          <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">{/* Your content */}</div>
+        </main>
+
       </div>
     )
 }

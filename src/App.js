@@ -7,7 +7,6 @@ import Dashboard from './components/Dashboard';
 function App() {
 
   return (
-    <div>
       <div className="App">
       <Router>
         <Routes>
@@ -16,7 +15,6 @@ function App() {
         </Routes>
       </Router>
       </div>
-    </div>
   );
 }
 
