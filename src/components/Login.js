@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// import "./test2.css";
+import config from '../config';
 import Loading from './Loading.js';
 
 function Login() {
@@ -17,7 +17,7 @@ function Login() {
       try {
         setIsLoading(true);
         // Send a request to your backend to authenticate the user and get a token
-        const response = await axios.post('https://hisab-kitab-api-v2.onrender.com/users/login', {
+        const response = await axios.post(`${config.API_URL}/users/login`, {
           "username": username,
           "password": password,
         });
@@ -39,7 +39,7 @@ function Login() {
         console.log("go to dashboard");
         navigate('/dashboard');
       } catch (error) {
-        // Handle authentication failure
+        // Handle authentication failure-[]
         console.log("Some Error. Log In Again")
         navigate("/");
       }

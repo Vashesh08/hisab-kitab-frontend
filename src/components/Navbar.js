@@ -1,8 +1,8 @@
-import { Fragment, useEffect } from 'react';
+import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import Sidebar from "./Sidebar.js";
+// import Sidebar from "./Sidebar.js";
 
 const user = {
   name: 'username',
@@ -10,18 +10,10 @@ const user = {
   imageUrl:
   'profilepic.png'
 }
-<<<<<<< HEAD
 
 // function handleProfileClick(){
 //     console.log("Profil/ Setting CLicked")
 // }
-=======
-const navigation = [
-  { name: 'Master Stock', href: '', current: true },
-  { name: 'Melting Book', href: '/meltingbook', current: false },
-  { name: 'Kareegar Book', href: '/kareegar', current: false },
-]
->>>>>>> 1cc92ee (pushed latest code)
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')

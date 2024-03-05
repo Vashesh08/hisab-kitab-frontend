@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 import Navbar from "./Navbar.js";
-import MasterStock from "../pages/Masterstoke.js";
+// import MasterStock from "../pages/Masterstoke.js";
 import SideNav from "./SideNav.js";
 
 function Dashboard() {

@@ -6,12 +6,12 @@ import {
   Button,
   Modal,
 } from "antd";
-import { getMasterStock, postMasterStock, fetchMasterStockList } from "../api/masterStock.js";
+import { fetchMasterStockList } from "../api/masterStock.js";
 import  ModelAdd from "../components/ModelAdd.js"
 
 const MasterStock = () => {
-  const [page, setPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(25);
+  const [page] = useState(1);
+  const [itemsPerPage] = useState(25);
   const [rows, setRows] = useState([]);
 
     useEffect(() => {
@@ -33,9 +33,6 @@ const MasterStock = () => {
 
   const showModal = () => {
     setIsModalOpen(true);
-  };
-  const handleOk = () => {
-    setIsModalOpen(false);
   };
   const handleCancel = () => {
     setIsModalOpen(false);
