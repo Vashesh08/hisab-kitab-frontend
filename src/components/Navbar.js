@@ -1,24 +1,16 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import Sidebar from "./Sidebar.js";
 
 const user = {
   name: 'username',
   email: 'email@example.com',
   imageUrl:
-  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+  'profilepic.png'
 }
-const navigation = [
-  // { name: 'Dashboard', href: '#', current: true },
-  // { name: 'Master Stock', href: '/master-stock', current: true },
-  // { name: 'Another', href: '#', current: false },
-  { name: 'Master Stock', href: '', current: true },
-  { name: 'Melting Book', href: '/meltingbook', current: false },
-  { name: 'Kareegar Book', href: '/kareegar', current: false },
-  // { name: 'Calendar', href: '#', current: false },
-  // { name: 'Reports', href: '#', current: false },
-]
+
 // function handleProfileClick(){
 //     console.log("Profil/ Setting CLicked")
 // }
@@ -27,7 +19,16 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Navbar() {
+const navigation = [
+  { index: 0, name: 'Master Stock', href: '#', current: false},
+  { index: 1, name: 'Melting Book', href: '#', current: false},
+  { index: 2, name: 'Kareegar Book', href: '#', current: false},
+]
+
+
+export default function Navbar(navigation_path) {
+  
+    // navigation[navigation_path]['current'] = true;
     const navigate = useNavigate();
     const handleLogout = () => {
         console.log("logging out")
@@ -36,22 +37,59 @@ export default function Navbar() {
         // Redirect the user to the login page
         navigate('/');
       };  
+
+    const handleIndex = (index) => {
+      console.log("index", index);
+      if (typeof index === 'number' && !isNaN(index) && (index >= 0) && (index < navigation.length)){
+      console.log("path", index);
+      for (let i = 0; i < navigation.length; i++) {
+        console.log(i, "Er", navigation[i])
+        navigation[i].current = false; 
+      }
+      console.log(index, "Vash", navigation);
+      navigation[index].current = true;
+    }
+    }
+    
     const userNavigation = [
-    // { name: 'Your Profile', href: '#', click: () => handleProfileClick()},
-    // { name: 'Settings', href: '#', click: () => handleProfileClick()},
     { name: 'Sign out', href: '#', click: handleLogout},
     ]
-      
+  
+    // useEffect(() => {
+    //   const checkPath = () => {
+    //     const currentIndex = navigation.findIndex((item) => item.current);
+
+    //     if (currentIndex !== -1) {
+    //       const currentItem = navigation[currentIndex];
+    //       const path = currentItem.href;
+    //       console.log('Current path:', path);
+    //       console.log('Current index:', currentIndex);
+    //     }
+    //     else{
+    //       currentIndex = 0;
+    //     }
+    //     console.log("full item", navigation)
+    //   };
+  
+    //   checkPath();
+    // });
+  console.log(navigation)
   return (
     <>
       <div className="min-h-full">
         <Disclosure as="nav" className="bg-gray-800">
           {({ open }) => (
             <>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ml-0">
                 <div className="flex h-16 items-center justify-between">
+                  
                   <div className="flex items-center">
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 left-0">
+                    <img
+                    className="h-8 w-40"
+                    src="logo.png"
+                    alt="RK Jewellers"
+                  />
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
@@ -65,6 +103,7 @@ export default function Navbar() {
                                 : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                               'rounded-md px-3 py-2 text-sm font-medium'
                             )}
+                            onClick={handleIndex(item.index)}
                             aria-current={item.current ? 'page' : undefined}
                           >
                             {item.name}
@@ -146,6 +185,7 @@ export default function Navbar() {
                       key={item.name}
                       as="a"
                       href={item.href}
+                      onClick={handleIndex(item.index)}
                       className={classNames(
                         item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                         'block rounded-md px-3 py-2 text-base font-medium'

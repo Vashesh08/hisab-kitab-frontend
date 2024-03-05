@@ -153,10 +153,10 @@ const MasterStock = () => {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <Button type="primary" onClick={showModal}>
+        <Button onClick={showModal}>
           Add Item
         </Button>
-        <Button type="primary">Delete</Button>
+        <Button>Delete</Button>
       </div>
       <Modal
         title="Add Item"
@@ -246,7 +246,7 @@ const MasterStock = () => {
               offset: 8,
             }}
           >
-            <Button type="primary" htmlType="submit">
+            <Button htmlType="submit">
               Submit
             </Button>
           </Form.Item>

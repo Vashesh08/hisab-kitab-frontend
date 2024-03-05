@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 // import "./test2.css";
+import Loading from './Loading.js';
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
   
     const handleLogin =  async (e) => {
@@ -13,8 +15,9 @@ function Login() {
       e.preventDefault();
             
       try {
+        setIsLoading(true);
         // Send a request to your backend to authenticate the user and get a token
-        const response = await axios.post('http://0.0.0.0:5003/users/login', {
+        const response = await axios.post('https://hisab-kitab-api-v2.onrender.com/users/login', {
           "username": username,
           "password": password,
         });
@@ -37,9 +40,10 @@ function Login() {
         navigate('/dashboard');
       } catch (error) {
         // Handle authentication failure
-        console.log("SOme Error. Log In Again")
+        console.log("Some Error. Log In Again")
         navigate("/");
       }
+      setIsLoading(false)
     };
   
     // Check if the user is already logged in
@@ -55,6 +59,9 @@ function Login() {
   
       checkLoggedIn();
     });
+    if (isLoading){
+      return <Loading />
+    }
   
     return (
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
