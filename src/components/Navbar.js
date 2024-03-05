@@ -10,10 +10,18 @@ const user = {
   imageUrl:
   'profilepic.png'
 }
+<<<<<<< HEAD
 
 // function handleProfileClick(){
 //     console.log("Profil/ Setting CLicked")
 // }
+=======
+const navigation = [
+  { name: 'Master Stock', href: '', current: true },
+  { name: 'Melting Book', href: '/meltingbook', current: false },
+  { name: 'Kareegar Book', href: '/kareegar', current: false },
+]
+>>>>>>> 1cc92ee (pushed latest code)
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')

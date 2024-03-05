@@ -1,21 +1,35 @@
 /* eslint-disable no-template-curly-in-string */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Divider,
   Table,
   Button,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  DatePicker,
   Modal,
 } from "antd";
-import { getMasterStock, postMasterStock } from "../api/allapi.js";
+import { getMasterStock, postMasterStock, fetchMasterStockList } from "../api/masterStock.js";
+import  ModelAdd from "../components/ModelAdd.js"
 
 const MasterStock = () => {
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
+  const [rows, setRows] = useState([]);
+
+    useEffect(() => {
+        (async () => {
+            const token = localStorage.getItem("token");
+        // send request to check authenticated
+        // console.log(localStorage);
+        // console.log("dashboaord", token);
+        const docs = await fetchMasterStockList(page, itemsPerPage, token);
+        setRows(docs);
+
+    })();
+    }, [page, itemsPerPage]);
+
+
+
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [dataAe, setDataAe] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -77,6 +91,17 @@ const MasterStock = () => {
       issuer: "gagag",
       receiver: "iuioga",
     },
+    {
+      date: "03/02/2024",
+      description: "agag",
+      category: "gaga",
+      weight: "100",
+      purity: "99.5",
+      issue22k: "gaga",
+      receive22k: "gagag",
+      issuer: "gagag",
+      receiver: "iuioga",
+    },
   ];
 
   const rowSelection = {
@@ -102,68 +127,28 @@ const MasterStock = () => {
     },
   };
 
-  const handleChange = (value) => {
-    console.log(`selected ${value}`);
-  };
-
-  const onDateChange = (date, dateString) => {
-    console.log(date, dateString);
-  };
-
-  const validateMessages = {
-    required: "${label} is required!",
-    types: {
-      email: "${label} is not a valid email!",
-      number: "${label} is not a valid number!",
-    },
-    number: {
-      range: "${label} must be between ${min} and ${max}",
-    },
-  };
-
-  const onFinish = async ({ user }) => {
-    const token = localStorage.getItem("token");
-
-    console.log(user);
-    const {
-      date,
-      description,
-      goodsType,
-      issueReceive,
-      issuerName,
-      purity,
-      weight,
-    } = user;
-    const backendData = {
-      type: "issues",
-      // date,
-      category: "category",
-      description,
-      weight,
-      issuer: issuerName,
-      receiver: issueReceive,
-      purity,
-    };
-
-    const updated = await postMasterStock(backendData, token);
-    console.log(updated);
-    handleOk();
-  };
-
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
+<<<<<<< HEAD
         <Button onClick={showModal}>
           Add Item
         </Button>
         <Button>Delete</Button>
+=======
+        <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
+          Add Item
+        </Button>
+        <Button type="primary" style={{ background: "red", borderColor: "yellow" }} >Delete</Button>
+>>>>>>> 1cc92ee (pushed latest code)
       </div>
       <Modal
         title="Add Item"
         open={isModalOpen}
-        onOk={handleOk}
         onCancel={handleCancel}
+        footer={null}
       >
+<<<<<<< HEAD
         <Form
           {...layout}
           name="nest-messages"
@@ -251,7 +236,13 @@ const MasterStock = () => {
             </Button>
           </Form.Item>
         </Form>
+=======
+        <ModelAdd
+          handleOk={handleCancel}
+          />
+>>>>>>> 1cc92ee (pushed latest code)
       </Modal>
+
       <Divider />
       <Table
         rowSelection={{
@@ -259,7 +250,7 @@ const MasterStock = () => {
           ...rowSelection,
         }}
         columns={columns}
-        dataSource={data}
+        dataSource={rows}
       />
       <Divider />
     </div>

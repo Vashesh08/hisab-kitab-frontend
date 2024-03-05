@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+<<<<<<< HEAD
 // import "./test2.css";
 import Loading from './Loading.js';
+=======
+>>>>>>> 1cc92ee (pushed latest code)
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -127,82 +130,8 @@ function Login() {
               </button>
             </div>
           </form>
-
-          {/* <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?{' '}
-            <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-              Start a 14 day free trial
-            </a>
-          </p> */}
         </div>
       </div>
-      
-      // <div className="container-login100">
-      //   <div className="wrap-login100">
-
-      //     <form className='login100-form p-l-55 p-r-55 p-t-178' onSubmit={handleLogin}>
-      //     <span class="login100-form-title">
-			// 			Login
-			// 		</span>
-
-      //     <div class="wrap-input100 validate-input m-b-16" data-validate="Please enter username">
-      //       <input 
-      //         class="input100"
-      //         name="username"
-      //         type="text"
-      //         value={username}
-      //         placeholder="Username"
-      //         onChange={(e) => setUsername(e.target.value)}
-      //         required
-      //         />
-			// 			<span class="focus-input100"></span>
-			// 		</div>
-
-      //     <div class="wrap-input100" data-validate = "Please enter password">
-      //     <input
-      //           type="password"
-      //           placeholder="Password" 
-      //           value={password}
-      //           onChange={(e) => setPassword(e.target.value)}
-      //           required
-      //         />
-      //       <span class="focus-input100"></span>
-			// 		</div>
-          
-			// 		<div class="text-right p-t-13 p-b-23">
-			// 			<span class="txt1">
-			// 				Forgot
-			// 			</span>
-
-			// 			<a href="#" class="txt2">
-			// 				Username / Password?
-			// 			</a>
-			// 		</div>
-
-			// 		<div class="container-login100-form-btn">
-			// 			<button type="submit" class="login100-form-btn">
-			// 				Sign in
-			// 			</button>
-			// 		</div>
-
-			// 		{/* <div class="flex-col-c p-t-170 p-b-40">
-			// 			<span class="txt1 p-b-9">
-			// 				Don’t have an account?
-			// 			</span>
-
-			// 			<a href="#" class="txt3">
-			// 				Sign up now
-			// 			</a>
-			// 		</div> */}
-
-
-              
-      //       {/* <div className="row button">
-      //         <input type="submit" value="Login"/>
-      //       </div> */}
-      //     </form>
-      //   </div>
-      // </div>
     );
   };
   
