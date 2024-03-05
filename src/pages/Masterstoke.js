@@ -130,17 +130,10 @@ const MasterStock = () => {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-<<<<<<< HEAD
-        <Button onClick={showModal}>
-          Add Item
-        </Button>
-        <Button>Delete</Button>
-=======
         <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
           Add Item
         </Button>
         <Button type="primary" style={{ background: "red", borderColor: "yellow" }} >Delete</Button>
->>>>>>> 1cc92ee (pushed latest code)
       </div>
       <Modal
         title="Add Item"
@@ -148,99 +141,9 @@ const MasterStock = () => {
         onCancel={handleCancel}
         footer={null}
       >
-<<<<<<< HEAD
-        <Form
-          {...layout}
-          name="nest-messages"
-          onFinish={onFinish}
-          style={{
-            maxWidth: 600,
-          }}
-          validateMessages={validateMessages}
-        >
-          <Form.Item
-            name={["user", "issueReceive"]}
-            label="Issue / Receive"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Select
-              defaultValue={"Issue"}
-              onChange={handleChange}
-              options={[
-                { value: "issue", label: "Issue" },
-                { value: "receive", label: "Receive" },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item
-            name={["user", "date"]}
-            label="Date (DD/MM/YYYY)"
-            rules={[
-              {
-                type: "Date",
-              },
-            ]}
-          >
-            <DatePicker onChange={onDateChange} />
-          </Form.Item>
-          <Form.Item name={["user", "goodsType"]} label="Goods Type">
-            <Input />
-          </Form.Item>
-          <Form.Item name={["user", "description"]} label="Description">
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name={["user", "weight"]}
-            label="Weight"
-            rules={[{ type: "number", min: 0, required: true }]}
-          >
-            <InputNumber />
-          </Form.Item>
-
-          <Form.Item
-            name={["user", "purity"]}
-            label="Purity"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Select
-              defaultValue={"99.5"}
-              onChange={handleChange}
-              options={[
-                { value: "99.5", label: "99.5" },
-                { value: "100", label: "100" },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item name={["user", "issuerName"]} label="Issuer Name">
-            <Input />
-          </Form.Item>
-          <Form.Item name={["user", "receiverName"]} label="Receiver Name">
-            <Input />
-          </Form.Item>
-          <Form.Item
-            wrapperCol={{
-              ...layout.wrapperCol,
-              offset: 8,
-            }}
-          >
-            <Button htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
-=======
         <ModelAdd
           handleOk={handleCancel}
           />
->>>>>>> 1cc92ee (pushed latest code)
       </Modal>
 
       <Divider />

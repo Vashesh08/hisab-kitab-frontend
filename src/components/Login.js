@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-<<<<<<< HEAD
 // import "./test2.css";
 import Loading from './Loading.js';
-=======
->>>>>>> 1cc92ee (pushed latest code)
 
 function Login() {
     const [username, setUsername] = useState('');
