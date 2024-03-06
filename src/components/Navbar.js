@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 // import Sidebar from "./Sidebar.js";
@@ -20,22 +20,26 @@ function classNames(...classes) {
 }
 
 const navigation = [
-  { index: 0, name: 'Master Stock', href: '#', current: false},
-  { index: 1, name: 'Melting Book', href: '#', current: false},
-  { index: 2, name: 'Kareegar Book', href: '#', current: false},
+  // { index: 0, name: 'Master Stock', href: '#', current: false},
+  // { index: 1, name: 'Melting Book', href: '#', current: false},
+  // { index: 2, name: 'Kareegar Book', href: '#', current: false},
 ]
 
 
-export default function Navbar(navigation_path) {
+export default function Navbar(checkLoggedIn) {
   
     // navigation[navigation_path]['current'] = true;
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const handleLogout = () => {
         console.log("logging out")
         // Clear the token from localStorage
         localStorage.removeItem('token');
+
+        console.log(localStorage.getItem("token"));
         // Redirect the user to the login page
-        navigate('/');
+    //     navigate('/');
+    checkLoggedIn.checkLoggedIn.checkLoggedIn();
+    // checkLoggedIn.checkLoggedIn();
       };  
 
     const handleIndex = (index) => {
@@ -80,16 +84,12 @@ export default function Navbar(navigation_path) {
         <Disclosure as="nav" className="bg-gray-800">
           {({ open }) => (
             <>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ml-0">
+              <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8 ml-0">
                 <div className="flex h-16 items-center justify-between">
                   
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 left-0">
-                    <img
-                    className="h-8 w-40"
-                    src="logo.png"
-                    alt="RK Jewellers"
-                  />
+                    <div className="flex-shrink-0 left-0 text-white">
+                    RK JEWELLERS
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">

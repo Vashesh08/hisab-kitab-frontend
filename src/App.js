@@ -1,22 +1,34 @@
+import React, { useEffect, useState } from 'react';
 // import logo from './logo.svg';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 
 function App() {
+  const [isLoggedIn, setLoggedIn] = useState(false);
+  const checkLoggedIn = () => {
+    const session_key = localStorage.getItem('token');
+    console.log("Effect token:", session_key);
 
+    if (session_key !== null) {
+      setLoggedIn(true);
+    }
+    else{
+      setLoggedIn(false);
+    }
+    console.log("setloggedin", isLoggedIn);
+  };
+
+  useEffect(() => {
+    checkLoggedIn();
+  }, [isLoggedIn]);
+
+  if (isLoggedIn){
+    return <Dashboard checkLoggedIn={checkLoggedIn}/>
+  }
   return (
       <div className="App">
-      <Router>
-        <Routes>
-          <Route exact path='/' element={<Login />}></Route>
-          <Route exact path='/dashboard' element={<Dashboard />}></Route>
-          {/* <Route exact path='/master-stock' element={<Dashboard route='master-stock' />}></Route>
-          <Route exact path='/melting-book' element={<Dashboard route='melting-book' />}></Route>
-          <Route exact path='/kareegar-book' element={<Dashboard route='kareegar-book' />}></Route>  */}
-        </Routes>
-      </Router>
+        <Login checkLoggedIn={checkLoggedIn}/>
       </div>
   );
 }

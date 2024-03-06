@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import axios from 'axios';
 import config from '../config';
 import Loading from './Loading.js';
 
-function Login() {
+function Login(checkLoggedIn) {
+  // console.log("Sessi", Login);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
 
     const handleLogin =  async (e) => {
       console.log("Login Component Called");
@@ -25,7 +24,6 @@ function Login() {
 
         if ('token' in response) {
             console.log("invalid login");
-            navigate("/");
         }
 
         // Assuming your backend sends a token upon successful authentication
@@ -36,28 +34,16 @@ function Login() {
         console.log("tok", token, localStorage.getItem('token'));
         // Redirect the user to the dashboard
         console.log("go to dashboard");
-        navigate('/dashboard');
+        // navigate('/dashboard');
+        console.log(checkLoggedIn)
+        checkLoggedIn.checkLoggedIn();
       } catch (error) {
         // Handle authentication failure-[]
-        console.log("Some Error. Log In Again")
-        navigate("/");
+        console.log("Some Error. Log In Again", error)
       }
       setIsLoading(false)
     };
 
-    // Check if the user is already logged in
-    useEffect(() => {
-      const checkLoggedIn = () => {
-        const token = localStorage.getItem('token');
-        console.log("token:", token);
-
-        if (token !== null) {
-          navigate('/dashboard');
-        }
-      };
-
-      checkLoggedIn();
-    });
     if (isLoading){
       return <Loading />
     }
@@ -65,11 +51,11 @@ function Login() {
     return (
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          {/* <img
-            className="mx-auto h-10 w-auto"
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-            alt="Your Company"
-          /> */}
+          <img
+            className="mx-auto h-20 w-auto"
+            src="logo.png"
+            alt="RK Jewellers"
+          />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Sign in to your account
           </h2>
