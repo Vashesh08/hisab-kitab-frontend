@@ -9,11 +9,11 @@ function Login() {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-  
+
     const handleLogin =  async (e) => {
       console.log("Login Component Called");
       e.preventDefault();
-            
+
       try {
         setIsLoading(true);
         // Send a request to your backend to authenticate the user and get a token
@@ -27,14 +27,13 @@ function Login() {
             console.log("invalid login");
             navigate("/");
         }
-  
+
         // Assuming your backend sends a token upon successful authentication
         const token = response.data.token;
-  
+
         // Store the token in localStorage or a secure storage method
         localStorage.setItem('token', response.data.token);
         console.log("tok", token, localStorage.getItem('token'));
-        
         // Redirect the user to the dashboard
         console.log("go to dashboard");
         navigate('/dashboard');
@@ -45,24 +44,24 @@ function Login() {
       }
       setIsLoading(false)
     };
-  
+
     // Check if the user is already logged in
     useEffect(() => {
       const checkLoggedIn = () => {
         const token = localStorage.getItem('token');
         console.log("token:", token);
-  
+
         if (token !== null) {
           navigate('/dashboard');
         }
       };
-  
+
       checkLoggedIn();
     });
     if (isLoading){
       return <Loading />
     }
-  
+
     return (
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">

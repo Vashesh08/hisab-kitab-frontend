@@ -6,7 +6,7 @@ import {
   Button,
   Modal,
 } from "antd";
-import { fetchMasterStockList } from "../api/masterStock.js";
+import { fetchMasterStockList, deleteMasterStockList } from "../api/masterStock.js";
 import  ModelAdd from "../components/ModelAdd.js"
 
 const MasterStock = () => {
@@ -27,6 +27,7 @@ const MasterStock = () => {
     }, [page, itemsPerPage]);
 
 
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,6 +35,15 @@ const MasterStock = () => {
   const showModal = () => {
     setIsModalOpen(true);
   };
+
+  const deleteModal = async () => {
+    const token = localStorage.getItem("token");
+    const masterStockId = {
+      masterstockId: selectedRowKeys
+    }
+    await deleteMasterStockList(masterStockId, token );
+
+  }
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -76,53 +86,43 @@ const MasterStock = () => {
       dataIndex: "receiver",
     },
   ];
-  const data = [
-    {
-      date: "03/02/2024",
-      description: "agag",
-      category: "gaga",
-      weight: "100",
-      purity: "99.5",
-      issue22k: "gaga",
-      receive22k: "gagag",
-      issuer: "gagag",
-      receiver: "iuioga",
-    },
-    {
-      date: "03/02/2024",
-      description: "agag",
-      category: "gaga",
-      weight: "100",
-      purity: "99.5",
-      issue22k: "gaga",
-      receive22k: "gagag",
-      issuer: "gagag",
-      receiver: "iuioga",
-    },
-  ];
+
+  // const rowSelection = {
+  //   onChange: (selectedRowKeys, selectedRows) => {
+  //     console.log(
+  //       `selectedRowKeys: ${selectedRowKeys}`,
+  //       "selectedRows: ",
+  //       selectedRows
+  //     );
+  //   },
+  //   getCheckboxProps: (record) => ({
+  //     disabled: record.name === "Disabled User",
+  //     name: record.name,
+  //   }),
+  // };
+  const onSelectChange = (newSelectedRowKeys) => {
+    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
 
   const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User",
-      name: record.name,
-    }),
+    selectedRowKeys,
+    onChange: onSelectChange,
+    selections: [
+      Table.SELECTION_ALL,
+      Table.SELECTION_INVERT,
+      Table.SELECTION_NONE,
+    ],
   };
 
-  const layout = {
-    labelCol: {
-      span: 8,
-    },
-    wrapperCol: {
-      span: 16,
-    },
-  };
+  // const layout = {
+  //   labelCol: {
+  //     span: 8,
+  //   },
+  //   wrapperCol: {
+  //     span: 16,
+  //   },
+  // };
 
   return (
     <div>
@@ -130,7 +130,7 @@ const MasterStock = () => {
         <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
           Add Item
         </Button>
-        <Button type="primary" style={{ background: "red", borderColor: "yellow" }} >Delete</Button>
+        <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button>
       </div>
       <Modal
         title="Add Item"
@@ -145,12 +145,10 @@ const MasterStock = () => {
 
       <Divider />
       <Table
-        rowSelection={{
-          type: "checkbox",
-          ...rowSelection,
-        }}
+        rowSelection={rowSelection}
         columns={columns}
         dataSource={rows}
+        rowKey="_id"
       />
       <Divider />
     </div>
