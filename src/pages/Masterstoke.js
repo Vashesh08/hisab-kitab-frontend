@@ -8,6 +8,7 @@ import {
 } from "antd";
 import { fetchMasterStockList, deleteMasterStockList } from "../api/masterStock.js";
 import  ModelAdd from "../components/ModelAdd.js"
+import '../style/pages.css';
 
 const MasterStock = () => {
   const [page] = useState(1);
@@ -123,6 +124,9 @@ const MasterStock = () => {
   //     span: 16,
   //   },
   // };
+  const getRowClassName = (record) => {
+    return record.is_deleted_flag ? 'striked-row' : '';
+  };
 
   return (
     <div>
@@ -147,8 +151,10 @@ const MasterStock = () => {
       <Table
         rowSelection={rowSelection}
         columns={columns}
+        rowClassName={getRowClassName} 
         dataSource={rows}
         rowKey="_id"
+
       />
       <Divider />
     </div>
