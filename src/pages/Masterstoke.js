@@ -22,6 +22,20 @@ const MasterStock = () => {
         // console.log(localStorage);
         // console.log("dashboaord", token);
         const docs = await fetchMasterStockList(page, itemsPerPage, token);
+        console.log("Vashesh", docs);
+        for (let eachEntry in docs) {
+          console.log("Vash", docs[eachEntry].date, typeof docs[eachEntry].date);
+          const dateEntry = docs[eachEntry].date;
+          const curDateEntry = new Date(dateEntry);
+          
+          const day = curDateEntry.getDate().toString().padStart(2, '0');
+          const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+          const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
+          const formattedDate = `${day}/${month}/${year}`;
+
+          console.log(formattedDate);
+          docs[eachEntry].date = formattedDate;
+        }
         setRows(docs);
 
     })();
@@ -57,6 +71,11 @@ const MasterStock = () => {
     {
       title: "Description",
       dataIndex: "description",
+      render: text => (
+        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
     },
     {
       title: "Category",
@@ -86,6 +105,7 @@ const MasterStock = () => {
       title: "Receiver",
       dataIndex: "receiver",
     },
+    
   ];
 
   // const rowSelection = {
