@@ -10,8 +10,7 @@ import {
   AccordionBody,
 } from "@material-tailwind/react";
 import {
-  PresentationChartBarIcon,
-  ShoppingBagIcon,
+  BookOpenIcon,
 } from "@heroicons/react/24/solid";
 import {
   ChevronRightIcon,
@@ -40,10 +39,10 @@ export default function Sidebar() {
           <ListItem className="p-0" selected={open === 1}>
             <AccordionHeader onClick={() => handleOpen(1)} className="border-b-0 p-3">
               <ListItemPrefix>
-                <PresentationChartBarIcon className="h-5 w-5" />
+                <BookOpenIcon className="h-5 w-5" />
               </ListItemPrefix>
               <Typography color="blue-gray" className="mr-auto font-normal">
-                Kareegar
+                Attendance Registers
               </Typography>
             </AccordionHeader>
           </ListItem>
@@ -82,26 +81,32 @@ export default function Sidebar() {
           <ListItem className="p-0" selected={open === 2}>
             <AccordionHeader onClick={() => handleOpen(2)} className="border-b-0 p-3">
               <ListItemPrefix>
-                <ShoppingBagIcon className="h-5 w-5" />
+                <BookOpenIcon className="h-5 w-5" />
               </ListItemPrefix>
               <Typography color="blue-gray" className="mr-auto font-normal">
-                E-Commerce
+                Books
               </Typography>
             </AccordionHeader>
           </ListItem>
           <AccordionBody className="py-1">
             <List className="p-0">
               <ListItem>
-                <ListItemPrefix>
+                {/* <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Orders
+                </ListItemPrefix> */}
+                Master-Stock
+              </ListItem>
+              <ListItem>
+                {/* <ListItemPrefix>
+                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                </ListItemPrefix> */}
+                Melting-Book
               </ListItem>
               <ListItem>
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
-                Products
+                Kareegar
               </ListItem>
             </List>
           </AccordionBody>
