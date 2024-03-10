@@ -1,6 +1,8 @@
-function Home() {
+import React from 'react';
+
+export default function Home() {
     return (
-        <div>
+        <div style={{textAlign: "center"}}>
             Home Page for RK Jewellers
         </div>
     )

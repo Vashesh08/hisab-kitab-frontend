@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Masterstoke from '../pages/Masterstoke';
 import Sidebar from './Sidebar';
-
+import Home from '../pages/Home';
    
 function SideNav() {
+  const [isEnabled, setIsEnabled] = useState(false);
+
     return (
         <>
     <button data-drawer-target="sidebar-multi-level-sidebar" data-drawer-toggle="sidebar-multi-level-sidebar" aria-controls="sidebar-multi-level-sidebar" type="button"
@@ -14,10 +16,10 @@ onClick={() => {
       sidebar.classList.toggle('-translate-x-full');
       sidebar_right.classList.toggle('ml-64');
     }
-    else{
+    // else{
       // sidebar.classList.toggle('-translate-x-0');
       // sidebar_right.classList.toggle('ml-64');
-    }
+    // }
   }} 
 className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
    <span className="sr-only">Open sidebar</span>
@@ -34,10 +36,21 @@ className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-
 
 <div id="sidebar-right" className="p-4">
    <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
-        <Masterstoke />
+        {isEnabled ?(
+          <Masterstoke />
+          ) : (
+            <div>
+            <Home />
+            <button onClick={() =>
+              setIsEnabled(true)
+              }>
+                Show Data
+              </button>
+            </div>                          
+          )
+        }
    </div>
 </div>
-
         </>
         
     )

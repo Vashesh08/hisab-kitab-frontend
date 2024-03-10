@@ -8,7 +8,6 @@ function App() {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const checkLoggedIn = () => {
     const session_key = localStorage.getItem('token');
-    console.log("Effect token:", session_key);
 
     if (session_key !== null) {
       setLoggedIn(true);
@@ -16,7 +15,6 @@ function App() {
     else{
       setLoggedIn(false);
     }
-    console.log("setloggedin", isLoggedIn);
   };
 
   useEffect(() => {

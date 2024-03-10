@@ -91,15 +91,9 @@ export default function Sidebar() {
           <AccordionBody className="py-1">
             <List className="p-0">
               <ListItem>
-                {/* <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix> */}
                 Master-Stock
               </ListItem>
               <ListItem>
-                {/* <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix> */}
                 Melting-Book
               </ListItem>
               <ListItem>

@@ -35,7 +35,7 @@ export default function Navbar(checkLoggedIn) {
         // Clear the token from localStorage
         localStorage.removeItem('token');
 
-        console.log(localStorage.getItem("token"));
+        // console.log(localStorage.getItem("token"));
         // Redirect the user to the login page
     //     navigate('/');
     checkLoggedIn.checkLoggedIn.checkLoggedIn();
@@ -59,24 +59,6 @@ export default function Navbar(checkLoggedIn) {
     { name: 'Sign out', href: '#', click: handleLogout},
     ]
   
-    // useEffect(() => {
-    //   const checkPath = () => {
-    //     const currentIndex = navigation.findIndex((item) => item.current);
-
-    //     if (currentIndex !== -1) {
-    //       const currentItem = navigation[currentIndex];
-    //       const path = currentItem.href;
-    //       console.log('Current path:', path);
-    //       console.log('Current index:', currentIndex);
-    //     }
-    //     else{
-    //       currentIndex = 0;
-    //     }
-    //     console.log("full item", navigation)
-    //   };
-  
-    //   checkPath();
-    // });
   console.log(navigation)
   return (
     <>
@@ -201,10 +183,10 @@ export default function Navbar(checkLoggedIn) {
                     <div className="flex-shrink-0">
                       <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
                     </div>
-                    <div className="ml-3">
+                    {/* <div className="ml-3">
                       <div className="text-base font-medium leading-none text-white">{user.name}</div>
                       <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
-                    </div>
+                    </div> */}
                     <button
                       type="button"
                       className="relative ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"

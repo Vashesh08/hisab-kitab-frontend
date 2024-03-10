@@ -9,19 +9,62 @@ import {
 import { fetchMasterStockList, deleteMasterStockList } from "../api/masterStock.js";
 import  ModelAdd from "../components/ModelAdd.js"
 import '../style/pages.css';
+import Loading from "../components/Loading.js";
 
 const MasterStock = () => {
   const [page] = useState(1);
-  const [itemsPerPage] = useState(25);
+  const [itemsPerPage] = useState(100); // Change this to show all
   const [rows, setRows] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  async function updateRows (dataType){
+
+    setIsLoading(true);
+    const token = localStorage.getItem("token");
+    // send request to check authenticated
+    const data = [];
+    const deleted_data = [];
+    // console.log("data", data)
+
+    const docs = await fetchMasterStockList(page, itemsPerPage, token);
+    for (let eachEntry in docs) {
+      const dateEntry = docs[eachEntry].date;
+      const curDateEntry = new Date(dateEntry);
+      
+      const day = curDateEntry.getDate().toString().padStart(2, '0');
+      const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+      const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
+      const formattedDate = `${day}/${month}/${year}`;
+
+      docs[eachEntry].date = formattedDate;
+      if (docs[eachEntry].is_deleted_flag){
+        deleted_data.push(docs[eachEntry]);
+      }
+      else{
+        data.push(docs[eachEntry]);
+      }
+    }
+    if (dataType === "all"){
+    setRows(docs);
+    }
+    else if (dataType === "valid"){
+      setRows(data);
+    }
+    else{
+      setRows(deleted_data);
+    }
+    setIsLoading(false);
+  };
 
     useEffect(() => {
         (async () => {
+
+        setIsLoading(true);
             const token = localStorage.getItem("token");
         // send request to check authenticated
         const data = [];
         const deleted_data = [];
-        console.log("data", data)
+        // console.log("data", data)
 
         const docs = await fetchMasterStockList(page, itemsPerPage, token);
         for (let eachEntry in docs) {
@@ -42,7 +85,7 @@ const MasterStock = () => {
           }
         }
         setRows(data);
-
+        setIsLoading(false);
     })();
     }, [page, itemsPerPage]);
 
@@ -57,15 +100,19 @@ const MasterStock = () => {
   };
 
   const deleteModal = async () => {
+    setIsLoading(true);
     const token = localStorage.getItem("token");
     const masterStockId = {
       masterstockId: selectedRowKeys
     }
     await deleteMasterStockList(masterStockId, token );
 
+    updateRows("valid");
+    setIsLoading(false);
   }
   const handleCancel = () => {
     setIsModalOpen(false);
+    updateRows("valid");
   };
 
   const columns = [
@@ -173,6 +220,9 @@ const MasterStock = () => {
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
+    getCheckboxProps: (record) => ({
+      disabled: record.is_deleted_flag === true,
+    }),
     selections: [
       Table.SELECTION_ALL,
       Table.SELECTION_INVERT,
@@ -180,110 +230,109 @@ const MasterStock = () => {
       {
         key: 'deleted',
         text: 'Show Only Deleted Entries',
-        onSelect: async (changableRowKeys) => {
-          const token = localStorage.getItem("token");
-          // send request to check authenticated
-          const data = [];
-          const deleted_data = [];
-          console.log("data", data)
+        onSelect: ()=> {updateRows("deleted")},
+        // async (changableRowKeys) => {
+        //   const token = localStorage.getItem("token");
+        //   // send request to check authenticated
+        //   const data = [];
+        //   const deleted_data = [];
+        //   // console.log("data", data)
   
-          const docs = await fetchMasterStockList(page, itemsPerPage, token);
-          for (let eachEntry in docs) {
-            const dateEntry = docs[eachEntry].date;
-            const curDateEntry = new Date(dateEntry);
+        //   const docs = await fetchMasterStockList(page, itemsPerPage, token);
+        //   for (let eachEntry in docs) {
+        //     const dateEntry = docs[eachEntry].date;
+        //     const curDateEntry = new Date(dateEntry);
             
-            const day = curDateEntry.getDate().toString().padStart(2, '0');
-            const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-            const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
-            const formattedDate = `${day}/${month}/${year}`;
+        //     const day = curDateEntry.getDate().toString().padStart(2, '0');
+        //     const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+        //     const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
+        //     const formattedDate = `${day}/${month}/${year}`;
   
-            docs[eachEntry].date = formattedDate;
-            if (docs[eachEntry].is_deleted_flag){
-              deleted_data.push(docs[eachEntry]);
-            }
-            else{
-              data.push(docs[eachEntry]);
-            }
-          }
-          setRows(deleted_data);
-        },
+        //     docs[eachEntry].date = formattedDate;
+        //     if (docs[eachEntry].is_deleted_flag){
+        //       deleted_data.push(docs[eachEntry]);
+        //     }
+        //     else{
+        //       data.push(docs[eachEntry]);
+        //     }
+        //   }
+        //   setRows(deleted_data);
+        // },
       },
       {
-        key: 'all',
+        key: 'all_entries',
         text: 'Show All Entries',
-        onSelect: async (changableRowKeys) => {
-          const token = localStorage.getItem("token");
-          // send request to check authenticated
-          const data = [];
-          const deleted_data = [];
-          console.log("data", data)
+        onSelect: ()=> {updateRows("all")},
+        // onSelect: async () => {
+        //   const token = localStorage.getItem("token");
+        //   // send request to check authenticated
+        //   const data = [];
+        //   const deleted_data = [];
+        //   // console.log("data", data)
   
-          const docs = await fetchMasterStockList(page, itemsPerPage, token);
-          for (let eachEntry in docs) {
-            const dateEntry = docs[eachEntry].date;
-            const curDateEntry = new Date(dateEntry);
+        //   const docs = await fetchMasterStockList(page, itemsPerPage, token);
+        //   for (let eachEntry in docs) {
+        //     const dateEntry = docs[eachEntry].date;
+        //     const curDateEntry = new Date(dateEntry);
             
-            const day = curDateEntry.getDate().toString().padStart(2, '0');
-            const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-            const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
-            const formattedDate = `${day}/${month}/${year}`;
+        //     const day = curDateEntry.getDate().toString().padStart(2, '0');
+        //     const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+        //     const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
+        //     const formattedDate = `${day}/${month}/${year}`;
   
-            docs[eachEntry].date = formattedDate;
-            if (docs[eachEntry].is_deleted_flag){
-              deleted_data.push(docs[eachEntry]);
-            }
-            else{
-              data.push(docs[eachEntry]);
-            }
-          }
-          setRows(docs);
-        },
+        //     docs[eachEntry].date = formattedDate;
+        //     if (docs[eachEntry].is_deleted_flag){
+        //       deleted_data.push(docs[eachEntry]);
+        //     }
+        //     else{
+        //       data.push(docs[eachEntry]);
+        //     }
+        //   }
+        //   setRows(docs);
+        // },
       },
       {
         key: 'valid',
         text: 'Show Valid Entries',
-        onSelect: async (changableRowKeys) => {
-          const token = localStorage.getItem("token");
-          // send request to check authenticated
-          const data = [];
-          const deleted_data = [];
-          console.log("data", data)
+        onSelect: ()=> {updateRows("valid")},
+        // onSelect: async (changableRowKeys) => {
+        //   const token = localStorage.getItem("token");
+        //   // send request to check authenticated
+        //   const data = [];
+        //   const deleted_data = [];
+        //   // console.log("data", data)
   
-          const docs = await fetchMasterStockList(page, itemsPerPage, token);
-          for (let eachEntry in docs) {
-            const dateEntry = docs[eachEntry].date;
-            const curDateEntry = new Date(dateEntry);
+        //   const docs = await fetchMasterStockList(page, itemsPerPage, token);
+        //   for (let eachEntry in docs) {
+        //     const dateEntry = docs[eachEntry].date;
+        //     const curDateEntry = new Date(dateEntry);
             
-            const day = curDateEntry.getDate().toString().padStart(2, '0');
-            const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-            const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
-            const formattedDate = `${day}/${month}/${year}`;
+        //     const day = curDateEntry.getDate().toString().padStart(2, '0');
+        //     const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+        //     const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
+        //     const formattedDate = `${day}/${month}/${year}`;
   
-            docs[eachEntry].date = formattedDate;
-            if (docs[eachEntry].is_deleted_flag){
-              deleted_data.push(docs[eachEntry]);
-            }
-            else{
-              data.push(docs[eachEntry]);
-            }
-          }
-          setRows(data);
-        },
+        //     docs[eachEntry].date = formattedDate;
+        //     if (docs[eachEntry].is_deleted_flag){
+        //       deleted_data.push(docs[eachEntry]);
+        //     }
+        //     else{
+        //       data.push(docs[eachEntry]);
+        //     }
+        //   }
+        //   setRows(data);
+        // },
       }
     ],
   };
 
-  // const layout = {
-  //   labelCol: {
-  //     span: 8,
-  //   },
-  //   wrapperCol: {
-  //     span: 16,
-  //   },
-  // };
   const getRowClassName = (record) => {
     return record.is_deleted_flag ? 'striked-row' : '';
   };
+
+  if (isLoading){
+    return <Loading />
+  }
 
   return (
     <div>
@@ -308,7 +357,7 @@ const MasterStock = () => {
       <Table
         rowSelection={rowSelection}
         columns={columns}
-        rowClassName={getRowClassName} 
+        rowClassName={getRowClassName}
         dataSource={rows}
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}

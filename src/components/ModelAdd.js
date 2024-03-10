@@ -1,12 +1,13 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import React from "react";
 import { postMasterStock } from "../api/masterStock.js";
 import moment from 'moment'
-
+import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker } from "antd";
+
 function ModelAdd({handleOk}) {
   const [form] = Form.useForm();
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateMessages = {
     required: "${label} is required!",
@@ -26,6 +27,10 @@ function ModelAdd({handleOk}) {
   const onDateChange = (date, dateString) => {
     console.log(date, dateString);
   };
+  const disabledDate = current => {
+    // Disable dates after the current date
+    return current && current > moment().endOf('day');
+  };
 
   const layout = {
     labelCol: {
@@ -41,6 +46,7 @@ function ModelAdd({handleOk}) {
   const onFinish = async ({ user }) => {
     const token = localStorage.getItem("token");
 
+    setIsLoading(true);
     console.log(user);
     const {
       date,
@@ -53,22 +59,27 @@ function ModelAdd({handleOk}) {
     } = user;
     const backendData = {
       type: "issues",
-      date: moment(user.date).format("YYYY-MM-DD"),
-      category: "category",
+      date: moment(date).format("YYYY-MM-DD"),
+      category: goodsType,
       description,
       weight,
       issuer: issuerName,
       receiver: issueReceive,
       purity,
+      // issue_weight: (weight * purity)  / 91.8
     };
 
     const updated = await postMasterStock(backendData, token);
-    console.log(updated);
+    console.log("Added ",updated);
+    form.resetFields();
+    setIsLoading(false);
     handleOk();
 
-    form.resetFields();
-
   };
+
+  if (isLoading){
+    return <Loading />
+  }
 
   return (
     <Form
@@ -88,9 +99,9 @@ function ModelAdd({handleOk}) {
             required: true,
           },
         ]}
+        initialValue="issue"
       >
         <Select
-          defaultValue={"Issue"}
           onChange={handleChange}
           options={[
             { value: "issue", label: "Issue" },
@@ -107,7 +118,7 @@ function ModelAdd({handleOk}) {
           },
         ]}
       >
-        <DatePicker onChange={onDateChange} />
+        <DatePicker onChange={onDateChange} disabledDate={disabledDate} />
       </Form.Item>
       <Form.Item name={["user", "goodsType"]} label="Goods Type">
         <Input />
@@ -120,12 +131,16 @@ function ModelAdd({handleOk}) {
         label="Weight"
         rules={[{ type: "number", min: 0, required: true }]}
       >
-        <InputNumber />
+        <InputNumber
+        precision={2}
+        step={0.01}
+      />
       </Form.Item>
 
       <Form.Item
         name={["user", "purity"]}
         label="Purity"
+        initialValue="99.5"
         rules={[
           {
             required: true,
@@ -133,7 +148,6 @@ function ModelAdd({handleOk}) {
         ]}
       >
         <Select
-          defaultValue={"99.5"}
           onChange={handleChange}
           options={[
             { value: "99.5", label: "99.5" },
