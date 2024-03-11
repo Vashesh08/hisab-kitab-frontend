@@ -59,7 +59,6 @@ export default function Navbar(checkLoggedIn) {
     { name: 'Sign out', href: '#', click: handleLogout},
     ]
   
-  console.log(navigation)
   return (
     <>
       <div className="min-h-full">

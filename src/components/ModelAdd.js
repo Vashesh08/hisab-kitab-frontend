@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import React from "react";
 import { postMasterStock } from "../api/masterStock.js";
 import moment from 'moment'
@@ -66,7 +66,7 @@ function ModelAdd({handleOk}) {
       issuer: issuerName,
       receiver: issueReceive,
       purity,
-      // issue_weight: (weight * purity)  / 91.8
+      issue_weight: (weight * purity)  / 91.8
     };
 
     const updated = await postMasterStock(backendData, token);
@@ -111,16 +111,16 @@ function ModelAdd({handleOk}) {
       </Form.Item>
       <Form.Item
         name={["user", "date"]}
-        label="Date (DD/MM/YYYY)"
+        label="Date"
         rules={[
           {
             type: "Date",
           },
         ]}
       >
-        <DatePicker onChange={onDateChange} disabledDate={disabledDate} />
+        <DatePicker format="DD MMM, YYYY" onChange={onDateChange} disabledDate={disabledDate} />
       </Form.Item>
-      <Form.Item name={["user", "goodsType"]} label="Goods Type">
+      <Form.Item name={["user", "goodsType"]} label="Category">
         <Input />
       </Form.Item>
       <Form.Item name={["user", "description"]} label="Description">
@@ -128,12 +128,12 @@ function ModelAdd({handleOk}) {
       </Form.Item>
       <Form.Item
         name={["user", "weight"]}
-        label="Weight"
-        rules={[{ type: "number", min: 0, required: true }]}
+        label="Weight (gm)"
+        rules={[{ type: "number", required: true }]}
       >
         <InputNumber
-        precision={2}
-        step={0.01}
+        // precision={4}
+        // step={0.01}
       />
       </Form.Item>
 

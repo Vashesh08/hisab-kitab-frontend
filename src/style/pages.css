@@ -3,9 +3,31 @@
   }
 
 .ant-table-thead .ant-table-cell{
-    background-color: rgb(243 244 246) !important;
+    background-color: #D1D2D2 !important;
 }
 .ant-table-cell{
-  border: solid 0.5px black !important;
-  color: grey ;
+  border: solid 0.5px gray !important;
+  color: black ;
+}
+
+.ant-table-tbody .ant-table-cell{
+  padding: 8px 8px 8px 8px !important;
+}
+
+/* for arrow filter on left */
+.ant-table-selection .ant-table-selection-extra{
+  right: 0%;
+}
+
+/* for arrow filter on left */
+.ant-table-selection .ant-checkbox-wrapper{
+  visibility: hidden;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: darkblue !important;
+}
+
+.ant-checkbox-inner {
+  border-color: darkblue !important;
 }

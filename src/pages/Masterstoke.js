@@ -20,21 +20,23 @@ const MasterStock = () => {
   async function updateRows (dataType){
 
     setIsLoading(true);
-    const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
     // send request to check authenticated
     const data = [];
     const deleted_data = [];
     // console.log("data", data)
 
     const docs = await fetchMasterStockList(page, itemsPerPage, token);
+    console.log(docs);
     for (let eachEntry in docs) {
       const dateEntry = docs[eachEntry].date;
       const curDateEntry = new Date(dateEntry);
       
       const day = curDateEntry.getDate().toString().padStart(2, '0');
-      const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+      // const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+      const month = curDateEntry.toLocaleString('en-US', {month: 'short'})
       const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
-      const formattedDate = `${day}/${month}/${year}`;
+      const formattedDate = `${day}-${month}-${year}`;
 
       docs[eachEntry].date = formattedDate;
       if (docs[eachEntry].is_deleted_flag){
@@ -67,14 +69,16 @@ const MasterStock = () => {
         // console.log("data", data)
 
         const docs = await fetchMasterStockList(page, itemsPerPage, token);
+        // console.log(docs);
         for (let eachEntry in docs) {
           const dateEntry = docs[eachEntry].date;
           const curDateEntry = new Date(dateEntry);
           
           const day = curDateEntry.getDate().toString().padStart(2, '0');
-          const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-          const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
-          const formattedDate = `${day}/${month}/${year}`;
+          // const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+          const month = curDateEntry.toLocaleString('en-US', {month: 'short'})
+          const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year
+          const formattedDate = `${day}-${month}-${year}`;
 
           docs[eachEntry].date = formattedDate;
           if (docs[eachEntry].is_deleted_flag){
@@ -120,19 +124,11 @@ const MasterStock = () => {
       title: "Date",
       dataIndex: "date",
       render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
+        <div style={{ minWidth: '65px', maxWidth: '65px', overflow: 'auto'}}>
           {text}
         </div>
       ),
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
+      width: '7%',
     },
     {
       title: "Category",
@@ -142,76 +138,80 @@ const MasterStock = () => {
           {text}
         </div>
       ),
+      width: '10%',
     },
     {
-      title: "Weight (in grams)",
-      dataIndex: "weight",
+      title: "Description",
+      dataIndex: "description",
       render: text => (
         <div style={{ maxWidth: '200px', overflow: 'auto'}}>
           {text}
         </div>
       ),
+      width: '18%',
+    },
+    {
+      title: "Weight",
+      dataIndex: "weight",
+      render: text => (
+        <div style={{ minWidth: '65px', maxWidth: '65', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '8%',
     },
     {
       title: "Purity",
       dataIndex: "purity",
       render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
+        <div style={{minWidth: '65px', maxWidth: '65',  overflow: 'auto'}}>
           {text}
         </div>
       ),
+      width: '8%',
     },
     {
-      title: "Issue 22k",
-      dataIndex: "issue22k",
-      render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-    },
-    {
-      title: "Receive 22k",
+      title: "Receive Qty",
       dataIndex: "receive22k",
       render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
+        <div style={{minWidth: '100px', maxWidth: '100px', overflow: 'auto'}}>
           {text}
         </div>
       ),
+      width: '10%',
     },
     {
-      title: "Issuer",
+      title: "Issue Qty",
+      dataIndex: "issue22k",
+      render: text => (
+        <div style={{ minWidth: '100px', maxWidth: '100px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+    },
+    {
+      title: "Issuer Name",
       dataIndex: "issuer",
       render: text => (
         <div style={{ maxWidth: '200px', overflow: 'auto'}}>
           {text}
         </div>
       ),
+      width: '10%',
     },
     {
-      title: "Receiver",
+      title: "Receiver Name",
       dataIndex: "receiver",
       render: text => (
         <div style={{ maxWidth: '200px', overflow: 'auto'}}>
           {text}
         </div>
       ),
+      width: '10%',
     },
   ];
 
-  // const rowSelection = {
-  //   onChange: (selectedRowKeys, selectedRows) => {
-  //     console.log(
-  //       `selectedRowKeys: ${selectedRowKeys}`,
-  //       "selectedRows: ",
-  //       selectedRows
-  //     );
-  //   },
-  //   getCheckboxProps: (record) => ({
-  //     disabled: record.name === "Disabled User",
-  //     name: record.name,
-  //   }),
-  // };
   const onSelectChange = (newSelectedRowKeys) => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
@@ -231,97 +231,18 @@ const MasterStock = () => {
         key: 'deleted',
         text: 'Show Only Deleted Entries',
         onSelect: ()=> {updateRows("deleted")},
-        // async (changableRowKeys) => {
-        //   const token = localStorage.getItem("token");
-        //   // send request to check authenticated
-        //   const data = [];
-        //   const deleted_data = [];
-        //   // console.log("data", data)
-  
-        //   const docs = await fetchMasterStockList(page, itemsPerPage, token);
-        //   for (let eachEntry in docs) {
-        //     const dateEntry = docs[eachEntry].date;
-        //     const curDateEntry = new Date(dateEntry);
-            
-        //     const day = curDateEntry.getDate().toString().padStart(2, '0');
-        //     const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-        //     const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
-        //     const formattedDate = `${day}/${month}/${year}`;
-  
-        //     docs[eachEntry].date = formattedDate;
-        //     if (docs[eachEntry].is_deleted_flag){
-        //       deleted_data.push(docs[eachEntry]);
-        //     }
-        //     else{
-        //       data.push(docs[eachEntry]);
-        //     }
-        //   }
-        //   setRows(deleted_data);
-        // },
+        
       },
       {
         key: 'all_entries',
         text: 'Show All Entries',
         onSelect: ()=> {updateRows("all")},
-        // onSelect: async () => {
-        //   const token = localStorage.getItem("token");
-        //   // send request to check authenticated
-        //   const data = [];
-        //   const deleted_data = [];
-        //   // console.log("data", data)
-  
-        //   const docs = await fetchMasterStockList(page, itemsPerPage, token);
-        //   for (let eachEntry in docs) {
-        //     const dateEntry = docs[eachEntry].date;
-        //     const curDateEntry = new Date(dateEntry);
-            
-        //     const day = curDateEntry.getDate().toString().padStart(2, '0');
-        //     const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-        //     const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
-        //     const formattedDate = `${day}/${month}/${year}`;
-  
-        //     docs[eachEntry].date = formattedDate;
-        //     if (docs[eachEntry].is_deleted_flag){
-        //       deleted_data.push(docs[eachEntry]);
-        //     }
-        //     else{
-        //       data.push(docs[eachEntry]);
-        //     }
-        //   }
-        //   setRows(docs);
-        // },
+        
       },
       {
         key: 'valid',
         text: 'Show Valid Entries',
         onSelect: ()=> {updateRows("valid")},
-        // onSelect: async (changableRowKeys) => {
-        //   const token = localStorage.getItem("token");
-        //   // send request to check authenticated
-        //   const data = [];
-        //   const deleted_data = [];
-        //   // console.log("data", data)
-  
-        //   const docs = await fetchMasterStockList(page, itemsPerPage, token);
-        //   for (let eachEntry in docs) {
-        //     const dateEntry = docs[eachEntry].date;
-        //     const curDateEntry = new Date(dateEntry);
-            
-        //     const day = curDateEntry.getDate().toString().padStart(2, '0');
-        //     const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-        //     const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
-        //     const formattedDate = `${day}/${month}/${year}`;
-  
-        //     docs[eachEntry].date = formattedDate;
-        //     if (docs[eachEntry].is_deleted_flag){
-        //       deleted_data.push(docs[eachEntry]);
-        //     }
-        //     else{
-        //       data.push(docs[eachEntry]);
-        //     }
-        //   }
-        //   setRows(data);
-        // },
       }
     ],
   };
@@ -336,7 +257,11 @@ const MasterStock = () => {
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div style={{ fontWeight: "bolder" }}>Master Stock</div>
+      
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+        
+
         <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
           Add Item
         </Button>

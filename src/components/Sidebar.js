@@ -17,50 +17,56 @@ import {
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
  
-export default function Sidebar() {
+export default function Sidebar({changeVisibility}) {
   const [open, setOpen] = React.useState(0);
  
   const handleOpen = (value) => {
     setOpen(open === value ? 0 : value);
+    
+    if (open === value){
+    changeVisibility(false);
+  }
+  else{
+    changeVisibility(true);
+  }
   };
- 
   return (
-    <Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
-      <List>
+    <Card className="bg-gray-800 text-white	h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-gray-800/5">
+      <List className="divide-y divide-solid">
         <Accordion
           open={open === 1}
           icon={
             <ChevronDownIcon
               strokeWidth={2.5}
-              className={`mx-auto h-4 w-4 transition-transform ${open === 1 ? "rotate-180" : ""}`}
+              className={`mx-auto break-all h-4 w-4 transition-transform ${open === 1 ? "rotate-180" : ""}`}
             />
           }
         >
           <ListItem className="p-0" selected={open === 1}>
-            <AccordionHeader onClick={() => handleOpen(1)} className="border-b-0 p-3">
+            <AccordionHeader onClick={() => handleOpen(1)} className="border-b-0 p-3 text-white hover:text-black active:text-black">
               <ListItemPrefix>
                 <BookOpenIcon className="h-5 w-5" />
               </ListItemPrefix>
-              <Typography color="blue-gray" className="mr-auto font-normal">
+              <Typography className="mr-auto font-normal">
                 Attendance Registers
               </Typography>
             </AccordionHeader>
           </ListItem>
           <AccordionBody className="py-1">
             <List className="p-0">
-              <ListItem>
+              <ListItem className="text-white hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
                 Analytics
               </ListItem>
-              <ListItem>
+              <ListItem className="text-white hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
                 Reporting
               </ListItem>
-              <ListItem>
+              <ListItem className="text-white hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
@@ -79,24 +85,24 @@ export default function Sidebar() {
           }
         >
           <ListItem className="p-0" selected={open === 2}>
-            <AccordionHeader onClick={() => handleOpen(2)} className="border-b-0 p-3">
+            <AccordionHeader onClick={() => handleOpen(2)} className="border-b-0 p-3 text-white hover:text-black active:text-black">
               <ListItemPrefix>
                 <BookOpenIcon className="h-5 w-5" />
               </ListItemPrefix>
-              <Typography color="blue-gray" className="mr-auto font-normal">
+              <Typography className="mr-auto font-normal">
                 Books
               </Typography>
             </AccordionHeader>
           </ListItem>
           <AccordionBody className="py-1">
             <List className="p-0">
-              <ListItem>
+              <ListItem className="text-white hover:text-black active:text-black">
                 Master-Stock
               </ListItem>
-              <ListItem>
+              <ListItem className="text-white hover:text-black active:text-black">
                 Melting-Book
               </ListItem>
-              <ListItem>
+              <ListItem className="text-white hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
