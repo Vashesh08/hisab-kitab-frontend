@@ -1,11 +1,11 @@
 import { useState } from "react";
 import React from "react";
-import { postMasterStock } from "../api/masterStock.js";
+import { postMeltingBook } from "../api/meltingBook.js";
 import moment from 'moment'
 import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker } from "antd";
 
-function ModelAdd({handleOk}) {
+function MeltingBookAdd({handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,43 +56,19 @@ function ModelAdd({handleOk}) {
     const {
       date,
       description,
-      goodsType,
-      issueReceive,
-      issuerName,
       purity,
       weight,
     } = user;
 
-    if (issueReceive === "issue"){
-      const backendData = {
-        type: "issues",
-        date: moment(date).format("YYYY-MM-DD"),
-        category: goodsType,
-        description,
-        weight,
-        issuer: issuerName,
-        receiver: issueReceive,
-        purity,
-        issue22k: weight
-      };
-      const updated = await postMasterStock(backendData, token);
-      console.log("Added ",updated);
-    }
-    else{
-      const backendData = {
-        type: "issues",
-        date: moment(date).format("YYYY-MM-DD"),
-        category: goodsType,
-        description,
-        weight,
-        issuer: issuerName,
-        receiver: issueReceive,
-        purity,
-        receive22k: ((weight * purity)  / 91.8).toFixed(3)
-      };
-      const updated = await postMasterStock(backendData, token);
-      console.log("Added ",updated);
-    }
+    const backendData = {
+    date: moment(date).format("YYYY-MM-DD"),
+    description,
+    weight24K: weight,
+    purity: purity,
+    issue22K: ((weight * purity)  / 91.8).toFixed(3),
+    };
+    const updated = await postMeltingBook(backendData, token);
+    console.log("Added ",updated);
 
     form.resetFields();
     setIsLoading(false);
@@ -115,24 +91,6 @@ function ModelAdd({handleOk}) {
       validateMessages={validateMessages}
     >
       <Form.Item
-        name={["user", "issueReceive"]}
-        label="Issue / Receive"
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-        initialValue="issue"
-      >
-        <Select
-          onChange={handleChange}
-          options={[
-            { value: "issue", label: "Issue" },
-            { value: "receive", label: "Receive" },
-          ]}
-        />
-      </Form.Item>
-      <Form.Item
         name={["user", "date"]}
         label="Date"
         rules={[
@@ -143,9 +101,6 @@ function ModelAdd({handleOk}) {
       >
         <DatePicker format="DD MMM, YYYY" onChange={onDateChange} disabledDate={disabledDate} />
       </Form.Item>
-      <Form.Item name={["user", "goodsType"]} label="Category">
-        <Input />
-      </Form.Item>
       <Form.Item name={["user", "description"]} label="Description">
         <Input />
       </Form.Item>
@@ -154,10 +109,7 @@ function ModelAdd({handleOk}) {
         label="Weight (gm)"
         rules={[{ type: "number", required: true }]}
       >
-        <InputNumber
-        // precision={4}
-        // step={0.01}
-      />
+        <InputNumber/>
       </Form.Item>
 
       <Form.Item
@@ -178,12 +130,6 @@ function ModelAdd({handleOk}) {
           ]}
         />
       </Form.Item>
-      <Form.Item name={["user", "issuerName"]} label="Issuer Name">
-        <Input />
-      </Form.Item>
-      <Form.Item name={["user", "receiverName"]} label="Receiver Name">
-        <Input />
-      </Form.Item>
       <Form.Item
         wrapperCol={{
           ...layout.wrapperCol,
@@ -198,4 +144,4 @@ function ModelAdd({handleOk}) {
   );
 }
 
-export default ModelAdd;
+export default MeltingBookAdd;

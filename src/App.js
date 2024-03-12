@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 // import logo from './logo.svg';
 import './App.css';
-import Login from './components/Login';
+import Login from './pages/Login';
 import Dashboard from './components/Dashboard';
 
 function App() {

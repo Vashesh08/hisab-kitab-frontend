@@ -17,18 +17,16 @@ import {
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
  
-export default function Sidebar({changeVisibility}) {
+export default function Sidebar({ changeVisibility }) {
   const [open, setOpen] = React.useState(0);
  
+  const changePage = (value) => {
+    changeVisibility(value);
+  }
+
   const handleOpen = (value) => {
     setOpen(open === value ? 0 : value);
-    
-    if (open === value){
-    changeVisibility(false);
-  }
-  else{
-    changeVisibility(true);
-  }
+    changePage("home")
   };
   return (
     <Card className="bg-gray-800 text-white	h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-gray-800/5">
@@ -96,10 +94,10 @@ export default function Sidebar({changeVisibility}) {
           </ListItem>
           <AccordionBody className="py-1">
             <List className="p-0">
-              <ListItem className="text-white hover:text-black active:text-black">
+              <ListItem onClick={() => changePage("masterstock")} className="text-white hover:text-black active:text-black">
                 Master-Stock
               </ListItem>
-              <ListItem className="text-white hover:text-black active:text-black">
+              <ListItem onClick={() => changePage("meltingbook")} className="text-white hover:text-black active:text-black">
                 Melting-Book
               </ListItem>
               <ListItem className="text-white hover:text-black active:text-black">

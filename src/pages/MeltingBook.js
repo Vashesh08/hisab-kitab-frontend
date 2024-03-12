@@ -6,12 +6,12 @@ import {
   Button,
   Modal,
 } from "antd";
-import { fetchMasterStockList, deleteMasterStockList } from "../api/masterStock.js";
-import  ModelAdd from "../components/ModelAdd.js"
+import { fetchMeltingBookList, deleteMeltingBookList } from "../api/meltingBook.js";
+import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 
-const MasterStock = () => {
+const MeltingBook = () => {
   const [page] = useState(1);
   const [itemsPerPage] = useState(100); // Change this to show all
   const [rows, setRows] = useState([]);
@@ -26,8 +26,8 @@ const MasterStock = () => {
     const deleted_data = [];
     // console.log("data", data)
 
-    const docs = await fetchMasterStockList(page, itemsPerPage, token);
-    console.log(docs);
+    const docs = await fetchMeltingBookList(page, itemsPerPage, token);
+    
     for (let eachEntry in docs) {
       const dateEntry = docs[eachEntry].date;
       const curDateEntry = new Date(dateEntry);
@@ -71,8 +71,8 @@ const MasterStock = () => {
         const deleted_data = [];
         // console.log("data", data)
 
-        const docs = await fetchMasterStockList(page, itemsPerPage, token);
-        console.log(docs);
+        const docs = await fetchMeltingBookList(page, itemsPerPage, token);
+        // console.log("data", docs);
         for (let eachEntry in docs) {
           const dateEntry = docs[eachEntry].date;
           const curDateEntry = new Date(dateEntry);
@@ -110,14 +110,15 @@ const MasterStock = () => {
   const deleteModal = async () => {
     setIsLoading(true);
     const token = localStorage.getItem("token");
-    const masterStockId = {
-      masterstockId: selectedRowKeys
+    const meltingBookId = {
+      _id: selectedRowKeys
     }
-    await deleteMasterStockList(masterStockId, token );
+    console.log(meltingBookId);
+    await deleteMeltingBookList(meltingBookId, token);
 
     updateRows("valid");
-    setIsLoading(false);
     setSelectedRowKeys([]);
+    setIsLoading(false);
   }
   const handleCancel = () => {
     updateRows("valid");
@@ -136,16 +137,6 @@ const MasterStock = () => {
       width: '7%',
     },
     {
-      title: "Category",
-      dataIndex: "category",
-      render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-    },
-    {
       title: "Description",
       dataIndex: "description",
       render: text => (
@@ -153,11 +144,11 @@ const MasterStock = () => {
           {text}
         </div>
       ),
-      width: '18%',
+      width: '38%',
     },
     {
       title: "Weight",
-      dataIndex: "weight",
+      dataIndex: "weight24K",
       render: text => (
         <div style={{ minWidth: '65px', maxWidth: '65', overflow: 'auto', textAlign: 'center'}}>
           {text}
@@ -176,18 +167,8 @@ const MasterStock = () => {
       width: '8%',
     },
     {
-      title: "Receive Qty",
-      dataIndex: "receive22k",
-      render: text => (
-        <div style={{minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-    },
-    {
       title: "Issue Qty",
-      dataIndex: "issue22k",
+      dataIndex: "issue22K",
       render: text => (
         <div style={{ minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
           {text}
@@ -196,20 +177,20 @@ const MasterStock = () => {
       width: '10%',
     },
     {
-      title: "Issuer Name",
-      dataIndex: "issuer",
+      title: "Receive Qty",
+      dataIndex: "receive22K",
       render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
+        <div style={{minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
       width: '10%',
     },
     {
-      title: "Receiver Name",
-      dataIndex: "receiver",
+      title: "Loss Qty",
+      dataIndex: "loss22K",
       render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
+        <div style={{minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
@@ -261,7 +242,7 @@ const MasterStock = () => {
 
   return (
     <div>
-      <div style={{ fontWeight: "bolder" }}>Master Stock</div>
+      <div style={{ fontWeight: "bolder" }}>Melting Book</div>
       
         <div style={{ display: "flex", justifyContent: "space-between" }}>
         
@@ -277,7 +258,7 @@ const MasterStock = () => {
         onCancel={handleCancel}
         footer={null}
       >
-        <ModelAdd
+      <MeltingBookAdd
           handleOk={handleCancel}
           />
       </Modal>
@@ -296,4 +277,4 @@ const MasterStock = () => {
   );
 };
 
-export default MasterStock;
+export default MeltingBook;

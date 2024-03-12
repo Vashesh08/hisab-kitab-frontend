@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import Masterstoke from '../pages/Masterstoke';
 import Sidebar from './Sidebar';
 import Home from '../pages/Home';
-   
-function SideNav() {
-  const [isEnabled, setIsEnabled] = useState(false);
+import MeltingBook from '../pages/MeltingBook';
 
-  function changeEnableValue(value){
-    setIsEnabled(value);
+function SideNav() {
+  const [currentPage, setCurrentPage] = useState('home');
+
+  function handlePageChange(newPage){
+    setCurrentPage(newPage);
   }
 
     return (
@@ -30,14 +31,16 @@ className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-
 
 
 <aside id="sidebar-multi-level-sidebar" className="fixed left-0 z-40 mt-1 w-64 h-screen transition-transform -translate-x-full" aria-label="Sidebar">
-<Sidebar changeVisibility = {changeEnableValue}/>
+<Sidebar changeVisibility = {handlePageChange}/>
 </aside>
 
 
 <div id="sidebar-right" className="p-4">
    <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
-        {isEnabled ?(
+        {currentPage === "masterstock" ?(
           <Masterstoke />
+          ) : currentPage === "meltingbook" ?(
+            <MeltingBook />
           ) : (
             <Home />
           )
