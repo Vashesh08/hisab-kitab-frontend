@@ -48,6 +48,7 @@ function ModelAdd({handleOk}) {
 
     setIsLoading(true);
     console.log(user);
+    
     const {
       date,
       description,
@@ -57,20 +58,38 @@ function ModelAdd({handleOk}) {
       purity,
       weight,
     } = user;
-    const backendData = {
-      type: "issues",
-      date: moment(date).format("YYYY-MM-DD"),
-      category: goodsType,
-      description,
-      weight,
-      issuer: issuerName,
-      receiver: issueReceive,
-      purity,
-      issue_weight: (weight * purity)  / 91.8
-    };
 
-    const updated = await postMasterStock(backendData, token);
-    console.log("Added ",updated);
+    if (issueReceive === "issue"){
+      const backendData = {
+        type: "issues",
+        date: moment(date).format("YYYY-MM-DD"),
+        category: goodsType,
+        description,
+        weight,
+        issuer: issuerName,
+        receiver: issueReceive,
+        purity,
+        issue22k: weight
+      };
+      const updated = await postMasterStock(backendData, token);
+      console.log("Added ",updated);
+    }
+    else{
+      const backendData = {
+        type: "issues",
+        date: moment(date).format("YYYY-MM-DD"),
+        category: goodsType,
+        description,
+        weight,
+        issuer: issuerName,
+        receiver: issueReceive,
+        purity,
+        receive22k: ((weight * purity)  / 91.8).toFixed(3)
+      };
+      const updated = await postMasterStock(backendData, token);
+      console.log("Added ",updated);
+    }
+
     form.resetFields();
     setIsLoading(false);
     handleOk();

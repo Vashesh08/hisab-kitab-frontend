@@ -20,7 +20,7 @@ const MasterStock = () => {
   async function updateRows (dataType){
 
     setIsLoading(true);
-        const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
     // send request to check authenticated
     const data = [];
     const deleted_data = [];
@@ -47,12 +47,15 @@ const MasterStock = () => {
       }
     }
     if (dataType === "all"){
-    setRows(docs);
+      docs.reverse();
+      setRows(docs);
     }
     else if (dataType === "valid"){
+      data.reverse();
       setRows(data);
     }
     else{
+      deleted_data.reverse();
       setRows(deleted_data);
     }
     setIsLoading(false);
@@ -69,7 +72,7 @@ const MasterStock = () => {
         // console.log("data", data)
 
         const docs = await fetchMasterStockList(page, itemsPerPage, token);
-        // console.log(docs);
+        console.log(docs);
         for (let eachEntry in docs) {
           const dateEntry = docs[eachEntry].date;
           const curDateEntry = new Date(dateEntry);
@@ -88,6 +91,7 @@ const MasterStock = () => {
             data.push(docs[eachEntry]);
           }
         }
+        data.reverse();
         setRows(data);
         setIsLoading(false);
     })();
@@ -115,8 +119,8 @@ const MasterStock = () => {
     setIsLoading(false);
   }
   const handleCancel = () => {
-    setIsModalOpen(false);
     updateRows("valid");
+    setIsModalOpen(false);
   };
 
   const columns = [
@@ -154,7 +158,7 @@ const MasterStock = () => {
       title: "Weight",
       dataIndex: "weight",
       render: text => (
-        <div style={{ minWidth: '65px', maxWidth: '65', overflow: 'auto'}}>
+        <div style={{ minWidth: '65px', maxWidth: '65', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
@@ -164,7 +168,7 @@ const MasterStock = () => {
       title: "Purity",
       dataIndex: "purity",
       render: text => (
-        <div style={{minWidth: '65px', maxWidth: '65',  overflow: 'auto'}}>
+        <div style={{minWidth: '65px', maxWidth: '65',  overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
@@ -174,7 +178,7 @@ const MasterStock = () => {
       title: "Receive Qty",
       dataIndex: "receive22k",
       render: text => (
-        <div style={{minWidth: '100px', maxWidth: '100px', overflow: 'auto'}}>
+        <div style={{minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
@@ -184,7 +188,7 @@ const MasterStock = () => {
       title: "Issue Qty",
       dataIndex: "issue22k",
       render: text => (
-        <div style={{ minWidth: '100px', maxWidth: '100px', overflow: 'auto'}}>
+        <div style={{ minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
