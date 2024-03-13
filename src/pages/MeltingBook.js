@@ -10,13 +10,15 @@ import { fetchMeltingBookList, deleteMeltingBookList } from "../api/meltingBook.
 import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
+import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
 
 const MeltingBook = () => {
   const [page] = useState(1);
   const [itemsPerPage] = useState(100); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [updateData, setUpdateData] = useState([]);
+
   async function updateRows (dataType){
 
     setIsLoading(true);
@@ -102,9 +104,16 @@ const MeltingBook = () => {
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
+  };
+
+  const showAddPopup = (text) => {
+    console.log(text);
+    setIsEditModalOpen(true);
+    setUpdateData(text)
   };
 
   const deleteModal = async () => {
@@ -123,6 +132,8 @@ const MeltingBook = () => {
   const handleCancel = () => {
     updateRows("valid");
     setIsModalOpen(false);
+    setIsEditModalOpen(false);
+    setUpdateData([]);
   };
 
   const columns = [
@@ -178,7 +189,7 @@ const MeltingBook = () => {
     },
     {
       title: "Receive Qty",
-      dataIndex: "receive22K",
+      dataIndex: "receive22k",
       render: text => (
         <div style={{minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
           {text}
@@ -196,6 +207,23 @@ const MeltingBook = () => {
       ),
       width: '10%',
     },
+    {
+      title: "Action",
+      key: "action",
+      width: 200,
+      
+      render: (text, record, index) => (
+        <>
+          {text.is_receiver_updated ? (
+          <div></div>
+        ) : (
+          <Button onClick={() => showAddPopup(text)}>
+          Add Receive Qty
+          </Button>
+        )}
+        </>
+      )
+    }
   ];
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -260,6 +288,18 @@ const MeltingBook = () => {
       >
       <MeltingBookAdd
           handleOk={handleCancel}
+          />
+      </Modal>
+
+      <Modal
+        title="Add Receive Quantity"
+        open={isEditModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+      >
+      <MeltingBookUpdate
+          handleOk={handleCancel}
+          textData={updateData}
           />
       </Modal>
 

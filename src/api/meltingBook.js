@@ -74,3 +74,23 @@ export async function postMeltingBook(meltingBook, token) {
     const body = await res.json();
     return body;
 }
+
+export async function updateMeltingBook(meltingBook, token){
+    // send request to check authenticated
+    const formData = await convertObjectToFormData(meltingBook);
+
+    const res = await fetch(`${config.API_URL}/admin/update/meltingBook`, {
+    method: 'PATCH',
+    headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json, text/plain, */*'
+    },
+    body:formData
+    });
+    console.log(res);
+    if ( res.status !== 200) {
+        throw Error('Failed to update');
+    }
+    const body = await res.json();
+    return body;
+}
