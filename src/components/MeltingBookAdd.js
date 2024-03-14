@@ -64,7 +64,7 @@ function MeltingBookAdd({handleOk}) {
     description,
     weight24K: weight,
     purity: purity,
-    issue22K: ((weight * purity)  / 91.8).toFixed(3),
+    issue22k: ((weight * purity)  / 91.8).toFixed(3),
     };
     const updated = await postMeltingBook(backendData, token);
     console.log("Added ",updated);
