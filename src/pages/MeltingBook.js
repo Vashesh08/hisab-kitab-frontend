@@ -159,7 +159,7 @@ const MeltingBook = () => {
     },
     {
       title: "Weight",
-      dataIndex: "weight24K",
+      dataIndex: "weight24k",
       render: text => (
         <div style={{ minWidth: '65px', maxWidth: '65', overflow: 'auto', textAlign: 'center'}}>
           {text}
@@ -179,7 +179,7 @@ const MeltingBook = () => {
     },
     {
       title: "Issue Qty",
-      dataIndex: "issue22K",
+      dataIndex: "issue22k",
       render: text => (
         <div style={{ minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
           {text}
@@ -199,7 +199,7 @@ const MeltingBook = () => {
     },
     {
       title: "Loss Qty",
-      dataIndex: "loss22K",
+      dataIndex: "loss22k",
       render: text => (
         <div style={{minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
           {text}

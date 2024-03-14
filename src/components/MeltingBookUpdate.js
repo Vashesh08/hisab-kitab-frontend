@@ -44,7 +44,7 @@ function MeltingBookUpdate({handleOk, textData}) {
         const backendData = {
         _id: textData._id,
         receive22k: String(recv_weight),
-        loss22K: (textData.issue22K - recv_weight).toFixed(3)
+        loss22k: (textData.issue22k - recv_weight).toFixed(3)
         };
         console.log("Vashesh", backendData);
         const updated = await updateMeltingBook(backendData, token);
