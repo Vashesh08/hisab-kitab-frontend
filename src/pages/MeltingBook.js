@@ -13,6 +13,7 @@ import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
 import { EditTwoTone } from "@ant-design/icons";
 import { Space } from 'antd';
+import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
 
 const MeltingBook = () => {
   const [page] = useState(1);
@@ -274,15 +275,17 @@ const MeltingBook = () => {
 
   return (
     <div>
-      <div style={{ fontWeight: "bolder" }}>Melting Book</div>
       
         <div style={{ display: "flex", justifyContent: "space-between" }}>
         
 
-        <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
+        <PlusCircleOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={showModal} />
+        {/* <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
           Add Item
-        </Button>
-        <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button>
+        </Button> */}
+        <div style={{ fontSize: '175%', fontWeight: "bolder" }}>Melting Book</div>
+        <DeleteOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={deleteModal} />
+        {/* <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button> */}
       </div>
       <Modal
         title="Add Item"

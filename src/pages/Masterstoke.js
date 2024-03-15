@@ -10,6 +10,7 @@ import { fetchMasterStockList, deleteMasterStockList } from "../api/masterStock.
 import  ModelAdd from "../components/ModelAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
+import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
 
 const MasterStock = () => {
   const [page] = useState(1);
@@ -261,15 +262,17 @@ const MasterStock = () => {
 
   return (
     <div>
-      <div style={{ fontWeight: "bolder" }}>Master Stock</div>
       
         <div style={{ display: "flex", justifyContent: "space-between" }}>
         
 
-        <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
+        {/* <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
           Add Item
-        </Button>
-        <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button>
+        </Button> */}
+        <PlusCircleOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={showModal} />
+        <div style={{ fontSize: '175%', fontWeight: "bolder" }}>Master Stock</div>
+        <DeleteOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={deleteModal} />
+        {/* <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button> */}
       </div>
       <Modal
         title="Add Item"
