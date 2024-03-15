@@ -11,6 +11,8 @@ import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
+import { EditTwoTone } from "@ant-design/icons";
+import { Space } from 'antd';
 
 const MeltingBook = () => {
   const [page] = useState(1);
@@ -217,9 +219,11 @@ const MeltingBook = () => {
           {text.is_receiver_updated ? (
           <div></div>
         ) : (
-          <Button onClick={() => showAddPopup(text)}>
-          Add Receive Qty
-          </Button>
+          <div style={{ textAlign:"center"}}>
+          <Space style={{ fontSize: '150%'}} >
+            <EditTwoTone onClick={() => showAddPopup(text)}/>
+          </Space>
+          </div>
         )}
         </>
       )
