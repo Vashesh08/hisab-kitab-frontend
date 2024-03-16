@@ -265,7 +265,7 @@ const MeltingBook = () => {
   };
 
   const getRowClassName = (record, i) => {
-    console.log(i, record, record.userId)
+    // console.log(i, record, record._id)
     return record.is_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
   };
 
