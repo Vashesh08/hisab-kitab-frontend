@@ -197,20 +197,20 @@ const MasterStock = () => {
       width: '10%',
     },
     {
-      title: "Issuer Name",
+      title: "Issuer",
       dataIndex: "issuer",
       render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
+        <div style={{ minWidth: '100px', maxWidth: '200px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
     },
     {
-      title: "Receiver Name",
+      title: "Receiver",
       dataIndex: "receiver",
       render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
+        <div style={{ minWidth: '100px', maxWidth: '200px', overflow: 'auto'}}>
           {text}
         </div>
       ),
@@ -252,8 +252,8 @@ const MasterStock = () => {
     ],
   };
 
-  const getRowClassName = (record) => {
-    return record.is_deleted_flag ? 'striked-row' : '';
+  const getRowClassName = (record, i) => {
+    return record.is_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
   };
 
   if (isLoading){
@@ -269,9 +269,9 @@ const MasterStock = () => {
         {/* <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
           Add Item
         </Button> */}
-        <PlusCircleOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={showModal} />
+        <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={showModal} />
         <div style={{ fontSize: '175%', fontWeight: "bolder" }}>Master Stock</div>
-        <DeleteOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={deleteModal} />
+        <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={deleteModal} />
         {/* <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button> */}
       </div>
       <Modal

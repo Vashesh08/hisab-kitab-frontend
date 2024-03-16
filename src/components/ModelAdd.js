@@ -152,7 +152,7 @@ function ModelAdd({handleOk}) {
       <Form.Item
         name={["user", "weight"]}
         label="Weight (gm)"
-        rules={[{ type: "number", required: true }]}
+        rules={[{ type: "number", min: 0, required: true }]}
       >
         <InputNumber
         // precision={4}

@@ -11,9 +11,8 @@ import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
-import { EditTwoTone } from "@ant-design/icons";
 import { Space } from 'antd';
-import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
 
 const MeltingBook = () => {
   const [page] = useState(1);
@@ -217,12 +216,12 @@ const MeltingBook = () => {
       
       render: (text, record, index) => (
         <>
-          {text.is_receiver_updated ? (
+          {text.is_receiver_updated || text.is_deleted_flag ? (
           <div></div>
         ) : (
           <div style={{ textAlign:"center"}}>
-          <Space style={{ fontSize: '150%'}} >
-            <EditTwoTone onClick={() => showAddPopup(text)}/>
+          <Space>
+            <EditOutlined style={{ color:"#1f2937", fontSize: '175%'}} onClick={() => showAddPopup(text)}/>
           </Space>
           </div>
         )}
@@ -265,8 +264,9 @@ const MeltingBook = () => {
     ],
   };
 
-  const getRowClassName = (record) => {
-    return record.is_deleted_flag ? 'striked-row' : '';
+  const getRowClassName = (record, i) => {
+    console.log(i, record, record.userId)
+    return record.is_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
   };
 
   if (isLoading){
@@ -279,12 +279,12 @@ const MeltingBook = () => {
         <div style={{ display: "flex", justifyContent: "space-between" }}>
         
 
-        <PlusCircleOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={showModal} />
+        <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={showModal} />
         {/* <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
           Add Item
         </Button> */}
         <div style={{ fontSize: '175%', fontWeight: "bolder" }}>Melting Book</div>
-        <DeleteOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={deleteModal} />
+        <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={deleteModal} />
         {/* <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button> */}
       </div>
       <Modal

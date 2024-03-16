@@ -106,7 +106,7 @@ function MeltingBookAdd({handleOk}) {
       <Form.Item
         name={["user", "weight"]}
         label="Weight (gm)"
-        rules={[{ type: "number", required: true }]}
+        rules={[{ type: "number", min: 0, required: true }]}
       >
         <InputNumber/>
       </Form.Item>

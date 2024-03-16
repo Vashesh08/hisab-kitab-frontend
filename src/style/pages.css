@@ -3,11 +3,18 @@
   }
 
 .ant-table-thead .ant-table-cell{
-    background-color: #D1D2D2 !important;
+    background-color: #394b65 !important;
+    font-size: 120%;
+    color: white !important;
 }
 .ant-table-cell{
-  border: solid 0.5px gray !important;
+  background-color: transparent !important;
+  border: solid 0.5px white !important;
   color: black ;
+}
+
+.ant-table-selection-column {
+  border-left: solid  0.5px white  !important;
 }
 
 .ant-table-tbody .ant-table-cell{
@@ -30,4 +37,32 @@
 
 .ant-checkbox-inner {
   border-color: darkblue !important;
+}
+
+.anticon-down{
+  color: white !important;
+}
+
+/* for table head border */
+th.ant-table-cell::before {
+  background-color: transparent !important;
+}
+
+.odd {
+  /* background-color: #d7ecff; */
+  /* background: color(var(--midnight-5) alpha(50%)); */
+  background-color: #e4e7eb;
+}
+
+.even {
+  background-color: #eff1f3;
+  /* background-color: #b3c4c7; */
+}
+
+.delete {
+  background-color: #ff5c5c;
+}
+
+.ant-table-row-selected{
+  background-color: #d7ecff;
 }
