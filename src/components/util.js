@@ -19,14 +19,14 @@ export const fetchProtectedData = async (setUserData, setError, navigate) => {
     }
 
     if (response.status_code !== 200) {
-        console.log("Error Status code", response.status_code);
+        // console.log("Error Status code", response.status_code);
         navigate('/');
     }
 
     // Parse the JSON response
     // const data = response.data;
   } catch (error) {
-    console.error('Error fetching data:', error.message);
+    // console.error('Error fetching data:', error.message);
     navigate("/");
   }
 };

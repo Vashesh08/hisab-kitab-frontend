@@ -34,10 +34,10 @@ export async function fetchMeltingBookList(page, itemsPerPage, token) {
 }
 
 export async function deleteMeltingBookList(meltingBookId, token) {
-    console.log(meltingBookId);
+    // console.log(meltingBookId);
     const formData = await convertObjectToFormData(meltingBookId); // TODO 
     // Var name to be changed later
-    console.log("vas",formData);
+    // console.log("vas",formData);
 
     const response = await fetch(`${config.API_URL}/admin/meltingBookDelete`, {
         method: 'POST',
@@ -67,7 +67,7 @@ export async function postMeltingBook(meltingBook, token) {
       },
       body:formData
     });
-    console.log(res);
+    // console.log(res);
     if ( res.status !== 200) {
         throw Error('Failed to update');
     }
@@ -87,7 +87,7 @@ export async function updateMeltingBook(meltingBook, token){
     },
     body:formData
     });
-    console.log(res);
+    // console.log(res);
     if ( res.status !== 200) {
         throw Error('Failed to update');
     }

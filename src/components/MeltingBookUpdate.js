@@ -35,20 +35,20 @@ function MeltingBookUpdate({handleOk, textData}) {
         const token = localStorage.getItem("token");
     
         setIsLoading(true);
-        console.log(user);
+        // console.log(user);
         
         const {
           recv_weight,
         } = user;
-        console.log(recv_weight);
+        // console.log(recv_weight);
         const backendData = {
         _id: textData._id,
         receive22k: String(recv_weight),
         loss22k: (textData.issue22k - recv_weight).toFixed(3)
         };
-        console.log("Vashesh", backendData);
+        // console.log("Vashesh", backendData);
         const updated = await updateMeltingBook(backendData, token);
-        console.log("Added ",updated);
+        // console.log("Added ",updated);
     
         form.resetFields();
         setIsLoading(false);

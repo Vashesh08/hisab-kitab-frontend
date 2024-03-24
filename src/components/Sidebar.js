@@ -29,7 +29,7 @@ export default function Sidebar({ changeVisibility }) {
     changePage("home")
   };
   return (
-    <Card className="bg-gray-800 text-white	h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-gray-800/5">
+    <Card className="rounded-none	bg-gray-800 text-white	h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-gray-800/5">
       <List className="divide-y divide-solid">
         <Accordion
           open={open === 1}

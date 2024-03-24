@@ -31,7 +31,7 @@ export default function Navbar(checkLoggedIn) {
     // navigation[navigation_path]['current'] = true;
     // const navigate = useNavigate();
     const handleLogout = () => {
-        console.log("logging out")
+        // console.log("logging out")
         // Clear the token from localStorage
         localStorage.removeItem('token');
 
@@ -43,14 +43,14 @@ export default function Navbar(checkLoggedIn) {
       };  
 
     const handleIndex = (index) => {
-      console.log("index", index);
+      // console.log("index", index);
       if (typeof index === 'number' && !isNaN(index) && (index >= 0) && (index < navigation.length)){
-      console.log("path", index);
+      // console.log("path", index);
       for (let i = 0; i < navigation.length; i++) {
-        console.log(i, "Er", navigation[i])
+        // console.log(i, "Er", navigation[i])
         navigation[i].current = false; 
       }
-      console.log(index, "Vash", navigation);
+      // console.log(index, "Vash", navigation);
       navigation[index].current = true;
     }
     }
@@ -66,10 +66,10 @@ export default function Navbar(checkLoggedIn) {
           {({ open }) => (
             <>
               <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8 ml-0">
-                <div className="flex h-16 items-center justify-between">
+                <div className="flex ml-9 h-16 items-center justify-between">
                   
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 left-0 text-white">
+                    <div className="flex-shrink-0 text-white">
                     RK JEWELLERS
                     </div>
                     <div className="hidden md:block">

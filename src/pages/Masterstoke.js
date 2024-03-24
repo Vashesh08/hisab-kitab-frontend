@@ -130,7 +130,7 @@ const MasterStock = () => {
       title: "Date",
       dataIndex: "date",
       render: text => (
-        <div style={{ minWidth: '65px', maxWidth: '65px', overflow: 'auto'}}>
+        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
           {text}
         </div>
       ),
@@ -180,7 +180,7 @@ const MasterStock = () => {
       title: "Receive Qty",
       dataIndex: "receive22k",
       render: text => (
-        <div style={{minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
@@ -218,8 +218,23 @@ const MasterStock = () => {
     },
   ];
 
+  const SelectNone = () => {
+    setSelectedRowKeys();
+  }
+
+  const SelectAll = () => {
+    const array = [];
+
+    rows.forEach( function(number){
+      if (number.is_deleted_flag === false){
+        array.push(number._id);
+      }
+    }
+    )
+    setSelectedRowKeys(array);
+  }
+
   const onSelectChange = (newSelectedRowKeys) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
@@ -230,23 +245,31 @@ const MasterStock = () => {
       disabled: record.is_deleted_flag === true,
     }),
     selections: [
-      Table.SELECTION_ALL,
-      Table.SELECTION_NONE,
+      {
+        key: 'all',
+        text: 'Select All',
+        onSelect: () => {SelectAll()},
+        hideSelectionColumn: true,
+      },
+      {
+        key: 'none',
+        text: 'Unselect All',
+        onSelect: () => {SelectNone()},
+      },
       {
         key: 'deleted',
-        text: 'Show Only Deleted Entries',
+        text: 'Show Deleted',
         onSelect: ()=> {updateRows("deleted")},
-        
       },
       {
         key: 'all_entries',
-        text: 'Show All Entries',
+        text: 'Show All',
         onSelect: ()=> {updateRows("all")},
         
       },
       {
         key: 'valid',
-        text: 'Show Valid Entries',
+        text: 'Show Valid',
         onSelect: ()=> {updateRows("valid")},
       }
     ],

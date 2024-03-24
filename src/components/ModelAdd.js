@@ -8,6 +8,7 @@ import { Button, Form, Input, InputNumber, Select, DatePicker } from "antd";
 function ModelAdd({handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
+  const [transactionType, setTransactionType] = useState("issue");
 
   const validateMessages = {
     // eslint-disable-next-line
@@ -25,11 +26,16 @@ function ModelAdd({handleOk}) {
   };
 
   const handleChange = (value) => {
-    console.log(`selected ${value}`);
+    // console.log(`selected ${value}`);
   };
 
+  const handleTransactionType = (value) => {
+    // console.log(`selected transaction type ${value}`);
+    setTransactionType(value);
+  }
+
   const onDateChange = (date, dateString) => {
-    console.log(date, dateString);
+    // console.log(date, dateString);
   };
   const disabledDate = current => {
     // Disable dates after the current date
@@ -51,7 +57,7 @@ function ModelAdd({handleOk}) {
     const token = localStorage.getItem("token");
 
     setIsLoading(true);
-    console.log(user);
+    // console.log(user);
     
     const {
       date,
@@ -59,6 +65,7 @@ function ModelAdd({handleOk}) {
       goodsType,
       issueReceive,
       issuerName,
+      receiverName,
       purity,
       weight,
     } = user;
@@ -71,12 +78,11 @@ function ModelAdd({handleOk}) {
         description,
         weight,
         issuer: issuerName,
-        receiver: issueReceive,
-        purity,
+        receiver: receiverName,
         issue22k: weight
       };
       const updated = await postMasterStock(backendData, token);
-      console.log("Added ",updated);
+      // console.log("Added ",updated);
     }
     else{
       const backendData = {
@@ -91,7 +97,7 @@ function ModelAdd({handleOk}) {
         receive22k: ((weight * purity)  / 91.8).toFixed(3)
       };
       const updated = await postMasterStock(backendData, token);
-      console.log("Added ",updated);
+      // console.log("Added ",updated);
     }
 
     form.resetFields();
@@ -125,7 +131,7 @@ function ModelAdd({handleOk}) {
         initialValue="issue"
       >
         <Select
-          onChange={handleChange}
+          onChange={handleTransactionType}
           options={[
             { value: "issue", label: "Issue" },
             { value: "receive", label: "Receive" },
@@ -160,6 +166,7 @@ function ModelAdd({handleOk}) {
       />
       </Form.Item>
 
+        { transactionType === "receive" ? (
       <Form.Item
         name={["user", "purity"]}
         label="Purity"
@@ -175,9 +182,14 @@ function ModelAdd({handleOk}) {
           options={[
             { value: "99.5", label: "99.5" },
             { value: "100", label: "100" },
+            { value: "91.80", label: "91.80" },
           ]}
         />
       </Form.Item>
+        ):(
+          <div></div>
+        )
+        }
       <Form.Item name={["user", "issuerName"]} label="Issuer Name">
         <Input />
       </Form.Item>

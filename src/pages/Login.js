@@ -10,7 +10,7 @@ function Login(checkLoggedIn) {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin =  async (e) => {
-      console.log("Login Component Called");
+      // console.log("Login Component Called");
       e.preventDefault();
 
       try {
@@ -20,7 +20,7 @@ function Login(checkLoggedIn) {
           "username": username,
           "password": password,
         });
-        console.log(response);
+        // console.log(response);
 
         if ('token' in response) {
             console.log("invalid login");
@@ -31,11 +31,11 @@ function Login(checkLoggedIn) {
 
         // Store the token in localStorage or a secure storage method
         localStorage.setItem('token', response.data.token);
-        console.log("tok", token, localStorage.getItem('token'));
+        // console.log("tok", token, localStorage.getItem('token'));
         // Redirect the user to the dashboard
-        console.log("go to dashboard");
+        // console.log("go to dashboard");
         // navigate('/dashboard');
-        console.log(checkLoggedIn)
+        // console.log(checkLoggedIn)
         checkLoggedIn.checkLoggedIn();
       } catch (error) {
         // Handle authentication failure-[]

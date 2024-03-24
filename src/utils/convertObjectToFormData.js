@@ -6,7 +6,7 @@ export default function convertObjectToFormData(data) {
     let formData = new FormData();
     
     for (let key in data) {
-        console.log(data, key)
+        // console.log(data, key)
         if (Array.isArray(data[key])) {
             data[key].forEach(item => {
                 if (!!item) {

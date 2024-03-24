@@ -34,9 +34,9 @@ export async function fetchMasterStockList(page, itemsPerPage, token) {
 }
 
 export async function deleteMasterStockList(masterStockId, token) {
-    console.log(masterStockId);
+    // console.log(masterStockId);
     const formData = await convertObjectToFormData(masterStockId);
-    console.log(formData);
+    // console.log(formData);
 
     const response = await fetch(`${config.API_URL}/admin/masterStockDelete`, {
         method: 'POST',

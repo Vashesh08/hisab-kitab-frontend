@@ -24,11 +24,11 @@ function MeltingBookAdd({handleOk}) {
   };
 
   const handleChange = (value) => {
-    console.log(`selected ${value}`);
+    // console.log(`selected ${value}`);
   };
 
   const onDateChange = (date, dateString) => {
-    console.log(date, dateString);
+    // console.log(date, dateString);
   };
   const disabledDate = current => {
     // Disable dates after the current date
@@ -50,7 +50,7 @@ function MeltingBookAdd({handleOk}) {
     const token = localStorage.getItem("token");
 
     setIsLoading(true);
-    console.log(user);
+    // console.log(user);
     
     const {
       date,
@@ -67,7 +67,7 @@ function MeltingBookAdd({handleOk}) {
     issue22k: ((weight * purity)  / 91.8).toFixed(3),
     };
     const updated = await postMeltingBook(backendData, token);
-    console.log("Added ",updated);
+    // console.log("Added ",updated);
 
     form.resetFields();
     setIsLoading(false);
@@ -126,6 +126,7 @@ function MeltingBookAdd({handleOk}) {
           options={[
             { value: "99.5", label: "99.5" },
             { value: "100", label: "100" },
+            { value: "91.80", label: "91.80" },
           ]}
         />
       </Form.Item>
