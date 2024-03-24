@@ -27,7 +27,7 @@ function Login(checkLoggedIn) {
         }
 
         // Assuming your backend sends a token upon successful authentication
-        const token = response.data.token;
+        // const token = response.data.token;
 
         // Store the token in localStorage or a secure storage method
         localStorage.setItem('token', response.data.token);

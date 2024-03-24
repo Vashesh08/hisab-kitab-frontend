@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import {
   Divider,
   Table,
-  Button,
+  // Button,
   Modal,
 } from "antd";
 import { fetchMeltingBookList, deleteMeltingBookList } from "../api/meltingBook.js";
@@ -21,6 +21,19 @@ const MeltingBook = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [updateData, setUpdateData] = useState([]);
 
+  const getFormattedDate = (date) => {
+    const dateEntry = date;
+    const curDateEntry = new Date(dateEntry);
+    
+    const day = curDateEntry.getDate().toString().padStart(2, '0');
+    // const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+    const month = curDateEntry.toLocaleString('en-US', {month: 'short'})
+    const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
+    const formattedDate = `${day}-${month}-${year}`;
+
+    return formattedDate
+  }
+
   async function updateRows (dataType){
 
     setIsLoading(true);
@@ -33,16 +46,6 @@ const MeltingBook = () => {
     const docs = await fetchMeltingBookList(page, itemsPerPage, token);
     
     for (let eachEntry in docs) {
-      const dateEntry = docs[eachEntry].date;
-      const curDateEntry = new Date(dateEntry);
-      
-      const day = curDateEntry.getDate().toString().padStart(2, '0');
-      // const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-      const month = curDateEntry.toLocaleString('en-US', {month: 'short'})
-      const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
-      const formattedDate = `${day}-${month}-${year}`;
-
-      docs[eachEntry].date = formattedDate;
       if (docs[eachEntry].is_deleted_flag){
         deleted_data.push(docs[eachEntry]);
       }
@@ -78,16 +81,6 @@ const MeltingBook = () => {
         const docs = await fetchMeltingBookList(page, itemsPerPage, token);
         // console.log("data", docs);
         for (let eachEntry in docs) {
-          const dateEntry = docs[eachEntry].date;
-          const curDateEntry = new Date(dateEntry);
-          
-          const day = curDateEntry.getDate().toString().padStart(2, '0');
-          // const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-          const month = curDateEntry.toLocaleString('en-US', {month: 'short'})
-          const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year
-          const formattedDate = `${day}-${month}-${year}`;
-
-          docs[eachEntry].date = formattedDate;
           if (docs[eachEntry].is_deleted_flag){
             deleted_data.push(docs[eachEntry]);
           }
@@ -144,9 +137,10 @@ const MeltingBook = () => {
       dataIndex: "date",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
-          {text}
+          {getFormattedDate(text)}
         </div>
       ),
+      sorter: (a, b) => new Date(a.date) - new Date(b.date),
       width: '7%',
     },
     {

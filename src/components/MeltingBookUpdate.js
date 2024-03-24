@@ -47,7 +47,8 @@ function MeltingBookUpdate({handleOk, textData}) {
         loss22k: (textData.issue22k - recv_weight).toFixed(3)
         };
         // console.log("Vashesh", backendData);
-        const updated = await updateMeltingBook(backendData, token);
+        await updateMeltingBook(backendData, token);
+        // const updated = await updateMeltingBook(backendData, token);
         // console.log("Added ",updated);
     
         form.resetFields();

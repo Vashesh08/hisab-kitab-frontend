@@ -67,6 +67,22 @@ th.ant-table-cell::before {
   background-color: #d7ecff;
 }
 
+.ant-table-wrapper .ant-table-column-sorter-up{
+  color: white;
+}
+.ant-table-wrapper .ant-table-column-sorter-up.active{
+  color: aqua;
+}
+
+
+.ant-table-wrapper .ant-table-column-sorter-down{
+  color: white;
+}
+.ant-table-wrapper .ant-table-column-sorter-down.active{
+  color: aqua;
+}
+
+
 /* TO GIVE BORDERS */
 /* .ant-table-row-selected >:first-child{
   border-left: solid 1.5px #0084f7 !important;

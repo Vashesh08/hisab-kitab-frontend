@@ -81,7 +81,8 @@ function ModelAdd({handleOk}) {
         receiver: receiverName,
         issue22k: weight
       };
-      const updated = await postMasterStock(backendData, token);
+      await postMasterStock(backendData, token);
+      // const updated = await postMasterStock(backendData, token);
       // console.log("Added ",updated);
     }
     else{
@@ -96,7 +97,8 @@ function ModelAdd({handleOk}) {
         purity,
         receive22k: ((weight * purity)  / 91.8).toFixed(3)
       };
-      const updated = await postMasterStock(backendData, token);
+      await postMasterStock(backendData, token);
+      // const updated = await postMasterStock(backendData, token);
       // console.log("Added ",updated);
     }
 

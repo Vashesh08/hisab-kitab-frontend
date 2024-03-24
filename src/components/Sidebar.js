@@ -30,7 +30,9 @@ export default function Sidebar({ changeVisibility }) {
   };
   return (
     <Card className="rounded-none	bg-gray-800 text-white	h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-gray-800/5">
-      <List className="divide-y divide-solid">
+      <List 
+      // className="divide-y divide-solid"
+      >
         <Accordion
           open={open === 1}
           icon={
@@ -46,7 +48,7 @@ export default function Sidebar({ changeVisibility }) {
                 <BookOpenIcon className="h-5 w-5" />
               </ListItemPrefix>
               <Typography className="mr-auto font-normal">
-                Attendance Registers
+                Utilites
               </Typography>
             </AccordionHeader>
           </ListItem>

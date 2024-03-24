@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import {
   Divider,
   Table,
-  Button,
+  // Button,
   Modal,
 } from "antd";
 import { fetchMasterStockList, deleteMasterStockList } from "../api/masterStock.js";
@@ -17,6 +17,19 @@ const MasterStock = () => {
   const [itemsPerPage] = useState(100); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const getFormattedDate = (date) => {
+    const dateEntry = date;
+    const curDateEntry = new Date(dateEntry);
+    
+    const day = curDateEntry.getDate().toString().padStart(2, '0');
+    // const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+    const month = curDateEntry.toLocaleString('en-US', {month: 'short'})
+    const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
+    const formattedDate = `${day}-${month}-${year}`;
+
+    return formattedDate
+  }
   
   async function updateRows (dataType){
 
@@ -28,18 +41,8 @@ const MasterStock = () => {
     // console.log("data", data)
 
     const docs = await fetchMasterStockList(page, itemsPerPage, token);
-    console.log(docs);
+    // console.log(docs);
     for (let eachEntry in docs) {
-      const dateEntry = docs[eachEntry].date;
-      const curDateEntry = new Date(dateEntry);
-      
-      const day = curDateEntry.getDate().toString().padStart(2, '0');
-      // const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-      const month = curDateEntry.toLocaleString('en-US', {month: 'short'})
-      const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
-      const formattedDate = `${day}-${month}-${year}`;
-
-      docs[eachEntry].date = formattedDate;
       if (docs[eachEntry].is_deleted_flag){
         deleted_data.push(docs[eachEntry]);
       }
@@ -73,18 +76,8 @@ const MasterStock = () => {
         // console.log("data", data)
 
         const docs = await fetchMasterStockList(page, itemsPerPage, token);
-        console.log(docs);
+        // console.log(docs);
         for (let eachEntry in docs) {
-          const dateEntry = docs[eachEntry].date;
-          const curDateEntry = new Date(dateEntry);
-          
-          const day = curDateEntry.getDate().toString().padStart(2, '0');
-          // const month = (curDateEntry.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-          const month = curDateEntry.toLocaleString('en-US', {month: 'short'})
-          const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year
-          const formattedDate = `${day}-${month}-${year}`;
-
-          docs[eachEntry].date = formattedDate;
           if (docs[eachEntry].is_deleted_flag){
             deleted_data.push(docs[eachEntry]);
           }
@@ -131,9 +124,10 @@ const MasterStock = () => {
       dataIndex: "date",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
-          {text}
+          {getFormattedDate(text)}
         </div>
       ),
+      sorter: (a, b) => new Date(a.date) - new Date(b.date),
       width: '7%',
     },
     {
