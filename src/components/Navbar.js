@@ -61,16 +61,16 @@ export default function Navbar(checkLoggedIn) {
   
   return (
     <>
-      <div className="min-h-full">
-        <Disclosure as="nav" className="bg-gray-800">
+      <div className="min-h-full h-16	">
+        <Disclosure as="nav" className="bg-gray-800 fixed w-full z-30">
           {({ open }) => (
             <>
               <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-8 ml-0">
-                <div className="flex ml-9 h-16 items-center justify-between">
+                <div className="flex ml-12 h-16 items-center justify-between">
                   
-                  <div className="flex items-center">
+                  <div className="flex items-center ">
                     <div className="flex-shrink-0 text-white">
-                    RK JEWELLERS
+                    MEHTA JEWELLERS
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">

@@ -93,7 +93,7 @@ function ModelAdd({handleOk}) {
         description,
         weight,
         issuer: issuerName,
-        receiver: issueReceive,
+        receiver: receiverName,
         purity,
         receive22k: ((weight * purity)  / 91.8).toFixed(3)
       };

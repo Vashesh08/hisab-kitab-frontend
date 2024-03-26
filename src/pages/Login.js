@@ -57,7 +57,7 @@ function Login(checkLoggedIn) {
             alt="RK Jewellers"
           />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign in to your account
+            Sign In
           </h2>
         </div>
 

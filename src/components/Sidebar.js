@@ -53,20 +53,20 @@ export default function Sidebar({ changeVisibility }) {
             </AccordionHeader>
           </ListItem>
           <AccordionBody className="py-1">
-            <List className="p-0">
-              <ListItem className="text-white hover:text-black active:text-black">
+            <List className="p-0 items-center">
+              <ListItem className="w-10/12 text-white hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
                 Analytics
               </ListItem>
-              <ListItem className="text-white hover:text-black active:text-black">
+              <ListItem className="w-10/12 text-white hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
                 Reporting
               </ListItem>
-              <ListItem className="text-white hover:text-black active:text-black">
+              <ListItem className="w-10/12 text-white hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
@@ -95,14 +95,15 @@ export default function Sidebar({ changeVisibility }) {
             </AccordionHeader>
           </ListItem>
           <AccordionBody className="py-1">
-            <List className="p-0">
-              <ListItem onClick={() => changePage("masterstock")} className="text-white hover:text-black active:text-black">
+            <List className="p-0 items-center">
+              <ListItem onClick={() => changePage("masterstock")}
+               className="text-amber-500 w-10/12 hover:text-black active:text-black">
                 Master-Stock
               </ListItem>
-              <ListItem onClick={() => changePage("meltingbook")} className="text-white hover:text-black active:text-black">
+              <ListItem onClick={() => changePage("meltingbook")} className="text-cyan-500 w-10/12 hover:text-black active:text-black">
                 Melting-Book
               </ListItem>
-              <ListItem className="text-white hover:text-black active:text-black">
+              <ListItem className="text-white w-10/12 hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>

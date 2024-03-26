@@ -1,16 +1,20 @@
 /* eslint-disable no-template-curly-in-string */
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Divider,
   Table,
-  // Button,
+  Button,
   Modal,
+  Input,
+  Space, 
 } from "antd";
+
+import Highlighter from 'react-highlight-words';
 import { fetchMasterStockList, deleteMasterStockList } from "../api/masterStock.js";
 import  ModelAdd from "../components/ModelAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
-import { DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusCircleOutlined, SearchOutlined } from "@ant-design/icons";
 
 const MasterStock = () => {
   const [page] = useState(1);
@@ -118,6 +122,112 @@ const MasterStock = () => {
     setIsModalOpen(false);
   };
 
+
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    // console.log(selectedKeys, confirm, dataIndex)
+    const array = [];
+
+    rows.forEach(function (user){
+      if (user[dataIndex]){
+        if (user[dataIndex].toString().toLowerCase().includes(selectedKeys)){
+          array.push(user)
+        }
+    }
+    });
+    setRows(array);
+    // confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    updateRows("valid");
+    setSearchText('');
+  };
+
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: 'block',
+          }}
+        />
+        <Space>
+          <Button
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            close
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? '#1677ff' : "#8da2fb",
+        }}
+      />
+    ),
+    onFilter: (value, record) => {if (record[dataIndex])  record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())},
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+      ) : (
+        text
+      ),
+  });
+
   const columns = [
     {
       title: "Date",
@@ -128,7 +238,8 @@ const MasterStock = () => {
         </div>
       ),
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
-      width: '7%',
+      width: '9%',
+      sortDirections: ['ascend', "descend", 'ascend'],
     },
     {
       title: "Category",
@@ -139,6 +250,7 @@ const MasterStock = () => {
         </div>
       ),
       width: '10%',
+      ...getColumnSearchProps('category'),
     },
     {
       title: "Description",
@@ -148,27 +260,30 @@ const MasterStock = () => {
           {text}
         </div>
       ),
-      width: '18%',
+      width: '15%',
+      ...getColumnSearchProps('description'),
     },
     {
       title: "Weight",
       dataIndex: "weight",
       render: text => (
-        <div style={{ minWidth: '65px', maxWidth: '65', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
-      width: '8%',
+      width: '9%',
+      ...getColumnSearchProps('weight'),
     },
     {
       title: "Purity",
       dataIndex: "purity",
       render: text => (
-        <div style={{minWidth: '65px', maxWidth: '65',  overflow: 'auto', textAlign: 'center'}}>
+        <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
-      width: '8%',
+      width: '9%',
+      ...getColumnSearchProps('purity'),
     },
     {
       title: "Receive Qty",
@@ -179,6 +294,7 @@ const MasterStock = () => {
         </div>
       ),
       width: '10%',
+      ...getColumnSearchProps('receive22k'),
     },
     {
       title: "Issue Qty",
@@ -189,6 +305,7 @@ const MasterStock = () => {
         </div>
       ),
       width: '10%',
+      ...getColumnSearchProps('issue22k'),
     },
     {
       title: "Issuer",
@@ -199,6 +316,7 @@ const MasterStock = () => {
         </div>
       ),
       width: '10%',
+      ...getColumnSearchProps('issuer'),
     },
     {
       title: "Receiver",
@@ -209,6 +327,7 @@ const MasterStock = () => {
         </div>
       ),
       width: '10%',
+      ...getColumnSearchProps('receiver'),
     },
   ];
 
@@ -251,11 +370,6 @@ const MasterStock = () => {
         onSelect: () => {SelectNone()},
       },
       {
-        key: 'deleted',
-        text: 'Show Deleted',
-        onSelect: ()=> {updateRows("deleted")},
-      },
-      {
         key: 'all_entries',
         text: 'Show All',
         onSelect: ()=> {updateRows("all")},
@@ -265,7 +379,12 @@ const MasterStock = () => {
         key: 'valid',
         text: 'Show Valid',
         onSelect: ()=> {updateRows("valid")},
-      }
+      },
+      {
+        key: 'deleted',
+        text: 'Show Deleted',
+        onSelect: ()=> {updateRows("deleted")},
+      },
     ],
   };
 
@@ -291,6 +410,52 @@ const MasterStock = () => {
         <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={deleteModal} />
         {/* <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button> */}
       </div>
+      <br/>
+
+      {/* <div className="text-xl flex justify-between items-center">
+          <span className="w-72 bg-indigo-400 p-2">
+            Opening Balance:
+            <input className="float-end w-24 border-current	border-0 bg-indigo-400 outline-blue-50 outline"/>
+          </span>
+          <span className="w-72 bg-indigo-400 p-2">
+            Closing Balance: &nbsp; <span className="float-end">1000</span> 
+          </span>
+      </div> */}
+      
+      <div className="flex justify-end mb-2 items-center">
+        <div className="rounded text-xl flex text-gray-600 justify-between p-3 items-center bg-indigo-400"> 
+          <span className="w-44">Opening Balance</span>
+          <span className="w-4">:</span>
+          <input className="rounded float-end text-right w-20 border-current	border-0 bg-indigo-400 outline-blue-50 outline"/>
+           </div>
+      </div>
+
+      <div className="flex justify-end items-center">
+        <div className="rounded text-xl text-black flex p-3 justify-between bg-[#e4e7eb] items-center">
+          <span className="w-44">Closing Balance &nbsp; </span>
+          <span className="w-4">:</span>
+          <span className="float-end text-right	w-20"> 1000</span>
+        </div>
+      </div>
+
+
+
+      <div className="flex justify-end items-center">
+        <div className="rounded text-xl text-white flex p-3 justify-between bg-[#e6aaa7] items-center">
+          <span className="w-44">Closing Balance &nbsp; </span>
+          <span className="w-4">:</span>
+          <span className="float-end text-right	w-20"> 1000</span>
+        </div>
+      </div>
+      
+      <div className="flex justify-end items-center">
+        <div className="rounded text-xl text-black flex p-3 justify-between bg-[#81c992] items-center">
+          <span className="w-44">Closing Balance &nbsp; </span>
+          <span className="w-4">:</span>
+          <span className="float-end text-right	w-20"> 1000</span>
+        </div>
+      </div>
+
       <Modal
         title="Add Item"
         open={isModalOpen}

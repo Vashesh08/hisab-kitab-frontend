@@ -142,6 +142,7 @@ const MeltingBook = () => {
       ),
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
       width: '7%',
+      sortDirections: ['ascend', "descend", 'ascend'],
     },
     {
       title: "Description",
@@ -306,6 +307,34 @@ const MeltingBook = () => {
         <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={deleteModal} />
         {/* <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button> */}
       </div>
+
+
+      {/* <div className="text-xl flex justify-between items-center">
+          <span className="w-72 bg-indigo-400 p-2">
+            Opening Balance:
+            <input className="float-end w-24 border-current	border-0 bg-indigo-400 outline-blue-50 outline"/>
+          </span>
+          <span className="w-72 bg-indigo-400 p-2">
+            Closing Balance: &nbsp; <span className="float-end">1000</span> 
+          </span>
+      </div> */}
+      
+      <div className="flex justify-end mb-2 items-center">
+        <div className="rounded text-xl flex text-gray-600 justify-between p-3 items-center bg-indigo-400"> 
+          <span className="w-44">Opening Balance</span>
+          <span className="w-4">:</span>
+          <input className="rounded float-end text-right w-20 border-current	border-0 bg-indigo-400 outline-blue-50 outline"/>
+           </div>
+      </div>
+
+      <div className="flex justify-end items-center">
+        <div className="rounded text-xl text-gray-600 flex p-3 justify-between bg-indigo-400 items-center">
+          <span className="w-44">Closing Balance &nbsp; </span>
+          <span className="w-4">:</span>
+          <span className="float-end text-right	w-20"> 1000</span>
+        </div>
+      </div>
+
       <Modal
         title="Add Item"
         open={isModalOpen}
