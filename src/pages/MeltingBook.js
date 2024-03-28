@@ -1,18 +1,20 @@
 /* eslint-disable no-template-curly-in-string */
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Divider,
   Table,
-  // Button,
+  Button,
   Modal,
+  Input,
+  Space, 
 } from "antd";
+import Highlighter from 'react-highlight-words';
 import { fetchMeltingBookList, deleteMeltingBookList } from "../api/meltingBook.js";
 import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
-import { Space } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusCircleOutlined,SearchOutlined } from "@ant-design/icons";
 
 const MeltingBook = () => {
   const [page] = useState(1);
@@ -20,6 +22,7 @@ const MeltingBook = () => {
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [updateData, setUpdateData] = useState([]);
+  const [fullData, setFullData] = useState([]);
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -44,7 +47,8 @@ const MeltingBook = () => {
     // console.log("data", data)
 
     const docs = await fetchMeltingBookList(page, itemsPerPage, token);
-    
+    setFullData(docs);
+
     for (let eachEntry in docs) {
       if (docs[eachEntry].is_deleted_flag){
         deleted_data.push(docs[eachEntry]);
@@ -79,6 +83,7 @@ const MeltingBook = () => {
         // console.log("data", data)
 
         const docs = await fetchMeltingBookList(page, itemsPerPage, token);
+        setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_deleted_flag){
@@ -131,6 +136,131 @@ const MeltingBook = () => {
     setUpdateData([]);
   };
 
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
+  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
+    console.log(selectedKeys, confirm, dataIndex)
+
+    // updateRows("valid");
+    const array = [];
+
+    fullData.forEach(function (user){
+      if (user[dataIndex]){
+        if (user[dataIndex].toString().toLowerCase().includes(selectedKeys[0])){
+          array.push(user)
+        }
+    }
+    });
+    setRows(array);
+    // confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+    close()
+  };
+  const handleReset = (clearFilters, close) => {
+    clearFilters();
+    updateRows("valid");
+    setSearchText('');
+    close();
+  };
+
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex, close)}
+          style={{
+            marginBottom: 8,
+            display: 'block',
+          }}
+        />
+        <Space>
+          <Button
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex, close)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters, close)}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+            }}
+          >
+            close
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? '#1677ff' : "#8da2fb",
+        }}
+      />
+    ),
+    onFilter: (value, record) => {if (record[dataIndex])  record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())},
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) =>
+      dataIndex === "date" ? (
+        searchedColumn === dataIndex ? (<Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={getFormattedDate(text) ? getFormattedDate(text).toString() : ''}
+        />
+        ) : (
+          getFormattedDate(text)
+        )
+      ) : (
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+      ) : (
+        text
+      )
+      )
+  });
+
+
   const columns = [
     {
       title: "Date",
@@ -143,6 +273,7 @@ const MeltingBook = () => {
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
       width: '7%',
       sortDirections: ['ascend', "descend", 'ascend'],
+      ...getColumnSearchProps('date'),
     },
     {
       title: "Description",
@@ -153,6 +284,7 @@ const MeltingBook = () => {
         </div>
       ),
       width: '38%',
+      ...getColumnSearchProps('description'),
     },
     {
       title: "Weight",
@@ -163,6 +295,7 @@ const MeltingBook = () => {
         </div>
       ),
       width: '8%',
+      ...getColumnSearchProps('weight24k'),
     },
     {
       title: "Purity",
@@ -173,6 +306,7 @@ const MeltingBook = () => {
         </div>
       ),
       width: '8%',
+      ...getColumnSearchProps('purity'),
     },
     {
       title: "Issue Qty",
@@ -183,6 +317,7 @@ const MeltingBook = () => {
         </div>
       ),
       width: '10%',
+      ...getColumnSearchProps('issue22k'),
     },
     {
       title: "Receive Qty",
@@ -193,6 +328,7 @@ const MeltingBook = () => {
         </div>
       ),
       width: '10%',
+      ...getColumnSearchProps('receive22k'),
     },
     {
       title: "Loss Qty",
@@ -203,6 +339,7 @@ const MeltingBook = () => {
         </div>
       ),
       width: '10%',
+      ...getColumnSearchProps('loss22k'),
     },
     {
       title: "Action",

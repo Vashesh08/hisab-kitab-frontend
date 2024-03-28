@@ -6,7 +6,7 @@ import {
   Button,
   Modal,
   Input,
-  Space, 
+  Space,
 } from "antd";
 
 import Highlighter from 'react-highlight-words';
@@ -21,6 +21,7 @@ const MasterStock = () => {
   const [itemsPerPage] = useState(100); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [fullData, setFullData] = useState([]);
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -46,6 +47,7 @@ const MasterStock = () => {
 
     const docs = await fetchMasterStockList(page, itemsPerPage, token);
     // console.log(docs);
+    setFullData(docs);
     for (let eachEntry in docs) {
       if (docs[eachEntry].is_deleted_flag){
         deleted_data.push(docs[eachEntry]);
@@ -80,6 +82,7 @@ const MasterStock = () => {
         // console.log("data", data)
 
         const docs = await fetchMasterStockList(page, itemsPerPage, token);
+        setFullData(docs);
         // console.log(docs);
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_deleted_flag){
@@ -126,13 +129,15 @@ const MasterStock = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
+    console.log(selectedKeys, confirm, dataIndex)
+
+    // updateRows("valid");
     const array = [];
 
-    rows.forEach(function (user){
+    fullData.forEach(function (user){
       if (user[dataIndex]){
-        if (user[dataIndex].toString().toLowerCase().includes(selectedKeys)){
+        if (user[dataIndex].toString().toLowerCase().includes(selectedKeys[0])){
           array.push(user)
         }
     }
@@ -141,11 +146,13 @@ const MasterStock = () => {
     // confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
+    close()
   };
-  const handleReset = (clearFilters) => {
+  const handleReset = (clearFilters, close) => {
     clearFilters();
     updateRows("valid");
     setSearchText('');
+    close();
   };
 
   const getColumnSearchProps = (dataIndex) => ({
@@ -161,7 +168,7 @@ const MasterStock = () => {
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
           onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex, close)}
           style={{
             marginBottom: 8,
             display: 'block',
@@ -169,7 +176,7 @@ const MasterStock = () => {
         />
         <Space>
           <Button
-            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex, close)}
             icon={<SearchOutlined />}
             size="small"
             style={{
@@ -179,7 +186,7 @@ const MasterStock = () => {
             Search
           </Button>
           <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
+            onClick={() => clearFilters && handleReset(clearFilters, close)}
             size="small"
             style={{
               width: 90,
@@ -213,6 +220,20 @@ const MasterStock = () => {
       }
     },
     render: (text) =>
+      dataIndex === "date" ? (
+        searchedColumn === dataIndex ? (<Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={getFormattedDate(text) ? getFormattedDate(text).toString() : ''}
+        />
+        ) : (
+          getFormattedDate(text)
+        )
+      ) : (
       searchedColumn === dataIndex ? (
         <Highlighter
           highlightStyle={{
@@ -225,7 +246,8 @@ const MasterStock = () => {
         />
       ) : (
         text
-      ),
+      )
+      )
   });
 
   const columns = [
@@ -240,6 +262,7 @@ const MasterStock = () => {
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
       width: '9%',
       sortDirections: ['ascend', "descend", 'ascend'],
+      ...getColumnSearchProps('date'),
     },
     {
       title: "Category",
@@ -475,6 +498,47 @@ const MasterStock = () => {
         dataSource={rows}
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
+        summary={(pageData) => {
+          let totalWeight = 0;
+          let totalRecvQty = 0;
+          let totalIssueQty = 0;
+          pageData.forEach(({ weight, receive22k, issue22k }) => {
+            if (isNaN(receive22k)) {
+              receive22k = 0; // Set it to zero if it's NaN
+            } 
+            if (isNaN(issue22k)) {
+              issue22k = 0; // Set it to zero if it's NaN
+            } 
+            totalWeight += weight;
+            totalRecvQty += receive22k;
+            totalIssueQty += issue22k;
+          });
+          totalWeight = totalWeight.toFixed(3);
+          totalRecvQty = totalRecvQty.toFixed(3);
+          totalIssueQty = totalIssueQty.toFixed(3);
+          return (
+            <>
+              <Table.Summary.Row className="text-center !text-white !bg-green-500	">
+                <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+                <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                <Table.Summary.Cell index={2}></Table.Summary.Cell>
+                <Table.Summary.Cell index={3}></Table.Summary.Cell>
+                <Table.Summary.Cell index={4}>
+                  {totalWeight}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={5}></Table.Summary.Cell>
+                <Table.Summary.Cell index={6}>
+                  {totalRecvQty}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={7}>
+                  {totalIssueQty}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={8}></Table.Summary.Cell>
+                <Table.Summary.Cell index={9}></Table.Summary.Cell>
+              </Table.Summary.Row>
+            </>
+          );
+        }}
       />
       <Divider />
     </div>

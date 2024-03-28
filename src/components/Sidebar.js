@@ -26,7 +26,6 @@ export default function Sidebar({ changeVisibility }) {
 
   const handleOpen = (value) => {
     setOpen(open === value ? 0 : value);
-    changePage("home")
   };
   return (
     <Card className="rounded-none	bg-gray-800 text-white	h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-gray-800/5">
