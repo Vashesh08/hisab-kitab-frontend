@@ -14,7 +14,7 @@ import { fetchMasterStockList, deleteMasterStockList } from "../api/masterStock.
 import  ModelAdd from "../components/ModelAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
-import { DeleteOutlined, PlusCircleOutlined, SearchOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 
 const MasterStock = () => {
   const [page] = useState(1);
@@ -22,6 +22,9 @@ const MasterStock = () => {
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
+  const [totalWeightQuantity, setTotalWeight] = useState(10);
+  const [totalRecvQuantity, setTotalRecvQty] = useState(20);
+  const [totalIssueQuantity, setTotalIssueQty] = useState(30);
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -68,6 +71,26 @@ const MasterStock = () => {
       deleted_data.reverse();
       setRows(deleted_data);
     }
+    
+
+    let totalWeight = 0;
+    let totalRecvQty = 0;
+    let totalIssueQty = 0;
+    data.forEach(({ weight, receive22k, issue22k }) => {
+      if (isNaN(receive22k)) {
+        receive22k = 0; // Set it to zero if it's NaN
+      } 
+      if (isNaN(issue22k)) {
+        issue22k = 0; // Set it to zero if it's NaN
+      } 
+      totalWeight += weight;
+      totalRecvQty += receive22k;
+      totalIssueQty += issue22k;
+    });
+    setTotalWeight(totalWeight.toFixed(3));
+    setTotalRecvQty(totalRecvQty.toFixed(3));
+    setTotalIssueQty(totalIssueQty.toFixed(3));
+
     setIsLoading(false);
   };
 
@@ -94,7 +117,26 @@ const MasterStock = () => {
         }
         data.reverse();
         setRows(data);
+        
+        // let totalWeight = 0;
+        // let totalRecvQty = 0;
+        // let totalIssueQty = 0;
+        // data.forEach(({ weight, receive22k, issue22k }) => {
+        //   if (isNaN(receive22k)) {
+        //     receive22k = 0; // Set it to zero if it's NaN
+        //   } 
+        //   if (isNaN(issue22k)) {
+        //     issue22k = 0; // Set it to zero if it's NaN
+        //   } 
+        //   totalWeight += weight;
+        //   totalRecvQty += receive22k;
+        //   totalIssueQty += issue22k;
+        // });
+        // setTotalWeight(totalWeight.toFixed(3));
+        // setTotalRecvQty(totalRecvQty.toFixed(3));
+        // setTotalIssueQty(totalIssueQty.toFixed(3));
         setIsLoading(false);
+
     })();
     }, [page, itemsPerPage]);
 
@@ -207,7 +249,8 @@ const MasterStock = () => {
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined
+      <BarsOutlined 
+        className="text-base	"
         style={{
           color: filtered ? '#1677ff' : "#8da2fb",
         }}
@@ -312,18 +355,18 @@ const MasterStock = () => {
       title: "Receive Qty",
       dataIndex: "receive22k",
       render: text => (
-        <div style={{minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{minWidth: '140px', maxWidth: '140px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
-      width: '10%',
+      width: '12%',
       ...getColumnSearchProps('receive22k'),
     },
     {
       title: "Issue Qty",
       dataIndex: "issue22k",
       render: text => (
-        <div style={{ minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
@@ -433,19 +476,10 @@ const MasterStock = () => {
         <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={deleteModal} />
         {/* <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button> */}
       </div>
-      <br/>
+      {/* <br/> */}
 
-      {/* <div className="text-xl flex justify-between items-center">
-          <span className="w-72 bg-indigo-400 p-2">
-            Opening Balance:
-            <input className="float-end w-24 border-current	border-0 bg-indigo-400 outline-blue-50 outline"/>
-          </span>
-          <span className="w-72 bg-indigo-400 p-2">
-            Closing Balance: &nbsp; <span className="float-end">1000</span> 
-          </span>
-      </div> */}
       
-      <div className="flex justify-end mb-2 items-center">
+      {/* <div className="flex justify-end mb-2 items-center">
         <div className="rounded text-xl flex text-gray-600 justify-between p-3 items-center bg-indigo-400"> 
           <span className="w-44">Opening Balance</span>
           <span className="w-4">:</span>
@@ -477,7 +511,7 @@ const MasterStock = () => {
           <span className="w-4">:</span>
           <span className="float-end text-right	w-20"> 1000</span>
         </div>
-      </div>
+      </div> */}
 
       <Modal
         title="Add Item"
@@ -518,7 +552,7 @@ const MasterStock = () => {
           totalIssueQty = totalIssueQty.toFixed(3);
           return (
             <>
-              <Table.Summary.Row className="text-center !text-white !bg-green-500	">
+              <Table.Summary.Row className="text-center !text-white !bg-green-500	mt-1">
                 <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
                 <Table.Summary.Cell index={1}></Table.Summary.Cell>
                 <Table.Summary.Cell index={2}></Table.Summary.Cell>
@@ -541,6 +575,34 @@ const MasterStock = () => {
         }}
       />
       <Divider />
+             {/* <Table.Summary.Row className="text-center !text-white !bg-green-500	">
+                 <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+                 <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                 <Table.Summary.Cell index={2}></Table.Summary.Cell>
+                 <Table.Summary.Cell index={3}></Table.Summary.Cell>
+                 <Table.Summary.Cell index={4}>
+                   {totalWeightQuantity}
+                 </Table.Summary.Cell>
+                 <Table.Summary.Cell index={5}></Table.Summary.Cell>
+                 <Table.Summary.Cell index={6}>
+                   {totalRecvQuantity}
+                 </Table.Summary.Cell>
+                 <Table.Summary.Cell index={7}>
+                   {totalIssueQuantity}
+                 </Table.Summary.Cell>
+                 <Table.Summary.Cell index={8}></Table.Summary.Cell>
+                 <Table.Summary.Cell index={9}></Table.Summary.Cell>
+               </Table.Summary.Row></> */}
+
+<div className="text-xl flex justify-between items-center">
+          <span className="w-72 bg-indigo-400 p-2">
+            Opening Balance:
+            <input className="float-end w-24 border-current	border-0 bg-indigo-400 outline-blue-50 outline"/>
+          </span>
+          <span className="w-72 bg-indigo-400 p-2">
+            Closing Balance: &nbsp; <span className="float-end">1000</span> 
+          </span>
+      </div>
     </div>
   );
 };

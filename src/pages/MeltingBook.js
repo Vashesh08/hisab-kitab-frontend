@@ -14,7 +14,7 @@ import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
-import { EditOutlined, DeleteOutlined, PlusCircleOutlined,SearchOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusCircleOutlined, FilterOutlined } from "@ant-design/icons";
 
 const MeltingBook = () => {
   const [page] = useState(1);
@@ -187,7 +187,7 @@ const MeltingBook = () => {
         <Space>
           <Button
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex, close)}
-            icon={<SearchOutlined />}
+            icon={<FilterOutlined />}
             size="small"
             style={{
               width: 90,
@@ -217,7 +217,7 @@ const MeltingBook = () => {
       </div>
     ),
     filterIcon: (filtered) => (
-      <SearchOutlined
+      <FilterOutlined 
         style={{
           color: filtered ? '#1677ff' : "#8da2fb",
         }}
