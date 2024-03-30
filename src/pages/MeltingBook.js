@@ -17,12 +17,17 @@ import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
 import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 
 const MeltingBook = () => {
+  const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [updateData, setUpdateData] = useState([]);
   const [fullData, setFullData] = useState([]);
+  const [totalWeightQuantity, setTotalWeight] = useState(0);
+  const [totalRecvQuantity, setTotalRecvQty] = useState(0);
+  const [totalIssueQuantity, setTotalIssueQty] = useState(0);
+  const [totalLossQuantity, setTotalLossQty] = useState(0);
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -69,6 +74,36 @@ const MeltingBook = () => {
       deleted_data.reverse();
       setRows(deleted_data);
     }
+
+    let totalWeight = 0.000;
+    let totalRecvQty = 0.0;
+    let totalIssueQty = 0.0;
+    let totalLossQty = 0.0;
+    data.forEach(({ weight24k, receive22k, issue22k, loss22k}) => {
+      console.log(weight24k, receive22k, issue22k, loss22k);
+      if (isNaN(parseFloat(receive22k))) {
+        receive22k = 0; // Set it to zero if it's NaN
+      } 
+      if (isNaN(parseFloat(issue22k))) {
+        issue22k = 0; // Set it to zero if it's NaN
+      } 
+      if (isNaN(parseFloat(weight24k))){
+        weight24k = 0 // Set it to zero if it's NaN
+      }
+      if (isNaN(parseFloat(loss22k))){
+        loss22k = 0  // Set it to zero if it's NaN
+      }
+      totalWeight += parseFloat(weight24k);
+      totalRecvQty += parseFloat(receive22k);
+      totalIssueQty += parseFloat(issue22k);
+      totalLossQty += parseFloat(loss22k);
+    });
+    console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
+    setTotalWeight(totalWeight.toFixed(3));
+    setTotalRecvQty(totalRecvQty.toFixed(3));
+    setTotalIssueQty(totalIssueQty.toFixed(3));
+    setTotalLossQty(totalLossQty.toFixed(3));
+
     setIsLoading(false);
   };
 
@@ -95,6 +130,36 @@ const MeltingBook = () => {
         }
         data.reverse();
         setRows(data);
+
+        let totalWeight = 0.000;
+        let totalRecvQty = 0.0;
+        let totalIssueQty = 0.0;
+        let totalLossQty = 0.0;
+        data.forEach(({ weight24k, receive22k, issue22k, loss22k}) => {
+          console.log(weight24k, receive22k, issue22k, loss22k);
+          if (isNaN(parseFloat(receive22k))) {
+            receive22k = 0; // Set it to zero if it's NaN
+          } 
+          if (isNaN(parseFloat(issue22k))) {
+            issue22k = 0; // Set it to zero if it's NaN
+          } 
+          if (isNaN(parseFloat(weight24k))){
+            weight24k = 0 // Set it to zero if it's NaN
+          }
+          if (isNaN(parseFloat(loss22k))){
+            loss22k = 0  // Set it to zero if it's NaN
+          }
+          totalWeight += parseFloat(weight24k);
+          totalRecvQty += parseFloat(receive22k);
+          totalIssueQty += parseFloat(issue22k);
+          totalLossQty += parseFloat(loss22k);
+        });
+        console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
+        setTotalWeight(totalWeight.toFixed(3));
+        setTotalRecvQty(totalRecvQty.toFixed(3));
+        setTotalIssueQty(totalIssueQty.toFixed(3));
+        setTotalLossQty(totalLossQty.toFixed(3));
+
         setIsLoading(false);
     })();
     }, [page, itemsPerPage]);
@@ -219,7 +284,7 @@ const MeltingBook = () => {
     filterIcon: (filtered) => (
       <BarsOutlined 
         style={{
-          color: filtered ? '#1677ff' : "#8da2fb",
+          color: filtered ? '#fff' : "#fff",
         }}
       />
     ),
@@ -279,7 +344,7 @@ const MeltingBook = () => {
       title: "Description",
       dataIndex: "description",
       render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
@@ -323,7 +388,7 @@ const MeltingBook = () => {
       title: "Receive Qty",
       dataIndex: "receive22k",
       render: text => (
-        <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}}>
+        <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
           {text}
         </div>
       ),
@@ -344,7 +409,7 @@ const MeltingBook = () => {
     {
       title: "Action",
       key: "action",
-      width: 200,
+      width: "8%",
       
       render: (text, record, index) => (
         <>
@@ -432,45 +497,49 @@ const MeltingBook = () => {
 
   return (
     <div>
-      
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-        
-
-        <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={showModal} />
-        {/* <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
-          Add Item
-        </Button> */}
-        <div style={{ fontSize: '175%', fontWeight: "bolder" }}>Melting Book</div>
-        <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={deleteModal} />
-        {/* <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button> */}
-      </div>
-
-
-      {/* <div className="text-xl flex justify-between items-center">
-          <span className="w-72 bg-indigo-400 p-2">
-            Opening Balance:
-            <input className="float-end w-24 border-current	border-0 bg-indigo-400 outline-blue-50 outline"/>
-          </span>
-          <span className="w-72 bg-indigo-400 p-2">
-            Closing Balance: &nbsp; <span className="float-end">1000</span> 
-          </span>
-      </div> */}
-      
-      <div className="flex justify-end mb-2 items-center">
-        <div className="rounded text-xl flex text-gray-600 justify-between p-3 items-center bg-indigo-400"> 
-          <span className="w-44">Opening Balance</span>
-          <span className="w-4">:</span>
-          <input className="rounded float-end text-right w-20 border-current	border-0 bg-indigo-400 outline-blue-50 outline"/>
-           </div>
-      </div>
-
-      <div className="flex justify-end items-center">
-        <div className="rounded text-xl text-gray-600 flex p-3 justify-between bg-indigo-400 items-center">
-          <span className="w-44">Closing Balance &nbsp; </span>
-          <span className="w-4">:</span>
-          <span className="float-end text-right	w-20"> 1000</span>
+        <div className="z-40 whitespace-nowrap	bg-white	border-t-0	text-xl flex justify-center items-center">
+        <div style={{ fontSize: '175%', fontWeight: "bolder", paddingBottom:"10px"}} className="text-center">Melting Book</div>
         </div>
-      </div>
+        {screenWidth > 700 ? (
+          <>
+            <div className="text-xl border-b-4 border-transparent flex justify-between items-center">
+              <div className="">
+              <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-28 border-r-2	border-gray-500	" onClick={showModal} />
+              
+              <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
+            </div>
+              <span className="text-[#00203FFF] font-medium	 w-72 bg-[#ABD6DFFF] p-2">
+                Opening Balance:
+                <input className="text-[#00203FFF] text-right	float-end w-24 px-2 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
+              </span>
+            </div>
+            
+            <div className="	text-xl flex justify-end items-center">
+              <span className="text-[#00203FFF] font-medium	 w-72 bg-[#ABD6DFFF] p-2">
+                  Closing Balance: &nbsp; <span className="text-[#00203FFF] text-right px-2 float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
+                </span>
+        
+            </div>
+          </>
+        ) : (
+          <>
+          <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
+            <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
+            <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
+          </div>
+          <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
+            <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
+              Opening Balance:
+              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
+            </span>
+          </div>
+          <div className="	text-xl flex justify-end items-center">
+              <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
+                Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
+              </span>
+            </div>
+          </>
+        )}
 
       <Modal
         title="Add Item"
@@ -503,6 +572,32 @@ const MeltingBook = () => {
         dataSource={rows}
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
+        pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100']}}
+        summary={() => {
+          return (
+            <>
+              <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
+                <Table.Summary.Cell index={0} className="" colSpan={2}>Total</Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
+                <Table.Summary.Cell index={2}></Table.Summary.Cell>
+                <Table.Summary.Cell index={3}>
+                  {totalWeightQuantity}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={4}>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={5}>
+                  {totalIssueQuantity}</Table.Summary.Cell>
+                <Table.Summary.Cell index={6}>
+                  {totalRecvQuantity}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={7}>
+                  {totalLossQuantity}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={8}></Table.Summary.Cell>
+              </Table.Summary.Row>
+            </>
+          );
+        }}
       />
       <Divider />
     </div>

@@ -100,7 +100,7 @@ export default function Navbar(checkLoggedIn) {
                   </div>
                   <div className="hidden md:block">
                     <div className="ml-4 flex items-center md:ml-6">
-                    <div className="flex-shrink-0 text-gray-400 hover:text-white focus:outline-none">
+                    <div className="flex-shrink-0 text-white hover:text-gray-400 focus:outline-none">
                       <HomeFilled className="pt-1.5 pr-2 pb-1.5" style={{fontSize: "175%"}} aria-hidden="true" onClick={handleLogoClick}/>
                     </div>
 
@@ -194,7 +194,7 @@ export default function Navbar(checkLoggedIn) {
                     >
                       <span className="absolute -inset-1.5" />
                       <span className="sr-only">View notifications</span> */}
-                    <div className="ml-auto flex-shrink-0 text-gray-400 hover:text-white focus:outline-none">
+                    <div className="ml-auto flex-shrink-0 hover:text-gray-400 text-white focus:outline-none">
                       <HomeFilled className="pt-1.5 pr-2 pb-1" style={{fontSize: "250%"}} aria-hidden="true" onClick={handleLogoClick}/>
                     </div>
                     {/* </button> */}

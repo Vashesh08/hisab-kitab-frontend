@@ -112,18 +112,22 @@ th.ant-table-cell::before {
   border-top: solid 10px white;
 }
 .ant-table-summary .footer-row >:first-child{
-  border-top-left-radius: 9999px;
-  border-bottom-left-radius: 9999px;
+  border-top-left-radius: 12.5px;
+  border-bottom-left-radius: 12.5px;
 }
 
 
 .ant-table-summary .footer-row >:last-child{
-  border-top-right-radius: 9999px;
-  border-bottom-right-radius: 9999px;
+  border-top-right-radius: 12.5px;
+  border-bottom-right-radius: 12.5px;
 }
 /* .ant-table-summary .footer-row .ant-table-cell{
   border-radius: 10px;
 } */
+
+.ant-table-column-title{
+  white-space: nowrap;
+}
 
 .ant-table-row >:first-child{
   border-top-left-radius: 12.5px;

@@ -17,14 +17,15 @@ import Loading from "../components/Loading.js";
 import { DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 
 const MasterStock = () => {
+  const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
-  const [totalWeightQuantity, setTotalWeight] = useState(10);
-  const [totalRecvQuantity, setTotalRecvQty] = useState(20);
-  const [totalIssueQuantity, setTotalIssueQty] = useState(30);
+  const [totalWeightQuantity, setTotalWeight] = useState(0);
+  const [totalRecvQuantity, setTotalRecvQty] = useState(0);
+  const [totalIssueQuantity, setTotalIssueQty] = useState(0);
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -73,24 +74,27 @@ const MasterStock = () => {
     }
     
 
-    let totalWeight = 0;
-    let totalRecvQty = 0;
-    let totalIssueQty = 0;
+    let totalWeight = 0.0;
+    let totalRecvQty = 0.0;
+    let totalIssueQty = 0.0;
     data.forEach(({ weight, receive22k, issue22k }) => {
-      if (isNaN(receive22k)) {
+      if (isNaN(parseFloat(receive22k))) {
         receive22k = 0; // Set it to zero if it's NaN
       } 
-      if (isNaN(issue22k)) {
+      if (isNaN(parseFloat(issue22k))) {
         issue22k = 0; // Set it to zero if it's NaN
       } 
-      totalWeight += weight;
-      totalRecvQty += receive22k;
-      totalIssueQty += issue22k;
+      if (isNaN(parseFloat(weight))){
+        weight = 0;  // Set it to zero if it's NaN
+      }    
+      totalWeight += parseFloat(weight);
+      totalRecvQty += parseFloat(receive22k);
+      totalIssueQty += parseFloat(issue22k);
     });
     setTotalWeight(totalWeight.toFixed(3));
     setTotalRecvQty(totalRecvQty.toFixed(3));
     setTotalIssueQty(totalIssueQty.toFixed(3));
-
+    
     setIsLoading(false);
   };
 
@@ -118,19 +122,22 @@ const MasterStock = () => {
         data.reverse();
         setRows(data);
         
-        let totalWeight = 0;
-        let totalRecvQty = 0;
-        let totalIssueQty = 0;
+        let totalWeight = 0.0;
+        let totalRecvQty = 0.0;
+        let totalIssueQty = 0.0;
         data.forEach(({ weight, receive22k, issue22k }) => {
-          if (isNaN(receive22k)) {
+          if (isNaN(parseFloat(receive22k))) {
             receive22k = 0; // Set it to zero if it's NaN
           } 
-          if (isNaN(issue22k)) {
+          if (isNaN(parseFloat(issue22k))) {
             issue22k = 0; // Set it to zero if it's NaN
           } 
-          totalWeight += weight;
-          totalRecvQty += receive22k;
-          totalIssueQty += issue22k;
+          if (isNaN(parseFloat(weight))){
+            weight = 0;  // Set it to zero if it's NaN
+          }    
+          totalWeight += parseFloat(weight);
+          totalRecvQty += parseFloat(receive22k);
+          totalIssueQty += parseFloat(issue22k);
         });
         setTotalWeight(totalWeight.toFixed(3));
         setTotalRecvQty(totalRecvQty.toFixed(3));
@@ -250,9 +257,9 @@ const MasterStock = () => {
     ),
     filterIcon: (filtered) => (
       <BarsOutlined 
-        className="text-base	"
+        className="text-base"
         style={{
-          color: filtered ? '#1677ff' : "#8da2fb",
+          color: filtered ? '#fff' : "#fff",
         }}
       />
     ),
@@ -464,68 +471,54 @@ const MasterStock = () => {
 
   return (
     <div>
+        <div className="z-40 whitespace-nowrap	bg-white	border-t-0	text-xl flex justify-center items-center">
+        <div style={{ fontSize: '175%', fontWeight: "bolder", paddingBottom:"10px"}} className="text-center">Master Stock</div>
+        </div>
       
-        <div className="border-b-4 border-transparent		text-xl flex justify-between items-center">
+
+        {screenWidth > 500 ? (
+          <>
+            <div className="text-xl border-b-4 border-transparent flex justify-between items-center">
+              <div className="">
+              <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-28 border-r-2	border-gray-500	" onClick={showModal} />
+              
+              <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
+            </div>
+              <span className="text-[#00203FFF] font-medium	 w-72 bg-[#ABD6DFFF] p-2">
+                Opening Balance:
+                <input className="text-[#00203FFF] text-right	float-end w-24 px-2 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
+              </span>
+            </div>
+      
+            <div className="	text-xl flex justify-end items-center">
+              <span className="text-[#00203FFF] font-medium	 w-72 bg-[#ABD6DFFF] p-2">
+                  Closing Balance: &nbsp; <span className="text-[#00203FFF] text-right px-2 float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
+                </span>
         
-
-        {/* <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
-          Add Item
-        </Button> */}
-        {/* <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={showModal} /> */}
-        <div style={{ fontSize: '175%', fontWeight: "bolder", paddingBottom:"10px"}}>Master Stock</div>
-        <span className="text-[#00203FFF] font-semibold	 w-72 bg-[#ABD6DFFF] p-2">
-            Opening Balance:
-            <input className="text-[#00203FFF] float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
-          </span>
+            </div>      
+            </>
+      ) : (
+        <>
+          <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
+            <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
+            <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
+          </div>
+          <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
+            <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
+              Opening Balance:
+              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
+            </span>
+          </div>
+          <div className="	text-xl flex justify-end items-center">
+              <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
+                Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
+              </span>
+            </div>
+        </>
         
-        {/* <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button> */}
-      </div>
+      )}
 
-    <div className="text-xl flex justify-between items-center">
-      <div className="">
-      <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-28 border-r-2	border-gray-500	" onClick={showModal} />
-      
-    <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
-    </div><span className="text-[#00203FFF] font-semibold w-72 bg-[#ABD6DFFF] p-2">
-            Closing Balance: &nbsp; <span className="text-[#00203FFF] float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
-          </span>
-      </div>
-      {/* <br/> */}
-
-      
-      {/* <div className="flex justify-end mb-2 items-center">
-        <div className="rounded text-xl flex text-gray-600 justify-between p-3 items-center bg-indigo-400"> 
-          <span className="w-44">Opening Balance</span>
-          <span className="w-4">:</span>
-          <input className="rounded float-end text-right w-20 border-current	border-0 bg-indigo-400 outline-blue-50 outline"/>
-           </div>
-      </div>
-
-      <div className="flex justify-end items-center">
-        <div className="rounded text-xl text-black flex p-3 justify-between bg-[#e4e7eb] items-center">
-          <span className="w-44">Closing Balance &nbsp; </span>
-          <span className="w-4">:</span>
-          <span className="float-end text-right	w-20"> 1000</span>
-        </div>
-      </div>
-
-
-
-      <div className="flex justify-end items-center">
-        <div className="rounded text-xl text-white flex p-3 justify-between bg-[#e6aaa7] items-center">
-          <span className="w-44">Closing Balance &nbsp; </span>
-          <span className="w-4">:</span>
-          <span className="float-end text-right	w-20"> 1000</span>
-        </div>
-      </div>
-      
-      <div className="flex justify-end items-center">
-        <div className="rounded text-xl text-black flex p-3 justify-between bg-[#81c992] items-center">
-          <span className="w-44">Closing Balance &nbsp; </span>
-          <span className="w-4">:</span>
-          <span className="float-end text-right	w-20"> 1000</span>
-        </div>
-      </div> */}
+      <br/>
 
       <Modal
         title="Add Item"
@@ -538,7 +531,7 @@ const MasterStock = () => {
           />
       </Modal>
 
-      <Divider />
+      <br />
       <Table
         rowSelection={rowSelection}
         columns={columns}
@@ -546,12 +539,13 @@ const MasterStock = () => {
         dataSource={rows}
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
+        pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100']}}
         summary={() => {
           return (
             <>
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-                <Table.Summary.Cell index={0} className="">Total</Table.Summary.Cell>
-                <Table.Summary.Cell index={1}></Table.Summary.Cell>
+                <Table.Summary.Cell index={0} className="" colSpan={2}>Total</Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={2}></Table.Summary.Cell>
                 <Table.Summary.Cell index={3}></Table.Summary.Cell>
                 <Table.Summary.Cell index={4}>
