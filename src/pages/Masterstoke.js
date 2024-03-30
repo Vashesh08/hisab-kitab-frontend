@@ -471,34 +471,38 @@ const MasterStock = () => {
 
   return (
     <div>
-        <div className="z-40 whitespace-nowrap	bg-white	border-t-0	text-xl flex justify-center items-center">
-        <div style={{ fontSize: '175%', fontWeight: "bolder", paddingBottom:"10px"}} className="text-center">Master Stock</div>
-        </div>
       
 
         {screenWidth > 500 ? (
           <>
-            <div className="text-xl border-b-4 border-transparent flex justify-between items-center">
-              <div className="">
-              <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-28 border-r-2	border-gray-500	" onClick={showModal} />
-              
-              <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
+          {/* <img src="download-removebg-preview.png" class=""></img> */}
+          <div className="absolute z-40 whitespace-nowrap	bg-white	border-t-0	text-xl flex justify-center items-center bg-[url('../public/download-removebg-preview.png')]">
+              <div style={{ fontSize: '225%', fontWeight: "bolder", paddingBottom:"10px"}} className="text-center text-[#ffb337]">Master Stock</div>
             </div>
-              <span className="text-[#00203FFF] font-medium	 w-72 bg-[#ABD6DFFF] p-2">
+            <div className="text-xl border-b-4 border-transparent flex justify-end items-center">
+              {/* <div className="">
+            </div> */}
+              {/* <div style={{ fontSize: '175%', fontWeight: "bolder", paddingBottom:"10px"}} className="text-center">Master Stock</div> */}
+              
+              <span className="text-[#00203FFF] whitespace-nowrap font-medium w-72 bg-[#ABD6DFFF] p-2">
                 Opening Balance:
-                <input className="text-[#00203FFF] text-right	float-end w-24 px-2 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
+                <input className="text-[#00203FFF] text-right	w-24 px-2 float-end border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
               </span>
+              <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-20 place-content-end" onClick={showModal} />
             </div>
       
             <div className="	text-xl flex justify-end items-center">
-              <span className="text-[#00203FFF] font-medium	 w-72 bg-[#ABD6DFFF] p-2">
+              <span className="text-[#00203FFF] whitespace-nowrap font-medium w-72 bg-[#ABD6DFFF] p-2">
                   Closing Balance: &nbsp; <span className="text-[#00203FFF] text-right px-2 float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
                 </span>
-        
+              <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-20" onClick={deleteModal} />
             </div>      
             </>
       ) : (
         <>
+          <div className="z-40 whitespace-nowrap	bg-white	border-t-0	text-xl flex justify-center items-center">
+            <div style={{ fontSize: '175%', fontWeight: "bolder", paddingBottom:"10px"}} className="text-center">Master Stock</div>
+          </div>
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
             <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
@@ -544,9 +548,9 @@ const MasterStock = () => {
           return (
             <>
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-                <Table.Summary.Cell index={0} className="" colSpan={2}>Total</Table.Summary.Cell>
+                <Table.Summary.Cell index={0} className="" colSpan={3}>Total</Table.Summary.Cell>
                 {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
-                <Table.Summary.Cell index={2}></Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={3}></Table.Summary.Cell>
                 <Table.Summary.Cell index={4}>
                   {totalWeightQuantity}

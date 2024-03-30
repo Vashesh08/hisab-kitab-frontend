@@ -53,19 +53,19 @@ export default function Sidebar({ changeVisibility }) {
           </ListItem>
           <AccordionBody className="py-1">
             <List className="p-0 items-center">
-              <ListItem className="w-10/12 text-cyan-500 hover:text-black active:text-black">
+              <ListItem className="w-10/12 text-[#ABD6DFFF] hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
                 Analytics
               </ListItem>
-              <ListItem className="w-10/12 text-cyan-500 hover:text-black active:text-black">
+              <ListItem className="w-10/12 text-[#ABD6DFFF] hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
                 Reporting
               </ListItem>
-              <ListItem className="w-10/12 text-cyan-500 hover:text-black active:text-black">
+              <ListItem className="w-10/12 text-[#ABD6DFFF] hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>
@@ -96,13 +96,13 @@ export default function Sidebar({ changeVisibility }) {
           <AccordionBody className="py-1">
             <List className="p-0 items-center">
               <ListItem onClick={() => changePage("masterstock")}
-               className="text-cyan-500 w-10/12 hover:text-black active:text-black">
+               className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                 Master-Stock
               </ListItem>
-              <ListItem onClick={() => changePage("meltingbook")} className="text-cyan-500 w-10/12 hover:text-black active:text-black">
+              <ListItem onClick={() => changePage("meltingbook")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                 Melting-Book
               </ListItem>
-              <ListItem className="text-cyan-500 w-10/12 hover:text-black active:text-black">
+              <ListItem className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                 <ListItemPrefix>
                   <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
                 </ListItemPrefix>

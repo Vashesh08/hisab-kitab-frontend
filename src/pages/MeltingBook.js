@@ -577,9 +577,9 @@ const MeltingBook = () => {
           return (
             <>
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-                <Table.Summary.Cell index={0} className="" colSpan={2}>Total</Table.Summary.Cell>
+                <Table.Summary.Cell index={0} className="" colSpan={3}>Total</Table.Summary.Cell>
                 {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
-                <Table.Summary.Cell index={2}></Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={3}>
                   {totalWeightQuantity}
                 </Table.Summary.Cell>
