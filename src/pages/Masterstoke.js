@@ -118,23 +118,23 @@ const MasterStock = () => {
         data.reverse();
         setRows(data);
         
-        // let totalWeight = 0;
-        // let totalRecvQty = 0;
-        // let totalIssueQty = 0;
-        // data.forEach(({ weight, receive22k, issue22k }) => {
-        //   if (isNaN(receive22k)) {
-        //     receive22k = 0; // Set it to zero if it's NaN
-        //   } 
-        //   if (isNaN(issue22k)) {
-        //     issue22k = 0; // Set it to zero if it's NaN
-        //   } 
-        //   totalWeight += weight;
-        //   totalRecvQty += receive22k;
-        //   totalIssueQty += issue22k;
-        // });
-        // setTotalWeight(totalWeight.toFixed(3));
-        // setTotalRecvQty(totalRecvQty.toFixed(3));
-        // setTotalIssueQty(totalIssueQty.toFixed(3));
+        let totalWeight = 0;
+        let totalRecvQty = 0;
+        let totalIssueQty = 0;
+        data.forEach(({ weight, receive22k, issue22k }) => {
+          if (isNaN(receive22k)) {
+            receive22k = 0; // Set it to zero if it's NaN
+          } 
+          if (isNaN(issue22k)) {
+            issue22k = 0; // Set it to zero if it's NaN
+          } 
+          totalWeight += weight;
+          totalRecvQty += receive22k;
+          totalIssueQty += issue22k;
+        });
+        setTotalWeight(totalWeight.toFixed(3));
+        setTotalRecvQty(totalRecvQty.toFixed(3));
+        setTotalIssueQty(totalIssueQty.toFixed(3));
         setIsLoading(false);
 
     })();
@@ -465,16 +465,30 @@ const MasterStock = () => {
   return (
     <div>
       
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div className="border-b-4 border-transparent		text-xl flex justify-between items-center">
         
 
         {/* <Button type="primary" style={{ background: "green", borderColor: "yellow" }} onClick={showModal}>
           Add Item
         </Button> */}
-        <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={showModal} />
-        <div style={{ fontSize: '175%', fontWeight: "bolder" }}>Master Stock</div>
-        <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={deleteModal} />
+        {/* <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} onClick={showModal} /> */}
+        <div style={{ fontSize: '175%', fontWeight: "bolder", paddingBottom:"10px"}}>Master Stock</div>
+        <span className="text-[#00203FFF] font-semibold	 w-72 bg-[#ABD6DFFF] p-2">
+            Opening Balance:
+            <input className="text-[#00203FFF] float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
+          </span>
+        
         {/* <Button type="primary" style={{ background: "red", borderColor: "yellow" }} onClick={deleteModal} >Delete</Button> */}
+      </div>
+
+    <div className="text-xl flex justify-between items-center">
+      <div className="">
+      <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-28 border-r-2	border-gray-500	" onClick={showModal} />
+      
+    <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
+    </div><span className="text-[#00203FFF] font-semibold w-72 bg-[#ABD6DFFF] p-2">
+            Closing Balance: &nbsp; <span className="text-[#00203FFF] float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
+          </span>
       </div>
       {/* <br/> */}
 
@@ -532,40 +546,23 @@ const MasterStock = () => {
         dataSource={rows}
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
-        summary={(pageData) => {
-          let totalWeight = 0;
-          let totalRecvQty = 0;
-          let totalIssueQty = 0;
-          pageData.forEach(({ weight, receive22k, issue22k }) => {
-            if (isNaN(receive22k)) {
-              receive22k = 0; // Set it to zero if it's NaN
-            } 
-            if (isNaN(issue22k)) {
-              issue22k = 0; // Set it to zero if it's NaN
-            } 
-            totalWeight += weight;
-            totalRecvQty += receive22k;
-            totalIssueQty += issue22k;
-          });
-          totalWeight = totalWeight.toFixed(3);
-          totalRecvQty = totalRecvQty.toFixed(3);
-          totalIssueQty = totalIssueQty.toFixed(3);
+        summary={() => {
           return (
             <>
-              <Table.Summary.Row className="text-center !text-white !bg-green-500	mt-1">
-                <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+              <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
+                <Table.Summary.Cell index={0} className="">Total</Table.Summary.Cell>
                 <Table.Summary.Cell index={1}></Table.Summary.Cell>
                 <Table.Summary.Cell index={2}></Table.Summary.Cell>
                 <Table.Summary.Cell index={3}></Table.Summary.Cell>
                 <Table.Summary.Cell index={4}>
-                  {totalWeight}
+                  {totalWeightQuantity}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={5}></Table.Summary.Cell>
                 <Table.Summary.Cell index={6}>
-                  {totalRecvQty}
+                  {totalRecvQuantity}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={7}>
-                  {totalIssueQty}
+                  {totalIssueQuantity}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={8}></Table.Summary.Cell>
                 <Table.Summary.Cell index={9}></Table.Summary.Cell>
@@ -575,34 +572,7 @@ const MasterStock = () => {
         }}
       />
       <Divider />
-             {/* <Table.Summary.Row className="text-center !text-white !bg-green-500	">
-                 <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
-                 <Table.Summary.Cell index={1}></Table.Summary.Cell>
-                 <Table.Summary.Cell index={2}></Table.Summary.Cell>
-                 <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                 <Table.Summary.Cell index={4}>
-                   {totalWeightQuantity}
-                 </Table.Summary.Cell>
-                 <Table.Summary.Cell index={5}></Table.Summary.Cell>
-                 <Table.Summary.Cell index={6}>
-                   {totalRecvQuantity}
-                 </Table.Summary.Cell>
-                 <Table.Summary.Cell index={7}>
-                   {totalIssueQuantity}
-                 </Table.Summary.Cell>
-                 <Table.Summary.Cell index={8}></Table.Summary.Cell>
-                 <Table.Summary.Cell index={9}></Table.Summary.Cell>
-               </Table.Summary.Row></> */}
 
-<div className="text-xl flex justify-between items-center">
-          <span className="w-72 bg-indigo-400 p-2">
-            Opening Balance:
-            <input className="float-end w-24 border-current	border-0 bg-indigo-400 outline-blue-50 outline"/>
-          </span>
-          <span className="w-72 bg-indigo-400 p-2">
-            Closing Balance: &nbsp; <span className="float-end">1000</span> 
-          </span>
-      </div>
     </div>
   );
 };

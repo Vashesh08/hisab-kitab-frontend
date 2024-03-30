@@ -14,7 +14,7 @@ import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
-import { EditOutlined, DeleteOutlined, PlusCircleOutlined, FilterOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 
 const MeltingBook = () => {
   const [page] = useState(1);
@@ -187,7 +187,7 @@ const MeltingBook = () => {
         <Space>
           <Button
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex, close)}
-            icon={<FilterOutlined />}
+            icon={<SearchOutlined />}
             size="small"
             style={{
               width: 90,
@@ -217,7 +217,7 @@ const MeltingBook = () => {
       </div>
     ),
     filterIcon: (filtered) => (
-      <FilterOutlined 
+      <BarsOutlined 
         style={{
           color: filtered ? '#1677ff' : "#8da2fb",
         }}
@@ -271,7 +271,7 @@ const MeltingBook = () => {
         </div>
       ),
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
-      width: '7%',
+      width: '9%',
       sortDirections: ['ascend', "descend", 'ascend'],
       ...getColumnSearchProps('date'),
     },
@@ -283,36 +283,36 @@ const MeltingBook = () => {
           {text}
         </div>
       ),
-      width: '38%',
+      width: '20%',
       ...getColumnSearchProps('description'),
     },
     {
       title: "Weight",
       dataIndex: "weight24k",
       render: text => (
-        <div style={{ minWidth: '65px', maxWidth: '65', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
-      width: '8%',
+      width: '9%',
       ...getColumnSearchProps('weight24k'),
     },
     {
       title: "Purity",
       dataIndex: "purity",
       render: text => (
-        <div style={{minWidth: '65px', maxWidth: '65',  overflow: 'auto', textAlign: 'center'}}>
+        <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
-      width: '8%',
+      width: '9%',
       ...getColumnSearchProps('purity'),
     },
     {
       title: "Issue Qty",
       dataIndex: "issue22k",
       render: text => (
-        <div style={{ minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
@@ -323,22 +323,22 @@ const MeltingBook = () => {
       title: "Receive Qty",
       dataIndex: "receive22k",
       render: text => (
-        <div style={{minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}}>
           {text}
         </div>
       ),
-      width: '10%',
+      width: '15%',
       ...getColumnSearchProps('receive22k'),
     },
     {
       title: "Loss Qty",
       dataIndex: "loss22k",
       render: text => (
-        <div style={{minWidth: '100px', maxWidth: '100px', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
-      width: '10%',
+      width: '12%',
       ...getColumnSearchProps('loss22k'),
     },
     {
