@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 // import Sidebar from "./Sidebar.js";
-import { HomeFilled } from '@ant-design/icons';
+import { HomeFilled, LogoutOutlined } from '@ant-design/icons';
 
 const user = {
   name: 'username',
@@ -98,14 +98,21 @@ export default function Navbar(checkLoggedIn) {
                       </div>
                     </div>
                   </div>
-                  <div className="hidden md:block">
+                  <div className="md:block">
                     <div className="ml-4 flex items-center md:ml-6">
                     <div className="flex-shrink-0 text-white hover:text-gray-400 focus:outline-none">
-                      <HomeFilled className="pt-1.5 pr-2 pb-1.5" style={{fontSize: "175%"}} aria-hidden="true" onClick={handleLogoClick}/>
+                      <HomeFilled className="mt-1.5 mr-5 mb-2" style={{fontSize: "190%"}} aria-hidden="true" onClick={handleLogoClick}/>
                     </div>
+                    <div className="flex-shrink-0 text-white hover:text-gray-400 focus:outline-none">
+                    <LogoutOutlined style={{fontSize: "175%"}} onClick={handleLogout}/>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+                </div>
 
                       {/* Profile dropdown */}
-                      <Menu as="div" className="relative ml-3">
+                      {/* <Menu as="div" className="relative ml-3">
                         <div>
                           <Menu.Button className="relative flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                             <span className="absolute -inset-1.5" />
@@ -145,7 +152,6 @@ export default function Navbar(checkLoggedIn) {
                     </div>
                   </div>
                   <div className="-mr-2 flex md:hidden">
-                    {/* Mobile menu button */}
                     <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                       <span className="absolute -inset-0.5" />
                       <span className="sr-only">Open main menu</span>
@@ -157,10 +163,12 @@ export default function Navbar(checkLoggedIn) {
                     </Disclosure.Button>
                   </div>
                 </div>
-              </div>
+              </div> */}
+              
 
-              <Disclosure.Panel className="md:hidden">
+              {/* <Disclosure.Panel className="md:hidden">
                 <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
+                  transition
                   {navigation.map((item) => (
                     <Disclosure.Button
                       key={item.name}
@@ -176,12 +184,12 @@ export default function Navbar(checkLoggedIn) {
                       {item.name}
                     </Disclosure.Button>
                   ))}
-                </div>
-                <div className="border-t border-gray-700 pb-3 pt-4">
+                </div> */}
+                {/* <div className="border-t border-gray-700 pb-3 pt-4">
                   <div className="flex items-center px-5">
                     <div className="flex-shrink-0">
                       <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
-                    </div>
+                    </div> */}
                     {/* <div className="ml-3">
                       <div className="text-base font-medium leading-none text-white">{user.name}</div>
                       <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
@@ -194,13 +202,13 @@ export default function Navbar(checkLoggedIn) {
                     >
                       <span className="absolute -inset-1.5" />
                       <span className="sr-only">View notifications</span> */}
-                    <div className="ml-auto flex-shrink-0 hover:text-gray-400 text-white focus:outline-none">
+                    {/* <div className="ml-auto flex-shrink-0 hover:text-gray-400 text-white focus:outline-none">
                       <HomeFilled className="pt-1.5 pr-2 pb-1" style={{fontSize: "250%"}} aria-hidden="true" onClick={handleLogoClick}/>
-                    </div>
+                    </div> */}
                     {/* </button> */}
                     {/* </div> */}
-                  </div>
-                  <div className="mt-3 space-y-1 px-2">
+                  {/* </div> */}
+                  {/* <div className="mt-3 space-y-1 px-2">
                     {userNavigation.map((item) => (
                       <Disclosure.Button
                         key={item.name}
@@ -212,9 +220,9 @@ export default function Navbar(checkLoggedIn) {
                         {item.name}
                       </Disclosure.Button>
                     ))}
-                  </div>
-                </div>
-              </Disclosure.Panel>
+                  </div> */}
+                {/* </div> */}
+              {/* </Disclosure.Panel> */}
             </>
           )}
         </Disclosure>

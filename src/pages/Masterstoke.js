@@ -473,37 +473,63 @@ const MasterStock = () => {
     <div>
       
 
-        {screenWidth > 500 ? (
+        {screenWidth > 800 ? (
           <>
-          {/* <img src="download-removebg-preview.png" class=""></img> */}
-          <div className="absolute z-40 whitespace-nowrap	bg-white	border-t-0	text-xl flex justify-center items-center bg-[url('../public/download-removebg-preview.png')]">
-              <div style={{ fontSize: '225%', fontWeight: "bolder", paddingBottom:"10px"}} className="text-center text-[#ffb337]">Master Stock</div>
-            </div>
-            <div className="text-xl border-b-4 border-transparent flex justify-end items-center">
-              {/* <div className="">
-            </div> */}
-              {/* <div style={{ fontSize: '175%', fontWeight: "bolder", paddingBottom:"10px"}} className="text-center">Master Stock</div> */}
+            <div className="text-xl border-b-4 border-transparent flex justify-between items-center" style={{
+              marginBottom:"-75px",
+            }}>
               
-              <span className="text-[#00203FFF] whitespace-nowrap font-medium w-72 bg-[#ABD6DFFF] p-2">
-                Opening Balance:
-                <input className="text-[#00203FFF] text-right	w-24 px-2 float-end border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
-              </span>
-              <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-20 place-content-end" onClick={showModal} />
+              <div style={{ 
+              backgroundImage: "url(download-removebg-preview.png)",
+              backgroundPosition: 'center',
+              backgroundSize: '200% auto',
+              backgroundRepeat: 'no-repeat',
+              fontSize: '175%',
+              fontWeight: 'bolder',
+              paddingBottom: '100px',
+              paddingLeft: "-5px",
+              paddingRight: "40px",
+              paddingTop: '15px', // Added paddingTop value to move the text up
+              lineHeight: "4em",
+              width: "400px"
+              }} className="text-center text-white" >Master Stock</div>
+              <div className="mb-4 flex flex-col" style={{ marginTop: '-70px' }}>
+                <div className="flex justify-between items-center">
+                  <span className="text-[#00203FFF] whitespace-nowrap font-medium bg-[#ABD6DFFF] p-2">
+                    Opening Balance:
+                    <input className="ml-4 text-[#00203FFF] text-right w-24 px-2 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
+                  </span>
+                  <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-20 place-content-end" onClick={showModal} />
+                </div>
+                <div className="mt-4 flex justify-between items-center">
+                  <span className="text-[#00203FFF] whitespace-nowrap w-72 font-medium bg-[#ABD6DFFF] p-2">
+                      Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] text-right px-2 w-24 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline" readOnly={true} value="100"/>
+                    </span>
+                  <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-20" onClick={deleteModal} />
+                </div>
+              </div>
             </div>
       
-            <div className="	text-xl flex justify-end items-center">
-              <span className="text-[#00203FFF] whitespace-nowrap font-medium w-72 bg-[#ABD6DFFF] p-2">
-                  Closing Balance: &nbsp; <span className="text-[#00203FFF] text-right px-2 float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
-                </span>
-              <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-20" onClick={deleteModal} />
-            </div>      
             </>
       ) : (
         <>
-          <div className="z-40 whitespace-nowrap	bg-white	border-t-0	text-xl flex justify-center items-center">
-            <div style={{ fontSize: '175%', fontWeight: "bolder", paddingBottom:"10px"}} className="text-center">Master Stock</div>
-          </div>
-          <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
+              <div style={{ 
+              backgroundImage: "url(download-removebg-preview.png)",
+              backgroundPosition: 'center',
+              backgroundSize: '150% auto',
+              backgroundRepeat: 'no-repeat',
+              fontSize: '150%',
+              fontWeight: 'bolder',
+              paddingBottom: '95px',
+              paddingLeft: "-5px",
+              paddingRight: "30px",
+              paddingTop: '45px', // Added paddingTop value to move the text up
+              lineHeight: "1em",
+              width: "300px",
+              marginBottom:"-25px"
+              }} className="text-center text-white" >Master Stock</div>
+
+          <div className="text-xl border-b-8 border-transparent	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
             <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
           </div>
@@ -518,11 +544,11 @@ const MasterStock = () => {
                 Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
               </span>
             </div>
+            <br/>
         </>
         
       )}
 
-      <br/>
 
       <Modal
         title="Add Item"
