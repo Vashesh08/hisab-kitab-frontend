@@ -495,31 +495,32 @@ const MasterStock = () => {
     <div>
       
 
-        {screenWidth > 800 ? (
+        {screenWidth > 900 ? (
           <>
             <div className="text-xl border-transparent flex justify-between items-center">
               
               <div style={{ 
-              fontSize: '250%',
+              fontSize: '300%',
               fontWeight: 'bolder',
               lineHeight: "3em",
+              marginTop: "-1.5rem",
               }} className="text-center text-[#00203FFF]" >
                 Master Stock
               </div>
 
-              <div className="mb-4 flex flex-col">
-                <div className="flex justify-between items-center">
-                  <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] p-2">
+              <div className="flex flex-col">
+                <div className="mb-2 flex justify-between items-center h-12">
+                  <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
                     Opening Balance:
-                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline" onChange={handleOpeningChange} type="text"/>
+                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus-outline" onChange={handleOpeningChange} type="text"/>
                   </span>
                   <Tooltip title="Add" placement="topRight">
-                    <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-28 place-content-end" onClick={showModal} />
+                    <PlusCircleOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="w-28 place-content-end" onClick={showModal} />
                   </Tooltip>
                 </div>
-                <div className="mt-4 flex justify-between items-center">
-                  <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] p-2">
-                      Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline" readOnly={true} value={closingBalance}/>
+                <div className="mt-2 flex justify-between items-center h-12">
+                  <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
+                      Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline" readOnly={true} value={closingBalance}/>
                     </span>
                   <Tooltip title="Delete" placement="bottomRight">
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
@@ -527,7 +528,7 @@ const MasterStock = () => {
                 </div>
               </div>
             </div>
-      
+            <br/>
             </>
       ) : (
         <>
@@ -544,7 +545,7 @@ const MasterStock = () => {
           <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
             <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
               Opening Balance:
-              <input className="text-[#00203FFF] text-right px-2	float-end w-32 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" onChange={handleOpeningChange}/>
+              <input className="text-[#00203FFF] text-right px-2	float-end w-32 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus-outline" onChange={handleOpeningChange}/>
             </span>
           </div>
           <div className="	text-xl flex justify-end items-center">
