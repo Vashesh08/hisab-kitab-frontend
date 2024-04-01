@@ -172,9 +172,14 @@ const MasterStock = () => {
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
+  };
+
+  const showDeleteModal = () => {
+    setIsDeleteModalOpen(true);
   };
 
   const deleteModal = async () => {
@@ -192,6 +197,7 @@ const MasterStock = () => {
   const handleCancel = () => {
     updateRows("valid");
     setIsModalOpen(false);
+    setIsDeleteModalOpen(false);
   };
 
 
@@ -512,7 +518,7 @@ const MasterStock = () => {
                 <div className="mb-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
                     Opening Balance:
-                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " onChange={handleOpeningChange} type="text" value={openingBalance}/>
+                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " onChange={handleOpeningChange} value={openingBalance}/>
                   </span>
                   <Tooltip title="Add" placement="topRight">
                     <PlusCircleOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showModal} />
@@ -545,7 +551,7 @@ const MasterStock = () => {
           <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
             <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
               Opening Balance:
-              <input className="text-[#00203FFF] text-right px-2	float-end w-32 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus-outline" onChange={handleOpeningChange}/>
+              <input className="text-[#00203FFF] text-right px-2	float-end w-32 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus-outline" onChange={handleOpeningChange} value={openingBalance}/>
             </span>
           </div>
           <div className="	text-xl flex justify-end items-center">
@@ -569,7 +575,16 @@ const MasterStock = () => {
           handleOk={handleCancel}
           />
       </Modal>
+      
+      <Modal
+        title="Confirm Delete"
+        open={isDeleteModalOpen}
+        onCancel={handleCancel}
+      >
+        {/* ADD DELETE CONFIRMATION MODAL HERE */}
 
+      </Modal>
+      
       <Table
         rowSelection={rowSelection}
         columns={columns}
