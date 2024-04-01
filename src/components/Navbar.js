@@ -4,6 +4,7 @@ import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 // import Sidebar from "./Sidebar.js";
 import { HomeFilled, LogoutOutlined } from '@ant-design/icons';
+import { Tooltip } from 'antd';
 
 const user = {
   name: 'username',
@@ -101,10 +102,14 @@ export default function Navbar(checkLoggedIn) {
                   <div className="md:block">
                     <div className="ml-4 flex items-center md:ml-6">
                     <div className="flex-shrink-0 text-white hover:text-gray-400 focus:outline-none">
+                    <Tooltip title="Home">
                       <HomeFilled className="mt-1.5 mr-5 mb-2" style={{fontSize: "190%"}} aria-hidden="true" onClick={handleLogoClick}/>
+                    </Tooltip>
                     </div>
                     <div className="flex-shrink-0 text-white hover:text-gray-400 focus:outline-none">
-                    <LogoutOutlined style={{fontSize: "175%"}} onClick={handleLogout}/>
+                    <Tooltip title="Logout">
+                      <LogoutOutlined style={{fontSize: "175%"}} onClick={handleLogout}/>
+                    </Tooltip>
                     </div>
                   </div>
                   </div>

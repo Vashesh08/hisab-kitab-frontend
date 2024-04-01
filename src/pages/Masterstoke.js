@@ -15,6 +15,7 @@ import  ModelAdd from "../components/ModelAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import { DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
+import { Tooltip } from 'antd';
 
 const MasterStock = () => {
   const screenWidth = window.innerWidth;
@@ -26,6 +27,8 @@ const MasterStock = () => {
   const [totalWeightQuantity, setTotalWeight] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
+  const [openingBalance, setOpeningBalance] = useState(0);
+  const [closingBalance, setClosingBalance] = useState(100);
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -39,6 +42,22 @@ const MasterStock = () => {
 
     return formattedDate
   }
+
+  const handleOpeningChange = (event) => {
+    // console.log(event.target.value, isNaN(event.target.value))
+    if (!isNaN(parseFloat(event.target.value))){
+      // console.log(event.target.value, parseFloat(event.target.value))
+      setOpeningBalance(parseFloat(event.target.value));
+      // console.log(openingBalance);
+      setClosingBalance((parseFloat(event.target.value) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
+      // console.log((parseFloat(openingBalance) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
+      // console.log(openingBalance, closingBalance);
+    }
+    else{
+      setOpeningBalance(0);
+      setClosingBalance(parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity).toFixed(3));
+    }
+  };
   
   async function updateRows (dataType){
 
@@ -94,7 +113,7 @@ const MasterStock = () => {
     setTotalWeight(totalWeight.toFixed(3));
     setTotalRecvQty(totalRecvQty.toFixed(3));
     setTotalIssueQty(totalIssueQty.toFixed(3));
-    
+    setClosingBalance((openingBalance + totalRecvQty - totalIssueQty).toFixed(3));
     setIsLoading(false);
   };
 
@@ -142,6 +161,7 @@ const MasterStock = () => {
         setTotalWeight(totalWeight.toFixed(3));
         setTotalRecvQty(totalRecvQty.toFixed(3));
         setTotalIssueQty(totalIssueQty.toFixed(3));
+        setClosingBalance((openingBalance + totalRecvQty - totalIssueQty).toFixed(3));
         setIsLoading(false);
 
     })();
@@ -179,7 +199,7 @@ const MasterStock = () => {
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
   const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    console.log(selectedKeys, confirm, dataIndex)
+    // console.log(selectedKeys, confirm, dataIndex)
 
     // updateRows("valid");
     const array = [];
@@ -256,12 +276,14 @@ const MasterStock = () => {
       </div>
     ),
     filterIcon: (filtered) => (
+      <Tooltip title="filter">
       <BarsOutlined 
         className="text-base"
         style={{
           color: filtered ? '#fff' : "#fff",
         }}
       />
+      </Tooltip>
     ),
     onFilter: (value, record) => {if (record[dataIndex])  record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())},
     onFilterDropdownOpenChange: (visible) => {
@@ -487,17 +509,21 @@ const MasterStock = () => {
 
               <div className="mb-4 flex flex-col">
                 <div className="flex justify-between items-center">
-                  <span className="text-[#00203FFF] whitespace-nowrap font-medium bg-[#ABD6DFFF] p-2">
+                  <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] p-2">
                     Opening Balance:
-                    <input className="ml-4 text-[#00203FFF] text-right w-24 px-2 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
+                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline" onChange={handleOpeningChange} type="text"/>
                   </span>
-                  <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-20 place-content-end" onClick={showModal} />
+                  <Tooltip title="Add" placement="topRight">
+                    <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-28 place-content-end" onClick={showModal} />
+                  </Tooltip>
                 </div>
                 <div className="mt-4 flex justify-between items-center">
-                  <span className="text-[#00203FFF] whitespace-nowrap w-72 font-medium bg-[#ABD6DFFF] p-2">
-                      Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] text-right px-2 w-24 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline" readOnly={true} value="100"/>
+                  <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] p-2">
+                      Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline" readOnly={true} value={closingBalance}/>
                     </span>
-                  <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-20" onClick={deleteModal} />
+                  <Tooltip title="Delete" placement="bottomRight">
+                    <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
+                  </Tooltip>
                 </div>
               </div>
             </div>
@@ -518,12 +544,12 @@ const MasterStock = () => {
           <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
             <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
               Opening Balance:
-              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
+              <input className="text-[#00203FFF] text-right px-2	float-end w-32 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" onChange={handleOpeningChange}/>
             </span>
           </div>
           <div className="	text-xl flex justify-end items-center">
               <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
-                Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
+                Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-32 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
               </span>
             </div>
             <br/>
