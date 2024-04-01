@@ -186,8 +186,8 @@ const MasterStock = () => {
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
-        if (user[dataIndex].toString().toLowerCase().includes(selectedKeys[0])){
-          array.push(user)
+        if (user[dataIndex].toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
+          array.push(user);
         }
     }
     });

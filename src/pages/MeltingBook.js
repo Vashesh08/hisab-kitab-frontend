@@ -212,7 +212,7 @@ const MeltingBook = () => {
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
-        if (user[dataIndex].toString().toLowerCase().includes(selectedKeys[0])){
+        if (user[dataIndex].toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
           array.push(user)
         }
     }
