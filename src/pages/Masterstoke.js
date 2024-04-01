@@ -475,25 +475,17 @@ const MasterStock = () => {
 
         {screenWidth > 800 ? (
           <>
-            <div className="text-xl border-b-4 border-transparent flex justify-between items-center" style={{
-              marginBottom:"-75px",
-            }}>
+            <div className="text-xl border-transparent flex justify-between items-center">
               
               <div style={{ 
-              backgroundImage: "url(download-removebg-preview.png)",
-              backgroundPosition: 'center',
-              backgroundSize: '200% auto',
-              backgroundRepeat: 'no-repeat',
-              fontSize: '175%',
+              fontSize: '250%',
               fontWeight: 'bolder',
-              paddingBottom: '100px',
-              paddingLeft: "-5px",
-              paddingRight: "40px",
-              paddingTop: '15px', // Added paddingTop value to move the text up
-              lineHeight: "4em",
-              width: "400px"
-              }} className="text-center text-white" >Master Stock</div>
-              <div className="mb-4 flex flex-col" style={{ marginTop: '-70px' }}>
+              lineHeight: "3em",
+              }} className="text-center text-[#00203FFF]" >
+                Master Stock
+              </div>
+
+              <div className="mb-4 flex flex-col">
                 <div className="flex justify-between items-center">
                   <span className="text-[#00203FFF] whitespace-nowrap font-medium bg-[#ABD6DFFF] p-2">
                     Opening Balance:
@@ -513,21 +505,11 @@ const MasterStock = () => {
             </>
       ) : (
         <>
-              <div style={{ 
-              backgroundImage: "url(download-removebg-preview.png)",
-              backgroundPosition: 'center',
-              backgroundSize: '150% auto',
-              backgroundRepeat: 'no-repeat',
-              fontSize: '150%',
+              <div style={{
+              fontSize: '250%',
               fontWeight: 'bolder',
-              paddingBottom: '95px',
-              paddingLeft: "-5px",
-              paddingRight: "30px",
-              paddingTop: '45px', // Added paddingTop value to move the text up
-              lineHeight: "1em",
-              width: "300px",
-              marginBottom:"-25px"
-              }} className="text-center text-white" >Master Stock</div>
+              lineHeight: "2em",
+              }} className="text-center text-[#00203FFF]" >Master Stock</div>
 
           <div className="text-xl border-b-8 border-transparent	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
@@ -561,7 +543,6 @@ const MasterStock = () => {
           />
       </Modal>
 
-      <br />
       <Table
         rowSelection={rowSelection}
         columns={columns}
