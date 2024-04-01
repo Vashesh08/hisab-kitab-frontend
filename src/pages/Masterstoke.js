@@ -28,7 +28,7 @@ const MasterStock = () => {
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
   const [openingBalance, setOpeningBalance] = useState(0);
-  const [closingBalance, setClosingBalance] = useState(100);
+  const [closingBalance, setClosingBalance] = useState(0);
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -512,7 +512,7 @@ const MasterStock = () => {
                 <div className="mb-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
                     Opening Balance:
-                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus-outline" onChange={handleOpeningChange} type="text"/>
+                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " onChange={handleOpeningChange} type="text" value={openingBalance}/>
                   </span>
                   <Tooltip title="Add" placement="topRight">
                     <PlusCircleOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showModal} />
@@ -520,7 +520,7 @@ const MasterStock = () => {
                 </div>
                 <div className="mt-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
-                      Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline" readOnly={true} value={closingBalance}/>
+                      Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/>
                     </span>
                   <Tooltip title="Delete" placement="bottomRight">
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={deleteModal} />
