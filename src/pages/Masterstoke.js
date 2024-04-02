@@ -15,7 +15,7 @@ import  ModelAdd from "../components/ModelAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import { DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
-import { Tooltip } from 'antd';
+import { Tooltip, Popconfirm } from 'antd';
 
 const MasterStock = () => {
   const screenWidth = window.innerWidth;
@@ -55,7 +55,7 @@ const MasterStock = () => {
     }
     else{
       setOpeningBalance(0);
-      setClosingBalance(parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity).toFixed(3));
+      setClosingBalance((parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
     }
   };
   
@@ -172,14 +172,9 @@ const MasterStock = () => {
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
-  };
-
-  const showDeleteModal = () => {
-    setIsDeleteModalOpen(true);
   };
 
   const deleteModal = async () => {
@@ -197,7 +192,6 @@ const MasterStock = () => {
   const handleCancel = () => {
     updateRows("valid");
     setIsModalOpen(false);
-    setIsDeleteModalOpen(false);
   };
 
 
@@ -528,9 +522,19 @@ const MasterStock = () => {
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
                       Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/>
                     </span>
-                  <Tooltip title="Delete" placement="bottomRight">
-                    <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={deleteModal} />
+                    <Popconfirm
+                    placement="bottomLeft"
+                    title="Are you sure you want to delete the selected rows"
+                    description="Delete the Selected Rows"
+                    okText="Yes"
+                    okType="default"
+                    cancelText="No"
+                    onConfirm={deleteModal}
+                    >
+                    <Tooltip title="Delete" placement="bottomRight">
+                    <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12"/>
                   </Tooltip>
+                  </Popconfirm>
                 </div>
               </div>
             </div>
@@ -544,7 +548,7 @@ const MasterStock = () => {
               lineHeight: "2em",
               }} className="text-center text-[#00203FFF]" >Master Stock</div>
 
-          <div className="text-xl border-b-8 border-transparent	border-transparent flex justify-between items-center">
+          <div className="text-xl border-b-8 border-transparent	border-transparent  border-t-4 pt-4 flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
             <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
           </div>
@@ -574,15 +578,6 @@ const MasterStock = () => {
         <ModelAdd
           handleOk={handleCancel}
           />
-      </Modal>
-      
-      <Modal
-        title="Confirm Delete"
-        open={isDeleteModalOpen}
-        onCancel={handleCancel}
-      >
-        {/* ADD DELETE CONFIRMATION MODAL HERE */}
-
       </Modal>
       
       <Table

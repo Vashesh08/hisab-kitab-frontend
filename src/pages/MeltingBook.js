@@ -15,6 +15,7 @@ import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
 import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
+import { Tooltip, Popconfirm } from 'antd';
 
 const MeltingBook = () => {
   const screenWidth = window.innerWidth;
@@ -28,6 +29,8 @@ const MeltingBook = () => {
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
   const [totalLossQuantity, setTotalLossQty] = useState(0);
+  const [openingBalance, setOpeningBalance] = useState(0);
+  const [closingBalance, setClosingBalance] = useState(0);
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -41,6 +44,22 @@ const MeltingBook = () => {
 
     return formattedDate
   }
+
+  const handleOpeningChange = (event) => {
+    // console.log(event.target.value, isNaN(event.target.value))
+    if (!isNaN(parseFloat(event.target.value))){
+      // console.log(event.target.value, parseFloat(event.target.value))
+      setOpeningBalance(parseFloat(event.target.value));
+      // console.log(openingBalance);
+      setClosingBalance((parseFloat(event.target.value) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity) + parseFloat(totalLossQuantity)).toFixed(3));
+      // console.log((parseFloat(openingBalance) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
+      // console.log(openingBalance, closingBalance);
+    }
+    else{
+      setOpeningBalance(0);
+      setClosingBalance((parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity) + parseFloat(totalLossQuantity)).toFixed(3));
+    }
+  };
 
   async function updateRows (dataType){
 
@@ -98,12 +117,13 @@ const MeltingBook = () => {
       totalIssueQty += parseFloat(issue22k);
       totalLossQty += parseFloat(loss22k);
     });
-    console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
+    // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
     setTotalWeight(totalWeight.toFixed(3));
     setTotalRecvQty(totalRecvQty.toFixed(3));
     setTotalIssueQty(totalIssueQty.toFixed(3));
     setTotalLossQty(totalLossQty.toFixed(3));
-
+    
+    setClosingBalance((openingBalance + totalRecvQty - totalIssueQty + totalLossQty).toFixed(3));
     setIsLoading(false);
   };
 
@@ -154,7 +174,7 @@ const MeltingBook = () => {
           totalIssueQty += parseFloat(issue22k);
           totalLossQty += parseFloat(loss22k);
         });
-        console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
+        // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
         setTotalWeight(totalWeight.toFixed(3));
         setTotalRecvQty(totalRecvQty.toFixed(3));
         setTotalIssueQty(totalIssueQty.toFixed(3));
@@ -497,32 +517,58 @@ const MeltingBook = () => {
 
   return (
     <div>
-        <div className="z-40 whitespace-nowrap	bg-white	border-t-0	text-xl flex justify-center items-center">
-        <div style={{ fontSize: '175%', fontWeight: "bolder", paddingBottom:"10px"}} className="text-center">Melting Book</div>
-        </div>
-        {screenWidth > 700 ? (
+        {screenWidth > 800 ? (
           <>
-            <div className="text-xl border-b-4 border-transparent flex justify-between items-center">
-              <div className="">
-              <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-28 border-r-2	border-gray-500	" onClick={showModal} />
-              
-              <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
+            <div className="text-xl border-transparent flex justify-between items-center">
+            <div style={{ 
+              fontSize: '250%',
+              fontWeight: 'bolder',
+              lineHeight: "3em",
+              marginTop: "-3rem",
+              }} className="text-center text-[#00203FFF]" >
+                Melting Book
+              </div>
+
+              <div className="flex flex-col">
+                <div className="mb-1 flex justify-between items-center h-12">
+                  <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
+                  Opening Balance:
+                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " onChange={handleOpeningChange} value={openingBalance}/>
+                  </span>
+                  <Tooltip title="Add" placement="topRight">
+                    <PlusCircleOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showModal} />
+                  </Tooltip>
+                </div>
+                <div className="mt-1 flex justify-between items-center h-12">
+                  <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
+                      Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/>
+                    </span>
+                    <Popconfirm
+                    placement="bottomLeft"
+                    title="Are you sure you want to delete the selected rows"
+                    description="Delete the Selected Rows"
+                    okText="Yes"
+                    okType="default"
+                    cancelText="No"
+                    onConfirm={deleteModal}
+                    >
+                    <Tooltip title="Delete" placement="bottomRight">
+                    <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12"/>
+                  </Tooltip>
+                  </Popconfirm>
+                </div>
+              </div>
             </div>
-              <span className="text-[#00203FFF] font-medium	 w-72 bg-[#ABD6DFFF] p-2">
-                Opening Balance:
-                <input className="text-[#00203FFF] text-right	float-end w-24 px-2 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
-              </span>
-            </div>
-            
-            <div className="	text-xl flex justify-end items-center">
-              <span className="text-[#00203FFF] font-medium	 w-72 bg-[#ABD6DFFF] p-2">
-                  Closing Balance: &nbsp; <span className="text-[#00203FFF] text-right px-2 float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
-                </span>
-        
-            </div>
+            <br/>
           </>
         ) : (
           <>
+            <div style={{
+              fontSize: '250%',
+              fontWeight: 'bolder',
+              lineHeight: "2em",
+              }} className="text-center text-[#00203FFF]" >Melting Book</div>
+
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
             <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
@@ -530,12 +576,12 @@ const MeltingBook = () => {
           <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
             <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
               Opening Balance:
-              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline"/>
+              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" onChange={handleOpeningChange} value={openingBalance}/>
             </span>
           </div>
           <div className="	text-xl flex justify-end items-center">
               <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
-                Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">1000</span> 
+                Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
               </span>
             </div>
           </>
@@ -564,7 +610,6 @@ const MeltingBook = () => {
           />
       </Modal>
 
-      <Divider />
       <Table
         rowSelection={rowSelection}
         columns={columns}
