@@ -97,16 +97,13 @@ export default function Sidebar({ changeVisibility }) {
             <List className="p-0 items-center">
               <ListItem onClick={() => changePage("masterstock")}
                className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
-                Master-Stock
+                Master Stock
               </ListItem>
               <ListItem onClick={() => changePage("meltingbook")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
-                Melting-Book
+                Melting Book
               </ListItem>
-              <ListItem className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
-                <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Kareegar
+              <ListItem onClick={() => changePage("kareegar")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                Kareegar Book
               </ListItem>
             </List>
           </AccordionBody>

@@ -51,13 +51,13 @@ const MeltingBook = () => {
       // console.log(event.target.value, parseFloat(event.target.value))
       setOpeningBalance(parseFloat(event.target.value));
       // console.log(openingBalance);
-      setClosingBalance((parseFloat(event.target.value) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity) + parseFloat(totalLossQuantity)).toFixed(3));
+      setClosingBalance((parseFloat(event.target.value) + parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(3));
       // console.log((parseFloat(openingBalance) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
       // console.log(openingBalance, closingBalance);
     }
     else{
       setOpeningBalance(0);
-      setClosingBalance((parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity) + parseFloat(totalLossQuantity)).toFixed(3));
+      setClosingBalance((parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(3));
     }
   };
 
@@ -99,7 +99,7 @@ const MeltingBook = () => {
     let totalIssueQty = 0.0;
     let totalLossQty = 0.0;
     data.forEach(({ weight24k, receive22k, issue22k, loss22k}) => {
-      console.log(weight24k, receive22k, issue22k, loss22k);
+      // console.log(weight24k, receive22k, issue22k, loss22k);
       if (isNaN(parseFloat(receive22k))) {
         receive22k = 0; // Set it to zero if it's NaN
       } 
@@ -123,7 +123,7 @@ const MeltingBook = () => {
     setTotalIssueQty(totalIssueQty.toFixed(3));
     setTotalLossQty(totalLossQty.toFixed(3));
     
-    setClosingBalance((openingBalance + totalRecvQty - totalIssueQty + totalLossQty).toFixed(3));
+    setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(3));
     setIsLoading(false);
   };
 
@@ -156,7 +156,7 @@ const MeltingBook = () => {
         let totalIssueQty = 0.0;
         let totalLossQty = 0.0;
         data.forEach(({ weight24k, receive22k, issue22k, loss22k}) => {
-          console.log(weight24k, receive22k, issue22k, loss22k);
+          // console.log(weight24k, receive22k, issue22k, loss22k);
           if (isNaN(parseFloat(receive22k))) {
             receive22k = 0; // Set it to zero if it's NaN
           } 
@@ -179,6 +179,7 @@ const MeltingBook = () => {
         setTotalRecvQty(totalRecvQty.toFixed(3));
         setTotalIssueQty(totalIssueQty.toFixed(3));
         setTotalLossQty(totalLossQty.toFixed(3));
+        setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(3));
 
         setIsLoading(false);
     })();
@@ -207,7 +208,7 @@ const MeltingBook = () => {
     const meltingBookId = {
       _id: selectedRowKeys
     }
-    console.log(meltingBookId);
+    // console.log(meltingBookId);
     await deleteMeltingBookList(meltingBookId, token);
 
     updateRows("valid");
@@ -225,18 +226,26 @@ const MeltingBook = () => {
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
   const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    console.log(selectedKeys, confirm, dataIndex)
+    // console.log(selectedKeys, confirm, dataIndex)
 
     // updateRows("valid");
     const array = [];
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
-        if (user[dataIndex].toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
-          array.push(user)
+        if (dataIndex === "date"){
+          if (getFormattedDate(user[dataIndex]).toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
+            array.push(user);
+          }
+        }
+        else{
+          if (user[dataIndex].toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
+            array.push(user);
+          }
         }
     }
     });
+    array.reverse();
     setRows(array);
     // confirm();
     setSearchText(selectedKeys[0]);
@@ -394,7 +403,7 @@ const MeltingBook = () => {
       ...getColumnSearchProps('purity'),
     },
     {
-      title: "Issue Qty",
+      title: "Issue Wt",
       dataIndex: "issue22k",
       render: text => (
         <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
@@ -405,7 +414,7 @@ const MeltingBook = () => {
       ...getColumnSearchProps('issue22k'),
     },
     {
-      title: "Receive Qty",
+      title: "Receive Wt",
       dataIndex: "receive22k",
       render: text => (
         <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">

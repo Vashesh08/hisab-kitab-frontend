@@ -74,9 +74,9 @@ function MeltingBookUpdate({handleOk, textData}) {
         <Form.Item
         name={["user", "recv_weight"]}
         label="Receive Weight (gm)"
-        rules={[{ type: "number", min: 0, required: true }]}
+        rules={[{ type: "number", min: 0, max: textData.issue22k, required: true }]}
         >
-        <InputNumber/>
+        <InputNumber />
         </Form.Item>
 
         <Form.Item
@@ -85,7 +85,7 @@ function MeltingBookUpdate({handleOk, textData}) {
             offset: 8,
         }}
         >
-        <Button type="primary" style={{ background: "green", borderColor: "yellow" }} htmlType="submit">
+        <Button className="bg-[#ABD6DFFF] text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" htmlType="submit">
             Submit
         </Button>
         </Form.Item>

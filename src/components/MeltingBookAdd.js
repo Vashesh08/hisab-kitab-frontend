@@ -137,7 +137,7 @@ function MeltingBookAdd({handleOk}) {
           offset: 8,
         }}
       >
-        <Button type="primary" style={{ background: "green", borderColor: "yellow" }} htmlType="submit">
+        <Button className="bg-[#ABD6DFFF] text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" htmlType="submit">
           Submit
         </Button>
       </Form.Item>

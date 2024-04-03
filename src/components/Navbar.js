@@ -1,17 +1,18 @@
-import { Fragment } from 'react';
+// import { Fragment } from 'react';
 // import { useNavigate } from 'react-router-dom';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Disclosure } from '@headlessui/react';
+// import { Disclosure, Menu, Transition } from '@headlessui/react';
+// import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 // import Sidebar from "./Sidebar.js";
 import { HomeFilled, LogoutOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 
-const user = {
-  name: 'username',
-  email: 'email@example.com',
-  imageUrl:
-  'profilepic.png'
-}
+// const user = {
+//   name: 'username',
+//   email: 'email@example.com',
+//   imageUrl:
+//   'profilepic.png'
+// }
 
 // function handleProfileClick(){
 //     console.log("Profil/ Setting CLicked")
@@ -31,7 +32,7 @@ const navigation = [
 export default function Navbar(checkLoggedIn) {
  
   const handleLogoClick = () => {
-    console.log("home")
+    // console.log("home")
     checkLoggedIn.handlePageChange("home");
   }
     // navigation[navigation_path]['current'] = true;
@@ -61,9 +62,9 @@ export default function Navbar(checkLoggedIn) {
     }
     }
     
-    const userNavigation = [
-    { name: 'Sign out', href: '#', click: handleLogout},
-    ]
+    // const userNavigation = [
+    // { name: 'Sign out', href: '#', click: handleLogout},
+    // ]
   
   return (
     <>
@@ -75,7 +76,7 @@ export default function Navbar(checkLoggedIn) {
                 <div className="flex ml-12 h-16 items-center justify-between">
                   
                   <div className="flex items-center ">
-                    <div className="flex-shrink-0 text-white">
+                    <div className="flex-shrink-0 text-white font-bold">
                     MEHTA JEWELLERS
                     </div>
                     <div className="hidden md:block">

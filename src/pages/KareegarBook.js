@@ -6,27 +6,29 @@ import {
   Button,
   Modal,
   Input,
-  Space,
+  Space, 
 } from "antd";
-
 import Highlighter from 'react-highlight-words';
-import { fetchMasterStockList, deleteMasterStockList } from "../api/masterStock.js";
-import  ModelAdd from "../components/ModelAdd.js"
+import { fetchMeltingBookList, deleteMeltingBookList } from "../api/meltingBook.js";
+import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
-import { DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
+import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
+import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip, Popconfirm } from 'antd';
 
-const MasterStock = () => {
+const KareegarBook = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [updateData, setUpdateData] = useState([]);
   const [fullData, setFullData] = useState([]);
   const [totalWeightQuantity, setTotalWeight] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
+  const [totalLossQuantity, setTotalLossQty] = useState(0);
   const [openingBalance, setOpeningBalance] = useState(0);
   const [closingBalance, setClosingBalance] = useState(0);
 
@@ -49,16 +51,16 @@ const MasterStock = () => {
       // console.log(event.target.value, parseFloat(event.target.value))
       setOpeningBalance(parseFloat(event.target.value));
       // console.log(openingBalance);
-      setClosingBalance((parseFloat(event.target.value) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
+      setClosingBalance((parseFloat(event.target.value) + parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(3));
       // console.log((parseFloat(openingBalance) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
       // console.log(openingBalance, closingBalance);
     }
     else{
       setOpeningBalance(0);
-      setClosingBalance((parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
+      setClosingBalance((parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(3));
     }
   };
-  
+
   async function updateRows (dataType){
 
     setIsLoading(true);
@@ -68,9 +70,9 @@ const MasterStock = () => {
     const deleted_data = [];
     // console.log("data", data)
 
-    const docs = await fetchMasterStockList(page, itemsPerPage, token);
-    // console.log(docs);
+    const docs = await fetchMeltingBookList(page, itemsPerPage, token);
     setFullData(docs);
+
     for (let eachEntry in docs) {
       if (docs[eachEntry].is_deleted_flag){
         deleted_data.push(docs[eachEntry]);
@@ -91,29 +93,37 @@ const MasterStock = () => {
       deleted_data.reverse();
       setRows(deleted_data);
     }
-    
 
-    let totalWeight = 0.0;
+    let totalWeight = 0.000;
     let totalRecvQty = 0.0;
     let totalIssueQty = 0.0;
-    data.forEach(({ weight, receive22k, issue22k }) => {
+    let totalLossQty = 0.0;
+    data.forEach(({ weight24k, receive22k, issue22k, loss22k}) => {
+      // console.log(weight24k, receive22k, issue22k, loss22k);
       if (isNaN(parseFloat(receive22k))) {
         receive22k = 0; // Set it to zero if it's NaN
       } 
       if (isNaN(parseFloat(issue22k))) {
         issue22k = 0; // Set it to zero if it's NaN
       } 
-      if (isNaN(parseFloat(weight))){
-        weight = 0;  // Set it to zero if it's NaN
-      }    
-      totalWeight += parseFloat(weight);
+      if (isNaN(parseFloat(weight24k))){
+        weight24k = 0 // Set it to zero if it's NaN
+      }
+      if (isNaN(parseFloat(loss22k))){
+        loss22k = 0  // Set it to zero if it's NaN
+      }
+      totalWeight += parseFloat(weight24k);
       totalRecvQty += parseFloat(receive22k);
       totalIssueQty += parseFloat(issue22k);
+      totalLossQty += parseFloat(loss22k);
     });
+    // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
     setTotalWeight(totalWeight.toFixed(3));
     setTotalRecvQty(totalRecvQty.toFixed(3));
     setTotalIssueQty(totalIssueQty.toFixed(3));
-    setClosingBalance((openingBalance + totalRecvQty - totalIssueQty).toFixed(3));
+    setTotalLossQty(totalLossQty.toFixed(3));
+    
+    setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(3));
     setIsLoading(false);
   };
 
@@ -127,9 +137,9 @@ const MasterStock = () => {
         const deleted_data = [];
         // console.log("data", data)
 
-        const docs = await fetchMasterStockList(page, itemsPerPage, token);
+        const docs = await fetchMeltingBookList(page, itemsPerPage, token);
         setFullData(docs);
-        // console.log(docs);
+        // console.log("data", docs);
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_deleted_flag){
             deleted_data.push(docs[eachEntry]);
@@ -140,30 +150,38 @@ const MasterStock = () => {
         }
         data.reverse();
         setRows(data);
-        
-        let totalWeight = 0.0;
+
+        let totalWeight = 0.000;
         let totalRecvQty = 0.0;
         let totalIssueQty = 0.0;
-        data.forEach(({ weight, receive22k, issue22k }) => {
+        let totalLossQty = 0.0;
+        data.forEach(({ weight24k, receive22k, issue22k, loss22k}) => {
+          // console.log(weight24k, receive22k, issue22k, loss22k);
           if (isNaN(parseFloat(receive22k))) {
             receive22k = 0; // Set it to zero if it's NaN
           } 
           if (isNaN(parseFloat(issue22k))) {
             issue22k = 0; // Set it to zero if it's NaN
           } 
-          if (isNaN(parseFloat(weight))){
-            weight = 0;  // Set it to zero if it's NaN
-          }    
-          totalWeight += parseFloat(weight);
+          if (isNaN(parseFloat(weight24k))){
+            weight24k = 0 // Set it to zero if it's NaN
+          }
+          if (isNaN(parseFloat(loss22k))){
+            loss22k = 0  // Set it to zero if it's NaN
+          }
+          totalWeight += parseFloat(weight24k);
           totalRecvQty += parseFloat(receive22k);
           totalIssueQty += parseFloat(issue22k);
+          totalLossQty += parseFloat(loss22k);
         });
+        // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
         setTotalWeight(totalWeight.toFixed(3));
         setTotalRecvQty(totalRecvQty.toFixed(3));
         setTotalIssueQty(totalIssueQty.toFixed(3));
-        setClosingBalance((openingBalance + totalRecvQty - totalIssueQty).toFixed(3));
-        setIsLoading(false);
+        setTotalLossQty(totalLossQty.toFixed(3));
 
+        setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(3));
+        setIsLoading(false);
     })();
     }, [page, itemsPerPage]);
 
@@ -172,28 +190,37 @@ const MasterStock = () => {
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
+  const showAddPopup = (text) => {
+    // console.log(text);
+    setIsEditModalOpen(true);
+    setUpdateData(text)
+  };
+
   const deleteModal = async () => {
     setIsLoading(true);
     const token = localStorage.getItem("token");
-    const masterStockId = {
-      masterstockId: selectedRowKeys
+    const meltingBookId = {
+      _id: selectedRowKeys
     }
-    await deleteMasterStockList(masterStockId, token );
+    // console.log(meltingBookId);
+    await deleteMeltingBookList(meltingBookId, token);
 
     updateRows("valid");
-    setIsLoading(false);
     setSelectedRowKeys([]);
+    setIsLoading(false);
   }
   const handleCancel = () => {
     updateRows("valid");
     setIsModalOpen(false);
+    setIsEditModalOpen(false);
+    setUpdateData([]);
   };
-
 
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
@@ -284,14 +311,11 @@ const MasterStock = () => {
       </div>
     ),
     filterIcon: (filtered) => (
-      <Tooltip title="filter">
       <BarsOutlined 
-        className="text-base"
         style={{
           color: filtered ? '#fff' : "#fff",
         }}
       />
-      </Tooltip>
     ),
     onFilter: (value, record) => {if (record[dataIndex])  record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())},
     onFilterDropdownOpenChange: (visible) => {
@@ -330,6 +354,7 @@ const MasterStock = () => {
       )
   });
 
+
   const columns = [
     {
       title: "Date",
@@ -345,93 +370,160 @@ const MasterStock = () => {
       ...getColumnSearchProps('date'),
     },
     {
-      title: "Category",
-      dataIndex: "category",
+      title: "Name",
+      dataIndex: "name",
       render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
+        <div style={{ minWidth:'100px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
-      width: '10%',
+      width: '9%',
+      ...getColumnSearchProps('name'),
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '9%',
       ...getColumnSearchProps('category'),
     },
     {
       title: "Description",
       dataIndex: "description",
       render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '15%',
-      ...getColumnSearchProps('description'),
-    },
-    {
-      title: "Weight",
-      dataIndex: "weight",
-      render: text => (
-        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
-          {text}
-        </div>
-      ),
-      width: '9%',
-      ...getColumnSearchProps('weight'),
-    },
-    {
-      title: "Purity",
-      dataIndex: "purity",
-      render: text => (
-        <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
-          {text}
-        </div>
-      ),
-      width: '9%',
-      ...getColumnSearchProps('purity'),
-    },
-    {
-      title: "Receive Wt",
-      dataIndex: "receive22k",
-      render: text => (
-        <div style={{minWidth: '140px', maxWidth: '140px', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '12%',
-      ...getColumnSearchProps('receive22k'),
+      ...getColumnSearchProps('description'),
     },
     {
-      title: "Issue Wt",
-      dataIndex: "issue22k",
+      title: "Box Wt",
+      dataIndex: "box_wt",
       render: text => (
-        <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{ minWidth:'85', maxWidth: '85px', overflow: 'auto'}}>
           {text}
         </div>
       ),
-      width: '10%',
-      ...getColumnSearchProps('issue22k'),
+      width: '9%',
+      ...getColumnSearchProps('box_wt'),
     },
     {
-      title: "Issuer",
-      dataIndex: "issuer",
-      render: text => (
-        <div style={{ minWidth: '100px', maxWidth: '200px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('issuer'),
+      title: "Metal (gm) + Box Weight	",
+      children: [
+        {
+          title: "Issue",
+          dataIndex: "issue22k",
+          render: text => (
+            <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+              {text}
+            </div>
+          ),
+          width: '9%',
+          ...getColumnSearchProps('issue22k'),
+        },
+        {
+          title: "Receive",
+          dataIndex: "receive22k",
+          render: text => (
+            <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
+              {text}
+            </div>
+          ),
+          width: '8%',
+          ...getColumnSearchProps('receive22k'),    
+        }
+      ]
     },
     {
-      title: "Receiver",
-      dataIndex: "receiver",
-      render: text => (
-        <div style={{ minWidth: '100px', maxWidth: '200px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('receiver'),
+      title: "Net Weight Metal (gm)	",
+      children: [
+        {
+          title: "Issue",
+          dataIndex: "issue22k",
+          render: text => (
+            <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+              {text}
+            </div>
+          ),
+          width: '9%',
+          ...getColumnSearchProps('issue22k'),
+        },
+        {
+          title: "Receive",
+          dataIndex: "receive22k",
+          render: text => (
+            <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
+              {text}
+            </div>
+          ),
+          width: '8%',
+          ...getColumnSearchProps('receive22k'),    
+        },
+        {
+          title: "Loss",
+          dataIndex: "loss22k",
+          render: text => (
+            <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
+              {text}
+            </div>
+          ),
+          width: '8%',
+          ...getColumnSearchProps('loss22k'),
+        }
+      ]
     },
+    {
+      title: "Beads(Pc)	",
+      children: [
+        {
+          title: "Issue",
+          dataIndex: "issue22k",
+          render: text => (
+            <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+              {text}
+            </div>
+          ),
+          width: '9%',
+          ...getColumnSearchProps('issue22k'),
+        },
+        {
+          title: "Receive",
+          dataIndex: "receive22k",
+          render: text => (
+            <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
+              {text}
+            </div>
+          ),
+          width: '8%',
+          ...getColumnSearchProps('receive22k'),    
+        }
+      ]
+    },
+    {
+      title: "Action",
+      key: "action",
+      width: "8%",
+      
+      render: (text, record, index) => (
+        <>
+          {text.is_receiver_updated || text.is_deleted_flag ? (
+          <div></div>
+        ) : (
+          <div style={{ textAlign:"center"}}>
+          <Space>
+            <EditOutlined style={{ color:"#1f2937", fontSize: '175%'}} onClick={() => showAddPopup(text)}/>
+          </Space>
+          </div>
+        )}
+        </>
+      )
+    }
   ];
 
   const SelectNone = () => {
@@ -451,6 +543,7 @@ const MasterStock = () => {
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
+    // console.log('selectedRowKeys changed: ', newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
@@ -473,6 +566,12 @@ const MasterStock = () => {
         onSelect: () => {SelectNone()},
       },
       {
+        key: 'deleted',
+        text: 'Show Deleted',
+        onSelect: ()=> {updateRows("deleted")},
+        
+      },
+      {
         key: 'all_entries',
         text: 'Show All',
         onSelect: ()=> {updateRows("all")},
@@ -482,16 +581,12 @@ const MasterStock = () => {
         key: 'valid',
         text: 'Show Valid',
         onSelect: ()=> {updateRows("valid")},
-      },
-      {
-        key: 'deleted',
-        text: 'Show Deleted',
-        onSelect: ()=> {updateRows("deleted")},
-      },
+      }
     ],
   };
 
   const getRowClassName = (record, i) => {
+    // console.log(i, record, record._id)
     return record.is_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
   };
 
@@ -501,25 +596,22 @@ const MasterStock = () => {
 
   return (
     <div>
-      
-
         {screenWidth > 800 ? (
           <>
             <div className="text-xl border-transparent flex justify-between items-center">
-              
-              <div style={{ 
+            <div style={{ 
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Master Stock
+                Kareegar Book
               </div>
 
               <div className="flex flex-col">
                 <div className="mb-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
-                    Opening Balance:
+                  Opening Balance:
                     <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " onChange={handleOpeningChange} value={openingBalance}/>
                   </span>
                   <Tooltip title="Add" placement="topRight">
@@ -547,35 +639,32 @@ const MasterStock = () => {
               </div>
             </div>
             <br/>
-            </>
-      ) : (
-        <>
-              <div style={{
+          </>
+        ) : (
+          <>
+            <div style={{
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Master Stock</div>
+              }} className="text-center text-[#00203FFF]" >Kareegar Book</div>
 
-          <div className="text-xl border-b-8 border-transparent	border-transparent  border-t-4 pt-4 flex justify-between items-center">
+          <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
             <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
           </div>
           <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
             <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
               Opening Balance:
-              <input className="text-[#00203FFF] text-right px-2	float-end w-32 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus-outline" onChange={handleOpeningChange} value={openingBalance}/>
+              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" onChange={handleOpeningChange} value={openingBalance}/>
             </span>
           </div>
           <div className="	text-xl flex justify-end items-center">
               <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
-                Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-32 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
+                Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
               </span>
             </div>
-            <br/>
-        </>
-        
-      )}
-
+          </>
+        )}
 
       <Modal
         title="Add Item"
@@ -583,11 +672,23 @@ const MasterStock = () => {
         onCancel={handleCancel}
         footer={null}
       >
-        <ModelAdd
+      <MeltingBookAdd
           handleOk={handleCancel}
           />
       </Modal>
-      
+
+      <Modal
+        title="Add Receive Quantity"
+        open={isEditModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+      >
+      <MeltingBookUpdate
+          handleOk={handleCancel}
+          textData={updateData}
+          />
+      </Modal>
+
       <Table
         rowSelection={rowSelection}
         columns={columns}
@@ -600,31 +701,35 @@ const MasterStock = () => {
           return (
             <>
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-                <Table.Summary.Cell index={0} className="" colSpan={3}>Total</Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
-                {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
-                <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                <Table.Summary.Cell index={4}>
-                  {totalWeightQuantity}
-                </Table.Summary.Cell>
+                <Table.Summary.Cell index={0} className="" colSpan={4}>Total</Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={4}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={5}></Table.Summary.Cell>
-                <Table.Summary.Cell index={6}>
-                  {totalRecvQuantity}
+                <Table.Summary.Cell index={6}></Table.Summary.Cell>
+                <Table.Summary.Cell index={7}></Table.Summary.Cell>
+                <Table.Summary.Cell index={8}>
+                  {/* {totalWeightQuantity} */}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={7}>
-                  {totalIssueQuantity}
+                <Table.Summary.Cell index={9}>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={8}></Table.Summary.Cell>
-                <Table.Summary.Cell index={9}></Table.Summary.Cell>
+                <Table.Summary.Cell index={10}>
+                  {/* {totalIssueQuantity} */}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={11}>
+                  {/* {totalRecvQuantity} */}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={12}>
+                  {/* {totalLossQuantity} */}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={13}></Table.Summary.Cell>
+                <Table.Summary.Cell index={14}></Table.Summary.Cell>
               </Table.Summary.Row>
             </>
           );
         }}
       />
       <Divider />
-
     </div>
   );
 };
 
-export default MasterStock;
+export default KareegarBook;
