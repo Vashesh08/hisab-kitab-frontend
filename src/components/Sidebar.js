@@ -102,7 +102,7 @@ export default function Sidebar({ changeVisibility }) {
               <ListItem onClick={() => changePage("meltingbook")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                 Melting Book
               </ListItem>
-              <ListItem onClick={() => changePage("kareegar")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+              <ListItem onClick={() => changePage("kareegardetails")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                 Kareegar Book
               </ListItem>
             </List>

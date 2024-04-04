@@ -14,6 +14,7 @@ import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
+import MeltingBookDelete from "../components/MeltingBookDelete.js";
 import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip, Popconfirm } from 'antd';
 

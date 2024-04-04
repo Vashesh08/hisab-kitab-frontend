@@ -3,7 +3,7 @@ import Masterstoke from '../pages/Masterstoke';
 import Sidebar from './Sidebar';
 import Home from '../pages/Home';
 import MeltingBook from '../pages/MeltingBook';
-import KareegarBook from '../pages/KareegarBook';
+import KareegarPage from '../pages/KareegarPage';
 
 function SideNav({ currentPage, handlePageChange }) {
 
@@ -37,8 +37,8 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
           <Masterstoke />
           ) : currentPage === "meltingbook" ?(
             <MeltingBook />
-          ) : currentPage === "kareegar" ?(
-            <KareegarBook />
+          ) : currentPage === "kareegardetails" ?(
+            <KareegarPage />
           ) : (
             <Home />
           )

@@ -14,10 +14,10 @@ import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
-import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, LeftOutlined , PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip, Popconfirm } from 'antd';
 
-const KareegarBook = () => {
+const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100); // Change this to show all
@@ -605,7 +605,8 @@ const KareegarBook = () => {
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Kareegar Book
+                <LeftOutlined onClick={() => setKareegarDetailsPage(true)}/>
+                Book {kareegarId}
               </div>
 
               <div className="flex flex-col">
@@ -642,11 +643,13 @@ const KareegarBook = () => {
           </>
         ) : (
           <>
+          <LeftOutlined onClick={() => setKareegarDetailsPage(true)}/>
+                
             <div style={{
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Kareegar Book</div>
+              }} className="text-center text-[#00203FFF]" >Book {kareegarId}</div>
 
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
