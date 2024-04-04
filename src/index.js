@@ -11,9 +11,8 @@ root.render(
   <React.StrictMode>
     <Router>
         <Routes>
-          <Route exact path='/login' element={<App />}></Route>
-          <Route exact path='/' element={<App />}></Route>
-            {/* <App /> */}
+          <Route exact path='/goldking' element={<App />}></Route>
+          <Route exact path='/' element={<Loading />}></Route>
         </Routes>
     </Router>
   </React.StrictMode>
