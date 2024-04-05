@@ -12,7 +12,7 @@ root.render(
     <Router>
         <Routes>
           <Route exact path='/goldking' element={<App />}></Route>
-          <Route exact path='/' element={<Loading />}></Route>
+          <Route exact path='/' element={<App />}></Route>
         </Routes>
     </Router>
   </React.StrictMode>
