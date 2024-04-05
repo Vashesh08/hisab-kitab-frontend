@@ -43,8 +43,8 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage 
                     hoverable 
                     className="hoverable border-gray-800 hover:text-white hover:bg-gray-800"
                     >
-                <Meta 
-                    avatar={<Avatar src="profilepic.png" />}
+                <Meta
+                    avatar={<Avatar src="profilepic.png" size={64} />}
                     title={[<div className="fontsize">{"Kareegar " + i.registeredObjectID + " Name"}</div>]}
                     description={[
                         <div className="data">

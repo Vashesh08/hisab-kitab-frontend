@@ -15,7 +15,7 @@ import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
 import { EditOutlined, DeleteOutlined, LeftOutlined , PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
-import { Tooltip, Popconfirm } from 'antd';
+import { Tooltip } from 'antd';
 
 const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
   const screenWidth = window.innerWidth;
@@ -191,6 +191,7 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -201,6 +202,10 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
     setIsEditModalOpen(true);
     setUpdateData(text)
   };
+
+  const showDeletePopup = (text) => {
+    setIsDeleteModalOpen(true)
+  }
 
   const deleteModal = async () => {
     setIsLoading(true);
@@ -213,15 +218,25 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
 
     updateRows("valid");
     setSelectedRowKeys([]);
+    setIsDeleteModalOpen(false);
     setIsLoading(false);
   }
   const handleCancel = () => {
-    updateRows("valid");
+    // updateRows("valid");
     setIsModalOpen(false);
     setIsEditModalOpen(false);
+    setIsDeleteModalOpen(false);
     setUpdateData([]);
   };
 
+  const handleUpdateClose = () => {
+    updateRows("valid");
+    setIsModalOpen(false);
+    setIsEditModalOpen(false);
+    setIsDeleteModalOpen(false);
+    setUpdateData([]);
+  }
+  
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
@@ -414,13 +429,13 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
       ...getColumnSearchProps('box_wt'),
     },
     {
-      title: "Metal (gm) + Box Weight	",
+      title: "Metal (gm) + Box Wt",
       children: [
         {
           title: "Issue",
           dataIndex: "issue22k",
           render: text => (
-            <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+            <div style={{ minWidth: '120px', maxWidth: '120px', whiteSpace:"nowrap !important", textAlign: 'center'}}>
               {text}
             </div>
           ),
@@ -623,19 +638,9 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
                       Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/>
                     </span>
-                    <Popconfirm
-                    placement="bottomLeft"
-                    title="Are you sure you want to delete the selected rows"
-                    description="Delete the Selected Rows"
-                    okText="Yes"
-                    okType="default"
-                    cancelText="No"
-                    onConfirm={deleteModal}
-                    >
                     <Tooltip title="Delete" placement="bottomRight">
-                    <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12"/>
+                    <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
                   </Tooltip>
-                  </Popconfirm>
                 </div>
               </div>
             </div>
@@ -653,7 +658,7 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
 
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
-            <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
+            <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={showDeletePopup} />
           </div>
           <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
             <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
@@ -676,8 +681,24 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
         footer={null}
       >
       <MeltingBookAdd
-          handleOk={handleCancel}
+          handleOk={handleUpdateClose}
           />
+      </Modal>
+
+      <Modal
+        title="Are you sure you want to delete the selected rows ?"
+        open={isDeleteModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <div className="flex justify-center	">
+        <Button className="bg-[#ABD6DFFF] mr-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={deleteModal}>
+            Yes
+        </Button>
+        <Button className="bg-[#ABD6DFFF] ml-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={handleCancel}>
+            No
+        </Button>
+        </div>
       </Modal>
 
       <Modal
@@ -687,7 +708,7 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
         footer={null}
       >
       <MeltingBookUpdate
-          handleOk={handleCancel}
+          handleOk={handleUpdateClose}
           textData={updateData}
           />
       </Modal>

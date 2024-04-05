@@ -20,7 +20,6 @@ function Login(checkLoggedIn) {
           "username": username,
           "password": password,
         });
-        // console.log(response);
 
         if ('token' in response) {
             console.log("invalid login");

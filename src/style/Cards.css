@@ -12,6 +12,10 @@
     text-align: left;
 } */
 
+.ant-card-meta-avatar{
+    padding-inline-end: 4px !important;
+}
+
 .hoverable:hover .fontsize-header  {
     color: white;
 }

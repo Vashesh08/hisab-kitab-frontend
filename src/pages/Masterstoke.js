@@ -172,11 +172,16 @@ const MasterStock = () => {
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
+  const showDeletePopup = (text) => {
+    setIsDeleteModalOpen(true)
+  }
+  
   const deleteModal = async () => {
     setIsLoading(true);
     const token = localStorage.getItem("token");
@@ -185,15 +190,22 @@ const MasterStock = () => {
     }
     await deleteMasterStockList(masterStockId, token );
 
-    updateRows("valid");
+    await updateRows("valid");
+    setIsDeleteModalOpen(false);
     setIsLoading(false);
     setSelectedRowKeys([]);
   }
   const handleCancel = () => {
-    updateRows("valid");
+    // updateRows("valid");
     setIsModalOpen(false);
+    setIsDeleteModalOpen(false);
   };
 
+  const handleUpdateClose = () => {
+    updateRows("valid");
+    setIsModalOpen(false);
+    setIsDeleteModalOpen(false);  
+  }
 
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
@@ -530,19 +542,9 @@ const MasterStock = () => {
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
                       Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/>
                     </span>
-                    <Popconfirm
-                    placement="bottomLeft"
-                    title="Are you sure you want to delete the selected rows"
-                    description="Delete the Selected Rows"
-                    okText="Yes"
-                    okType="default"
-                    cancelText="No"
-                    onConfirm={deleteModal}
-                    >
                     <Tooltip title="Delete" placement="bottomRight">
-                    <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12"/>
+                    <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
                   </Tooltip>
-                  </Popconfirm>
                 </div>
               </div>
             </div>
@@ -558,7 +560,7 @@ const MasterStock = () => {
 
           <div className="text-xl border-b-8 border-transparent	border-transparent  border-t-4 pt-4 flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
-            <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={deleteModal} />
+            <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={showDeletePopup} />
           </div>
           <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
             <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
@@ -584,8 +586,24 @@ const MasterStock = () => {
         footer={null}
       >
         <ModelAdd
-          handleOk={handleCancel}
+          handleOk={handleUpdateClose}
           />
+      </Modal>
+
+      <Modal
+        title="Are you sure you want to delete the selected rows ?"
+        open={isDeleteModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <div className="flex justify-center	">
+          <Button className="bg-[#ABD6DFFF] mr-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={deleteModal}>
+              Yes
+          </Button>
+          <Button className="bg-[#ABD6DFFF] ml-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={handleCancel}>
+              No
+          </Button>
+        </div>
       </Modal>
       
       <Table
