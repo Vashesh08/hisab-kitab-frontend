@@ -16,11 +16,35 @@
     padding-inline-end: 4px !important;
 }
 
-.hoverable:hover .fontsize-header  {
+.hoverable:hover .ant-card-head{
     color: white;
 }
 
-.hoverable:hover .fontsize {
+/* .hoverable:hover .ant-card-head{
+    border-bottom-color: rgb(31 41 55) !important;
+} */
+
+/*Use this for hover
+ .ant-card-head:hover{
+    background-color: rgb(31 41 55);
+    color: white;
+}
+.ant-card-head:hover .ant-card-body {
+    background-color: rgb(31 41 55);
+    color: white;
+}
+
+.ant-card-body:hover{
+    background-color: rgb(31 41 55);
+    color: white;
+}
+.ant-card-body:hover .ant-card-head {
+    background-color: rgb(31 41 55);
+    color: white;
+}
+ */
+
+ .hoverable:hover .fontsize {
     color: white;
 }
 
@@ -62,7 +86,7 @@
     }
 
     .fontsize-header{
-        font-size: 2.25rem; /* 36px */
+        font-size: 1.75rem; /* 36px */
         line-height: 2.5rem; /* 40px */
     }
 

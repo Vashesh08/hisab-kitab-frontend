@@ -621,7 +621,7 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
                 <LeftOutlined onClick={() => setKareegarDetailsPage(true)}/>
-                Book {kareegarId}
+                {kareegarId}
               </div>
 
               <div className="flex flex-col">
@@ -654,7 +654,7 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Book {kareegarId}</div>
+              }} className="text-center text-[#00203FFF]" >{kareegarId}</div>
 
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
