@@ -45,22 +45,6 @@ const MeltingBook = () => {
     return formattedDate
   }
 
-  const handleOpeningChange = (event) => {
-    // console.log(event.target.value, isNaN(event.target.value))
-    if (!isNaN(parseFloat(event.target.value))){
-      // console.log(event.target.value, parseFloat(event.target.value))
-      setOpeningBalance(parseFloat(event.target.value));
-      // console.log(openingBalance);
-      setClosingBalance((parseFloat(event.target.value) + parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(3));
-      // console.log((parseFloat(openingBalance) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
-      // console.log(openingBalance, closingBalance);
-    }
-    else{
-      setOpeningBalance(0);
-      setClosingBalance((parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(3));
-    }
-  };
-
   async function updateRows (dataType){
 
     setIsLoading(true);
@@ -557,7 +541,7 @@ const MeltingBook = () => {
                 <div className="mb-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
                   Opening Balance:
-                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " onChange={handleOpeningChange} value={openingBalance}/>
+                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={openingBalance}/>
                   </span>
                   <Tooltip title="Add" placement="topRight">
                     <PlusCircleOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showModal} />
@@ -590,7 +574,7 @@ const MeltingBook = () => {
           <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
             <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
               Opening Balance:
-              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" onChange={handleOpeningChange} value={openingBalance}/>
+              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" readOnly={true} value={openingBalance}/>
             </span>
           </div>
           <div className="	text-xl flex justify-end items-center">

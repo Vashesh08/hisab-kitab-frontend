@@ -3,12 +3,23 @@ import React from "react";
 import { postMasterStock } from "../api/masterStock.js";
 import moment from 'moment'
 import Loading from "./Loading.js";
-import { Button, Form, Input, InputNumber, Select, DatePicker } from "antd";
+import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } from "antd";
 
 function ModelAdd({handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [transactionType, setTransactionType] = useState("issue");
+  const purityOptions = [
+    {
+      value: 91.8,
+    },
+    {
+      value: 99.5,
+    },
+    {
+      value: 100,
+    },
+  ];
 
   const validateMessages = {
     // eslint-disable-next-line
@@ -23,10 +34,6 @@ function ModelAdd({handleOk}) {
       // eslint-disable-next-line
       range: "${label} must be between ${min} and ${max}",
     },
-  };
-
-  const handleChange = (value) => {
-    // console.log(`selected ${value}`);
   };
 
   const handleTransactionType = (value) => {
@@ -169,25 +176,53 @@ function ModelAdd({handleOk}) {
       </Form.Item>
 
         { transactionType === "receive" ? (
+      // <Form.Item
+      //   name={["user", "purity"]}
+      //   label="Purity"
+      //   initialValue="99.5"
+      //   rules={[
+      //     {
+      //       required: true,
+      //     },
+      //   ]}
+      // >
+      //   <Select
+      //     onChange={handleChange}
+      //     options={[
+      //       { value: "99.5", label: "99.5" },
+      //       { value: "100", label: "100" },
+      //       { value: "91.80", label: "91.80" },
+      //     ]}
+      //   />
+      // </Form.Item>
+      
       <Form.Item
         name={["user", "purity"]}
         label="Purity"
-        initialValue="99.5"
         rules={[
-          {
-            required: true,
-          },
+          {           
+            validator: (_, value) => {
+              const intValue = parseInt(value, 10);
+              if (isNaN(intValue)) {
+                return Promise.reject(new Error("Please enter a valid number."));
+              } else if (intValue < 0) {
+                return Promise.reject(new Error("Value must be greater than or equal to 0."));
+              }
+              return Promise.resolve();
+            },
+            required: true 
+          }
         ]}
+        transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
       >
-        <Select
-          onChange={handleChange}
-          options={[
-            { value: "99.5", label: "99.5" },
-            { value: "100", label: "100" },
-            { value: "91.80", label: "91.80" },
-          ]}
-        />
+        <AutoComplete
+          options={purityOptions}
+          // onSelect={onSelect}
+          // onChange={onChange}            
+        >
+        </AutoComplete>
       </Form.Item>
+      
         ):(
           <div></div>
         )

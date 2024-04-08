@@ -2,11 +2,22 @@ import React, { useState } from "react";
 import { postMeltingBook } from "../api/meltingBook.js";
 import moment from 'moment'
 import Loading from "./Loading.js";
-import { Button, Form, Input, InputNumber, Select, DatePicker } from "antd";
+import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } from "antd";
 
 function MeltingBookAdd({handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
+  const purityOptions = [
+    {
+      value: 91.8,
+    },
+    {
+      value: 99.5,
+    },
+    {
+      value: 100,
+    },
+  ];
 
   const validateMessages = {
     // eslint-disable-next-line
@@ -23,9 +34,14 @@ function MeltingBookAdd({handleOk}) {
     },
   };
 
-  const handleChange = (value) => {
-    // console.log(`selected ${value}`);
-  };
+  // const onSelect = (data) => {
+  //   console.log('onSelect', data);
+  // };
+
+  // const onChange = (data) => {
+  //   console.log('onSelect', data, typeof data);
+  // };
+
 
   const onDateChange = (date, dateString) => {
     // console.log(date, dateString);
@@ -112,7 +128,7 @@ function MeltingBookAdd({handleOk}) {
         <InputNumber/>
       </Form.Item>
 
-      <Form.Item
+      {/* <Form.Item
         name={["user", "purity"]}
         label="Purity"
         initialValue="99.5"
@@ -130,7 +146,35 @@ function MeltingBookAdd({handleOk}) {
             { value: "91.80", label: "91.80" },
           ]}
         />
+      </Form.Item> */}
+
+      <Form.Item
+        name={["user", "purity"]}
+        label="Purity"
+        rules={[
+          {           
+            validator: (_, value) => {
+              const intValue = parseInt(value, 10);
+              if (isNaN(intValue)) {
+                return Promise.reject(new Error("Please enter a valid number."));
+              } else if (intValue < 0) {
+                return Promise.reject(new Error("Value must be greater than or equal to 0."));
+              }
+              return Promise.resolve();
+            },
+            required: true 
+          }
+        ]}
+        transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
+      >
+        <AutoComplete
+          options={purityOptions}
+          // onSelect={onSelect}
+          // onChange={onChange}            
+        >
+        </AutoComplete>
       </Form.Item>
+
       <Form.Item
         wrapperCol={{
           ...layout.wrapperCol,
