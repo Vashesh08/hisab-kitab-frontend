@@ -74,17 +74,19 @@ function MeltingBookAdd({handleOk}) {
     const {
       date,
       description,
-      purity,
-      weight,
+      purity: originalPurity,
+      weight: originalWt,
     } = user;
 
-    const number = (weight * purity)  / 91.8;
-    const roundedNumber = Math.round(number * 100) / 100;
+    const weight = originalWt.toFixed(2);
+    const purity = parseFloat(originalPurity).toFixed(2);
+    let number = (weight * purity)  / 91.8;
+    let roundedNumber = Math.round(number * 100) / 100;
 
     const backendData = {
     date: moment(date).format("YYYY-MM-DD"),
     description,
-    weight24k: weight.toFixed(2),
+    weight24k: weight,
     purity: purity,
     issue22k: (roundedNumber).toFixed(2),
     };

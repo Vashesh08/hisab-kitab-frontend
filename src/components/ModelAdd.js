@@ -77,10 +77,14 @@ function ModelAdd({handleOk}) {
       issueReceive,
       issuerName,
       receiverName,
-      purity,
-      weight,
+      purity: originalPurity,
+      weight: originalWt,
       metal
     } = user;
+
+    const weight = originalWt.toFixed(2);
+    const purity = originalPurity.toFixed(2);
+
     const number = (weight * purity)  / 91.8;
     const roundedNumber = Math.round(number * 100) / 100;
     
@@ -90,10 +94,10 @@ function ModelAdd({handleOk}) {
         date: moment(date).format("YYYY-MM-DD"),
         category: goodsType,
         description,
-        weight: weight.toFixed(2),
+        weight: weight,
         issuer: issuerName,
         receiver: receiverName,
-        issue22k: weight.toFixed(2)
+        issue22k: weight
       };
       await postMasterStock(backendData, token);
       // const updated = await postMasterStock(backendData, token);
@@ -105,7 +109,7 @@ function ModelAdd({handleOk}) {
         date: moment(date).format("YYYY-MM-DD"),
         category: goodsType,
         description,
-        weight: weight.toFixed(2),
+        weight: weight,
         issuer: issuerName,
         receiver: receiverName,
         purity: purity,
