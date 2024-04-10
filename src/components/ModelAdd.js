@@ -8,16 +8,20 @@ import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } fr
 function ModelAdd({handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
-  const [transactionType, setTransactionType] = useState("issue");
+  const [transactionType, setTransactionType] = useState("receive");
+
   const purityOptions = [
     {
-      value: 91.8,
+      label: "91.80",
+      value: "91.80",
     },
     {
-      value: 99.5,
+      label: "99.50",
+      value: "99.50",
     },
     {
-      value: 100,
+      label: "100",
+      value: "100",
     },
   ];
 
@@ -75,11 +79,14 @@ function ModelAdd({handleOk}) {
       receiverName,
       purity,
       weight,
+      metal
     } = user;
-
+    const number = (weight * purity)  / 91.8;
+    const roundedNumber = Math.round(number * 100) / 100;
+    
     if (issueReceive === "issue"){
       const backendData = {
-        type: "issues",
+        type: "issue",
         date: moment(date).format("YYYY-MM-DD"),
         category: goodsType,
         description,
@@ -94,15 +101,15 @@ function ModelAdd({handleOk}) {
     }
     else{
       const backendData = {
-        type: "issues",
+        type: "receive",
         date: moment(date).format("YYYY-MM-DD"),
         category: goodsType,
         description,
         weight,
         issuer: issuerName,
         receiver: receiverName,
-        purity,
-        receive22k: ((weight * purity)  / 91.8).toFixed(3)
+        purity: purity,
+        receive22k: (roundedNumber).toFixed(2)
       };
       await postMasterStock(backendData, token);
       // const updated = await postMasterStock(backendData, token);
@@ -131,19 +138,19 @@ function ModelAdd({handleOk}) {
     >
       <Form.Item
         name={["user", "issueReceive"]}
-        label="Issue / Receive"
+        label="Receive / Issue"
         rules={[
           {
             required: true,
           },
         ]}
-        initialValue="issue"
+        initialValue="receive"
       >
         <Select
           onChange={handleTransactionType}
           options={[
-            { value: "issue", label: "Issue" },
             { value: "receive", label: "Receive" },
+            { value: "issue", label: "Issue" },
           ]}
         />
       </Form.Item>
@@ -195,7 +202,26 @@ function ModelAdd({handleOk}) {
       //     ]}
       //   />
       // </Form.Item>
-      
+
+      <>
+      <Form.Item
+        name={["user", "metal"]}
+        label="Metal / Non-Metal"
+        rules={[
+          {
+            required: true,
+          },
+        ]}
+        initialValue="metal"
+      >
+        <Select
+          // onChange={handleMetalType}
+          options={[
+            { value: "metal", label: "Metal" },
+            { value: "non-metal", label: "Non-Metal" },
+          ]}
+        />
+      </Form.Item>
       <Form.Item
         name={["user", "purity"]}
         label="Purity"
@@ -222,6 +248,8 @@ function ModelAdd({handleOk}) {
         >
         </AutoComplete>
       </Form.Item>
+      
+      </>
       
         ):(
           <div></div>

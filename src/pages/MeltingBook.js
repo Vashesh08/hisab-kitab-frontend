@@ -102,12 +102,12 @@ const MeltingBook = () => {
       totalLossQty += parseFloat(loss22k);
     });
     // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-    setTotalWeight(totalWeight.toFixed(3));
-    setTotalRecvQty(totalRecvQty.toFixed(3));
-    setTotalIssueQty(totalIssueQty.toFixed(3));
-    setTotalLossQty(totalLossQty.toFixed(3));
+    setTotalWeight(totalWeight.toFixed(2));
+    setTotalRecvQty(totalRecvQty.toFixed(2));
+    setTotalIssueQty(totalIssueQty.toFixed(2));
+    setTotalLossQty(totalLossQty.toFixed(2));
     
-    setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(3));
+    setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 
@@ -159,11 +159,11 @@ const MeltingBook = () => {
           totalLossQty += parseFloat(loss22k);
         });
         // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-        setTotalWeight(totalWeight.toFixed(3));
-        setTotalRecvQty(totalRecvQty.toFixed(3));
-        setTotalIssueQty(totalIssueQty.toFixed(3));
-        setTotalLossQty(totalLossQty.toFixed(3));
-        setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(3));
+        setTotalWeight(totalWeight.toFixed(2));
+        setTotalRecvQty(totalRecvQty.toFixed(2));
+        setTotalIssueQty(totalIssueQty.toFixed(2));
+        setTotalLossQty(totalLossQty.toFixed(2));
+        setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
 
         setIsLoading(false);
     })();
@@ -402,7 +402,18 @@ const MeltingBook = () => {
       ...getColumnSearchProps('purity'),
     },
     {
-      title: "Issue Wt",
+      title: "Issue Wt (Formula)",
+      dataIndex: "issue22k",
+      render: text => (
+        <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      ...getColumnSearchProps('issue22k'),
+    },
+    {
+      title: "Issue Wt (Actual)",
       dataIndex: "issue22k",
       render: text => (
         <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
@@ -645,14 +656,18 @@ const MeltingBook = () => {
                 <Table.Summary.Cell index={4}>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={5}>
-                  {totalIssueQuantity}</Table.Summary.Cell>
+                  {totalIssueQuantity}
+                </Table.Summary.Cell>
                 <Table.Summary.Cell index={6}>
-                  {totalRecvQuantity}
+                  {/* TODO Add Total Issue Weight {totalIssueQuantity} */}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={7}>
+                  {totalRecvQuantity}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={8}>
                   {totalLossQuantity}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={8}></Table.Summary.Cell>
+                <Table.Summary.Cell index={9}></Table.Summary.Cell>
               </Table.Summary.Row>
             </>
           );

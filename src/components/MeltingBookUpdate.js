@@ -50,7 +50,9 @@ function MeltingBookUpdate({handleOk, textData}) {
         await updateMeltingBook(backendData, token);
         // const updated = await updateMeltingBook(backendData, token);
         // console.log("Added ",updated);
-    
+        
+        // TODO ADD TO LOSS ACCT HERE
+
         form.resetFields();
         setIsLoading(false);
         handleOk();

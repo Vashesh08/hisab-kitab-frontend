@@ -9,13 +9,16 @@ function MeltingBookAdd({handleOk}) {
   const [isLoading, setIsLoading] = useState(false);
   const purityOptions = [
     {
-      value: 91.8,
+      label: "91.80",
+      value: "91.80",
     },
     {
-      value: 99.5,
+      label: "99.50",
+      value: "99.50",
     },
     {
-      value: 100,
+      label: "100",
+      value: "100",
     },
   ];
 
@@ -75,12 +78,15 @@ function MeltingBookAdd({handleOk}) {
       weight,
     } = user;
 
+    const number = (weight * purity)  / 91.8;
+    const roundedNumber = Math.round(number * 100) / 100;
+
     const backendData = {
     date: moment(date).format("YYYY-MM-DD"),
     description,
     weight24k: weight,
     purity: purity,
-    issue22k: ((weight * purity)  / 91.8).toFixed(3),
+    issue22k: (roundedNumber).toFixed(2),
     };
     await postMeltingBook(backendData, token);
     // const updated = await postMeltingBook(backendData, token);

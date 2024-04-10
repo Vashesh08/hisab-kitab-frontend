@@ -51,13 +51,13 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
       // console.log(event.target.value, parseFloat(event.target.value))
       setOpeningBalance(parseFloat(event.target.value));
       // console.log(openingBalance);
-      setClosingBalance((parseFloat(event.target.value) + parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(3));
+      setClosingBalance((parseFloat(event.target.value) + parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(2));
       // console.log((parseFloat(openingBalance) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
       // console.log(openingBalance, closingBalance);
     }
     else{
       setOpeningBalance(0);
-      setClosingBalance((parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(3));
+      setClosingBalance((parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(2));
     }
   };
 
@@ -118,12 +118,12 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
       totalLossQty += parseFloat(loss22k);
     });
     // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-    setTotalWeight(totalWeight.toFixed(3));
-    setTotalRecvQty(totalRecvQty.toFixed(3));
-    setTotalIssueQty(totalIssueQty.toFixed(3));
-    setTotalLossQty(totalLossQty.toFixed(3));
+    setTotalWeight(totalWeight.toFixed(2));
+    setTotalRecvQty(totalRecvQty.toFixed(2));
+    setTotalIssueQty(totalIssueQty.toFixed(2));
+    setTotalLossQty(totalLossQty.toFixed(2));
     
-    setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(3));
+    setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 
@@ -175,12 +175,12 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
           totalLossQty += parseFloat(loss22k);
         });
         // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-        setTotalWeight(totalWeight.toFixed(3));
-        setTotalRecvQty(totalRecvQty.toFixed(3));
-        setTotalIssueQty(totalIssueQty.toFixed(3));
-        setTotalLossQty(totalLossQty.toFixed(3));
+        setTotalWeight(totalWeight.toFixed(2));
+        setTotalRecvQty(totalRecvQty.toFixed(2));
+        setTotalIssueQty(totalIssueQty.toFixed(2));
+        setTotalLossQty(totalLossQty.toFixed(2));
 
-        setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(3));
+        setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
         setIsLoading(false);
     })();
     }, [page, itemsPerPage]);

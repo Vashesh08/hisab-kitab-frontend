@@ -110,10 +110,10 @@ const MasterStock = () => {
       totalRecvQty += parseFloat(receive22k);
       totalIssueQty += parseFloat(issue22k);
     });
-    setTotalWeight(totalWeight.toFixed(3));
-    setTotalRecvQty(totalRecvQty.toFixed(3));
-    setTotalIssueQty(totalIssueQty.toFixed(3));
-    setClosingBalance((openingBalance + totalRecvQty - totalIssueQty).toFixed(3));
+    setTotalWeight(totalWeight.toFixed(2));
+    setTotalRecvQty(totalRecvQty.toFixed(2));
+    setTotalIssueQty(totalIssueQty.toFixed(2));
+    setClosingBalance((openingBalance + totalRecvQty - totalIssueQty).toFixed(2));
     setIsLoading(false);
   };
 
@@ -129,7 +129,7 @@ const MasterStock = () => {
 
         const docs = await fetchMasterStockList(page, itemsPerPage, token);
         setFullData(docs);
-        // console.log(docs);
+        console.log(docs);
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_deleted_flag){
             deleted_data.push(docs[eachEntry]);
@@ -158,10 +158,10 @@ const MasterStock = () => {
           totalRecvQty += parseFloat(receive22k);
           totalIssueQty += parseFloat(issue22k);
         });
-        setTotalWeight(totalWeight.toFixed(3));
-        setTotalRecvQty(totalRecvQty.toFixed(3));
-        setTotalIssueQty(totalIssueQty.toFixed(3));
-        setClosingBalance((openingBalance + totalRecvQty - totalIssueQty).toFixed(3));
+        setTotalWeight(totalWeight.toFixed(2));
+        setTotalRecvQty(totalRecvQty.toFixed(2));
+        setTotalIssueQty(totalIssueQty.toFixed(2));
+        setClosingBalance((openingBalance + totalRecvQty - totalIssueQty).toFixed(2));
         setIsLoading(false);
 
     })();
@@ -355,6 +355,17 @@ const MasterStock = () => {
       width: '9%',
       sortDirections: ['ascend', "descend", 'ascend'],
       ...getColumnSearchProps('date'),
+    },
+    {
+      title: "Type",
+      dataIndex: "type",
+      render: text => (
+        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      ...getColumnSearchProps('type'),
     },
     {
       title: "Category",
@@ -618,22 +629,22 @@ const MasterStock = () => {
           return (
             <>
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-                <Table.Summary.Cell index={0} className="" colSpan={3}>Total</Table.Summary.Cell>
+                <Table.Summary.Cell index={0} className="" colSpan={4}>Total</Table.Summary.Cell>
                 {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
                 {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
-                <Table.Summary.Cell index={3}></Table.Summary.Cell>
-                <Table.Summary.Cell index={4}>
+                <Table.Summary.Cell index={4}></Table.Summary.Cell>
+                <Table.Summary.Cell index={5}>
                   {totalWeightQuantity}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={5}></Table.Summary.Cell>
-                <Table.Summary.Cell index={6}>
+                <Table.Summary.Cell index={6}></Table.Summary.Cell>
+                <Table.Summary.Cell index={7}>
                   {totalRecvQuantity}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={7}>
+                <Table.Summary.Cell index={8}>
                   {totalIssueQuantity}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={8}></Table.Summary.Cell>
                 <Table.Summary.Cell index={9}></Table.Summary.Cell>
+                <Table.Summary.Cell index={10}></Table.Summary.Cell>
               </Table.Summary.Row>
             </>
           );
