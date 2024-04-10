@@ -90,10 +90,10 @@ function ModelAdd({handleOk}) {
         date: moment(date).format("YYYY-MM-DD"),
         category: goodsType,
         description,
-        weight,
+        weight: weight.toFixed(2),
         issuer: issuerName,
         receiver: receiverName,
-        issue22k: weight
+        issue22k: weight.toFixed(2)
       };
       await postMasterStock(backendData, token);
       // const updated = await postMasterStock(backendData, token);
@@ -105,7 +105,7 @@ function ModelAdd({handleOk}) {
         date: moment(date).format("YYYY-MM-DD"),
         category: goodsType,
         description,
-        weight,
+        weight: weight.toFixed(2),
         issuer: issuerName,
         receiver: receiverName,
         purity: purity,

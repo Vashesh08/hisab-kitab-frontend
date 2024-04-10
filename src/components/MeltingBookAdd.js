@@ -84,7 +84,7 @@ function MeltingBookAdd({handleOk}) {
     const backendData = {
     date: moment(date).format("YYYY-MM-DD"),
     description,
-    weight24k: weight,
+    weight24k: weight.toFixed(2),
     purity: purity,
     issue22k: (roundedNumber).toFixed(2),
     };
