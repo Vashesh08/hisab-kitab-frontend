@@ -83,7 +83,7 @@ function ModelAdd({handleOk}) {
     } = user;
 
     const weight = originalWt.toFixed(2);
-    const purity = originalPurity.toFixed(2);
+    const purity = parseFloat(originalPurity).toFixed(2);
 
     const number = (weight * purity)  / 91.8;
     const roundedNumber = Math.round(number * 100) / 100;
