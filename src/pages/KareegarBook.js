@@ -20,7 +20,7 @@ import { Tooltip } from 'antd';
 const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
-  const [itemsPerPage] = useState(100); // Change this to show all
+  const [itemsPerPage] = useState(1000000); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [updateData, setUpdateData] = useState([]);

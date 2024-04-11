@@ -90,9 +90,9 @@ function ModelAdd({handleOk}) {
     
     if (issueReceive === "issue"){
       const backendData = {
-        type: "issue",
+        type: "Issue",
         date: moment(date).format("YYYY-MM-DD"),
-        category: goodsType,
+        // category: goodsType,
         description,
         weight: weight,
         issuer: issuerName,
@@ -105,9 +105,9 @@ function ModelAdd({handleOk}) {
     }
     else{
       const backendData = {
-        type: "receive",
+        type: "Receive",
         date: moment(date).format("YYYY-MM-DD"),
-        category: goodsType,
+        category: metal,
         description,
         weight: weight,
         issuer: issuerName,
@@ -118,6 +118,8 @@ function ModelAdd({handleOk}) {
       await postMasterStock(backendData, token);
       // const updated = await postMasterStock(backendData, token);
       // console.log("Added ",updated);
+
+      //TODO Add data to melting book
     }
 
     form.resetFields();
@@ -169,9 +171,27 @@ function ModelAdd({handleOk}) {
       >
         <DatePicker format="DD MMM, YYYY" onChange={onDateChange} disabledDate={disabledDate} />
       </Form.Item>
-      <Form.Item name={["user", "goodsType"]} label="Category">
-        <Input />
+        { transactionType === "receive" ? (
+      
+      <>
+      <Form.Item
+        name={["user", "metal"]}
+        label="Category"
+        rules={[
+          {
+            required: true,
+          },
+        ]}
+        initialValue="metal"
+      >
+        <Select
+          options={[
+            { value: "metal", label: "Metal" },
+            { value: "non-metal", label: "Non-Metal" },
+          ]}
+        />
       </Form.Item>
+
       <Form.Item name={["user", "description"]} label="Description">
         <Input />
       </Form.Item>
@@ -186,46 +206,6 @@ function ModelAdd({handleOk}) {
       />
       </Form.Item>
 
-        { transactionType === "receive" ? (
-      // <Form.Item
-      //   name={["user", "purity"]}
-      //   label="Purity"
-      //   initialValue="99.5"
-      //   rules={[
-      //     {
-      //       required: true,
-      //     },
-      //   ]}
-      // >
-      //   <Select
-      //     onChange={handleChange}
-      //     options={[
-      //       { value: "99.5", label: "99.5" },
-      //       { value: "100", label: "100" },
-      //       { value: "91.80", label: "91.80" },
-      //     ]}
-      //   />
-      // </Form.Item>
-
-      <>
-      <Form.Item
-        name={["user", "metal"]}
-        label="Metal / Non-Metal"
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-        initialValue="metal"
-      >
-        <Select
-          // onChange={handleMetalType}
-          options={[
-            { value: "metal", label: "Metal" },
-            { value: "non-metal", label: "Non-Metal" },
-          ]}
-        />
-      </Form.Item>
       <Form.Item
         name={["user", "purity"]}
         label="Purity"
@@ -256,7 +236,21 @@ function ModelAdd({handleOk}) {
       </>
       
         ):(
-          <div></div>
+          <>      
+          <Form.Item name={["user", "description"]} label="Description">
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name={["user", "weight"]}
+            label="Weight (gm)"
+            rules={[{ type: "number", min: 0, required: true }]}
+          >
+            <InputNumber
+            // precision={4}
+            // step={0.01}
+          />
+          </Form.Item>
+        </>
         )
         }
       <Form.Item name={["user", "issuerName"]} label="Issuer Name">
