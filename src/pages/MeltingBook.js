@@ -20,7 +20,7 @@ import { Tooltip } from 'antd';
 const MeltingBook = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
-  const [itemsPerPage] = useState(100); // Change this to show all
+  const [itemsPerPage] = useState(1000000); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [updateData, setUpdateData] = useState([]);
@@ -28,6 +28,7 @@ const MeltingBook = () => {
   const [totalWeightQuantity, setTotalWeight] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
+  const [totalIssueActualQuantity, setTotalIssueActualQty] = useState(0);
   const [totalLossQuantity, setTotalLossQty] = useState(0);
   const [openingBalance, setOpeningBalance] = useState(0);
   const [closingBalance, setClosingBalance] = useState(0);
@@ -82,7 +83,8 @@ const MeltingBook = () => {
     let totalRecvQty = 0.0;
     let totalIssueQty = 0.0;
     let totalLossQty = 0.0;
-    data.forEach(({ weight24k, receive22k, issue22k, loss22k}) => {
+    let totalIssueActualQty = 0.0;
+    data.forEach(({ weight24k, receive22k, issue22k, issue22kActual, loss22k}) => {
       // console.log(weight24k, receive22k, issue22k, loss22k);
       if (isNaN(parseFloat(receive22k))) {
         receive22k = 0; // Set it to zero if it's NaN
@@ -91,20 +93,25 @@ const MeltingBook = () => {
         issue22k = 0; // Set it to zero if it's NaN
       } 
       if (isNaN(parseFloat(weight24k))){
-        weight24k = 0 // Set it to zero if it's NaN
+        weight24k = 0; // Set it to zero if it's NaN
       }
       if (isNaN(parseFloat(loss22k))){
-        loss22k = 0  // Set it to zero if it's NaN
+        loss22k = 0; // Set it to zero if it's NaN
+      }
+      if (isNaN(parseFloat(issue22kActual))){
+        issue22kActual = 0; // Set it to zero if it's NaN
       }
       totalWeight += parseFloat(weight24k);
       totalRecvQty += parseFloat(receive22k);
       totalIssueQty += parseFloat(issue22k);
+      totalIssueActualQty += parseFloat(issue22kActual);
       totalLossQty += parseFloat(loss22k);
     });
     // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
     setTotalWeight(totalWeight.toFixed(2));
     setTotalRecvQty(totalRecvQty.toFixed(2));
     setTotalIssueQty(totalIssueQty.toFixed(2));
+    setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
     setTotalLossQty(totalLossQty.toFixed(2));
     
     setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
@@ -139,7 +146,8 @@ const MeltingBook = () => {
         let totalRecvQty = 0.0;
         let totalIssueQty = 0.0;
         let totalLossQty = 0.0;
-        data.forEach(({ weight24k, receive22k, issue22k, loss22k}) => {
+        let totalIssueActualQty = 0.0;
+        data.forEach(({ weight24k, receive22k, issue22k, issue22kActual, loss22k}) => {
           // console.log(weight24k, receive22k, issue22k, loss22k);
           if (isNaN(parseFloat(receive22k))) {
             receive22k = 0; // Set it to zero if it's NaN
@@ -153,15 +161,20 @@ const MeltingBook = () => {
           if (isNaN(parseFloat(loss22k))){
             loss22k = 0  // Set it to zero if it's NaN
           }
+          if (isNaN(parseFloat(issue22kActual))){
+            issue22kActual = 0; // Set it to zero if it's NaN
+          }    
           totalWeight += parseFloat(weight24k);
           totalRecvQty += parseFloat(receive22k);
           totalIssueQty += parseFloat(issue22k);
+          totalIssueActualQty += parseFloat(issue22kActual);
           totalLossQty += parseFloat(loss22k);
         });
         // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
         setTotalWeight(totalWeight.toFixed(2));
         setTotalRecvQty(totalRecvQty.toFixed(2));
         setTotalIssueQty(totalIssueQty.toFixed(2));
+        setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
         setTotalLossQty(totalLossQty.toFixed(2));
         setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
 
@@ -414,14 +427,14 @@ const MeltingBook = () => {
     },
     {
       title: "Issue Wt (Actual)",
-      dataIndex: "issue22k",
+      dataIndex: "issue22kActual",
       render: text => (
         <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('issue22k'),
+      ...getColumnSearchProps('issue22kActual'),
     },
     {
       title: "Receive Wt",
@@ -659,6 +672,7 @@ const MeltingBook = () => {
                   {totalIssueQuantity}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={6}>
+                  {totalIssueActualQuantity}
                   {/* TODO Add Total Issue Weight {totalIssueQuantity} */}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={7}>

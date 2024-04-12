@@ -39,12 +39,14 @@ function MeltingBookUpdate({handleOk, textData}) {
         
         const {
           recv_weight,
+          issue22kActual
         } = user;
         // console.log(recv_weight);
         const backendData = {
         _id: textData._id,
+        issue22kActual: issue22kActual,
         receive22k: String(recv_weight),
-        loss22k: (textData.issue22k - recv_weight).toFixed(3)
+        loss22k: (issue22kActual - recv_weight).toFixed(2)
         };
         // console.log("Vashesh", backendData);
         await updateMeltingBook(backendData, token);
@@ -73,6 +75,15 @@ function MeltingBookUpdate({handleOk, textData}) {
         }}
         validateMessages={validateMessages}
     >
+        <Form.Item
+        name={["user", "issue22kActual"]}
+        label="Issue Wt (Actual)"
+        rules={[{ type: "number", min: 0, required: true }]}
+        initialValue={textData.issue22k}
+        >
+        <InputNumber />
+        </Form.Item>
+
         <Form.Item
         name={["user", "recv_weight"]}
         label="Receive Weight (gm)"

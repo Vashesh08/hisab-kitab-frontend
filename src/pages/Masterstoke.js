@@ -113,7 +113,7 @@ const MasterStock = () => {
     setTotalWeight(totalWeight.toFixed(2));
     setTotalRecvQty(totalRecvQty.toFixed(2));
     setTotalIssueQty(totalIssueQty.toFixed(2));
-    setClosingBalance((openingBalance + totalWeight - totalIssueQty).toFixed(2));
+    setClosingBalance((openingBalance + totalWeight - (2 * totalIssueQty)).toFixed(2));
     setIsLoading(false);
   };
 
@@ -161,7 +161,7 @@ const MasterStock = () => {
         setTotalWeight(totalWeight.toFixed(2));
         setTotalRecvQty(totalRecvQty.toFixed(2));
         setTotalIssueQty(totalIssueQty.toFixed(2));
-        setClosingBalance((openingBalance + totalWeight - totalIssueQty).toFixed(2));
+        setClosingBalance((openingBalance + totalWeight - (2 * totalIssueQty)).toFixed(2));
         setIsLoading(false);
 
     })();
