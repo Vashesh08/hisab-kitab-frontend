@@ -16,6 +16,7 @@ import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import { DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
+import { getUtilityData, updateUtility } from "../api/utility.js";
 
 const MasterStock = () => {
   const screenWidth = window.innerWidth;
@@ -68,6 +69,10 @@ const MasterStock = () => {
     const deleted_data = [];
     // console.log("data", data)
 
+    const balanceData = await getUtilityData(token);
+    setOpeningBalance(balanceData[0]["masterStockOpeningBalance"]);
+    setClosingBalance(balanceData[0]["masterStockClosingBalance"]);
+
     const docs = await fetchMasterStockList(page, itemsPerPage, token);
     // console.log(docs);
     setFullData(docs);
@@ -113,7 +118,7 @@ const MasterStock = () => {
     setTotalWeight(totalWeight.toFixed(2));
     setTotalRecvQty(totalRecvQty.toFixed(2));
     setTotalIssueQty(totalIssueQty.toFixed(2));
-    setClosingBalance((openingBalance + totalWeight - (2 * totalIssueQty)).toFixed(2));
+    // setClosingBalance((openingBalance + totalWeight - (2 * totalIssueQty)).toFixed(2));
     setIsLoading(false);
   };
 
@@ -127,9 +132,12 @@ const MasterStock = () => {
         const deleted_data = [];
         // console.log("data", data)
 
+        const balanceData = await getUtilityData(token);
+        setOpeningBalance(balanceData[0]["masterStockOpeningBalance"]);
+        setClosingBalance(balanceData[0]["masterStockClosingBalance"]);
+
         const docs = await fetchMasterStockList(page, itemsPerPage, token);
         setFullData(docs);
-        console.log(docs);
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_deleted_flag){
             deleted_data.push(docs[eachEntry]);
@@ -161,7 +169,7 @@ const MasterStock = () => {
         setTotalWeight(totalWeight.toFixed(2));
         setTotalRecvQty(totalRecvQty.toFixed(2));
         setTotalIssueQty(totalIssueQty.toFixed(2));
-        setClosingBalance((openingBalance + totalWeight - (2 * totalIssueQty)).toFixed(2));
+        // setClosingBalance((openingBalance + totalWeight - (2 * totalIssueQty)).toFixed(2));
         setIsLoading(false);
 
     })();
@@ -188,6 +196,48 @@ const MasterStock = () => {
     const masterStockId = {
       masterstockId: selectedRowKeys
     }
+    console.log(selectedRowKeys, rows);
+
+    const balanceData = await getUtilityData(token);
+
+    let curMasterStockOpeningBalance = parseFloat(balanceData[0]["masterStockOpeningBalance"]);
+    let curMasterStockClosingBalance = parseFloat(balanceData[0]["masterStockClosingBalance"]);
+    let curMeltingBookOpeningBalance = parseFloat(balanceData[0]["meltingBookOpeningBalance"]);
+    let curMeltingBookClosingBalance = parseFloat(balanceData[0]["meltingBookClosingBalance"]);
+    
+    selectedRowKeys.map((item, index) => {
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i]["_id"] === item) {
+          console.log(rows[i])
+          if (rows[i]["type"] === "Issue"){
+              curMasterStockClosingBalance += parseFloat(rows[i]["weight"])
+          }
+          else{
+              if (rows[i]["category"] === "metal"){
+                curMasterStockOpeningBalance -= parseFloat(rows[i]["receive22k"])
+                curMasterStockClosingBalance -= parseFloat(rows[i]["receive22k"])
+                curMeltingBookOpeningBalance -= parseFloat(rows[i]["weight"])
+                curMeltingBookClosingBalance -= parseFloat(rows[i]["weight"])
+              }
+              else{
+                curMasterStockOpeningBalance -= parseFloat(rows[i]["receive22k"])
+                curMasterStockClosingBalance -= parseFloat(rows[i]["receive22k"])
+              }
+          }
+        }
+        }
+      }
+    )
+    
+    const utilityData = {
+      _id: balanceData[0]["_id"],
+      masterStockOpeningBalance: curMasterStockOpeningBalance,
+      masterStockClosingBalance: curMasterStockClosingBalance,
+      meltingBookOpeningBalance: curMeltingBookOpeningBalance,
+      meltingBookClosingBalance: curMeltingBookClosingBalance
+    }
+    await updateUtility(utilityData, token);
+
     await deleteMasterStockList(masterStockId, token );
 
     await updateRows("valid");
@@ -415,7 +465,7 @@ const MasterStock = () => {
       title: "Receive Wt",
       dataIndex: "receive22k",
       render: text => (
-        <div style={{minWidth: '140px', maxWidth: '140px', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{minWidth: '140px', maxWidth: '140px', overflow: 'auto', textAlign: 'end !important'}}>
           {text}
         </div>
       ),

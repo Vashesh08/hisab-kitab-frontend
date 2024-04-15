@@ -4,6 +4,7 @@ import { postMasterStock } from "../api/masterStock.js";
 import moment from 'moment'
 import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } from "antd";
+import { getUtilityData, updateUtility } from "../api/utility.js";
 
 function ModelAdd({handleOk}) {
   const [form] = Form.useForm();
@@ -88,6 +89,8 @@ function ModelAdd({handleOk}) {
     const number = (weight * purity)  / 91.8;
     const roundedNumber = Math.round(number * 100) / 100;
     
+    const balanceData = await getUtilityData(token)
+
     if (issueReceive === "issue"){
       const backendData = {
         type: "Issue",
@@ -100,6 +103,11 @@ function ModelAdd({handleOk}) {
         issue22k: weight
       };
       await postMasterStock(backendData, token);
+      const utilityData = {
+        _id: balanceData[0]["_id"],
+        masterStockClosingBalance: parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(weight))
+      }
+      await updateUtility(utilityData, token);
       // const updated = await postMasterStock(backendData, token);
       // console.log("Added ",updated);
     }
@@ -115,11 +123,29 @@ function ModelAdd({handleOk}) {
         purity: purity,
         receive22k: (roundedNumber).toFixed(2)
       };
+      if (metal === "metal")
+      {
+        const utilityData = {
+          _id: balanceData[0]["_id"],
+          masterStockOpeningBalance: parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2))),
+          masterStockClosingBalance: parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2))),
+          meltingBookOpeningBalance: parseFloat(balanceData[0]["meltingBookOpeningBalance"]) + parseFloat(weight),
+          meltingBookClosingBalance: parseFloat(balanceData[0]["meltingBookClosingBalance"]) + parseFloat(weight)
+        }
+        await updateUtility(utilityData, token);
+      }
+      else{
+        const utilityData = {
+          _id: balanceData[0]["_id"],
+          masterStockOpeningBalance: parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2))),
+          masterStockClosingBalance: parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))
+        }
+        await updateUtility(utilityData, token);  
+      }
       await postMasterStock(backendData, token);
       // const updated = await postMasterStock(backendData, token);
       // console.log("Added ",updated);
 
-      //TODO Add data to melting book
     }
 
     form.resetFields();

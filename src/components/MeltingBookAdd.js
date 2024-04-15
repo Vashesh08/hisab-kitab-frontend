@@ -3,10 +3,12 @@ import { postMeltingBook } from "../api/meltingBook.js";
 import moment from 'moment'
 import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } from "antd";
+import { getUtilityData, updateUtility } from "../api/utility.js";
 
-function MeltingBookAdd({handleOk}) {
+function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
+  
   const purityOptions = [
     {
       label: "91.80",
@@ -70,33 +72,55 @@ function MeltingBookAdd({handleOk}) {
 
     setIsLoading(true);
     // console.log(user);
+    const balanceData = await getUtilityData(token);
     
     const {
       date,
       description,
+      category,
       purity: originalPurity,
       weight: originalWt,
+      conversion: conversionValue,
     } = user;
-
+    
+    const conversion = parseFloat(conversionValue).toFixed(2);
     const weight = originalWt.toFixed(2);
     const purity = parseFloat(originalPurity).toFixed(2);
-    let number = (weight * purity)  / 91.8;
+    let number = (weight * purity)  / conversion;
     let roundedNumber = Math.round(number * 100) / 100;
+    form.resetFields();
 
-    const backendData = {
-    date: moment(date).format("YYYY-MM-DD"),
-    description,
-    weight24k: weight,
-    purity: purity,
-    issue22k: (roundedNumber).toFixed(2),
-    };
-    await postMeltingBook(backendData, token);
+    if (parseFloat(weight) <= parseFloat(balanceData[0]["meltingBookClosingBalance"])){
+
+      
+      const backendData = {
+        date: moment(date).format("YYYY-MM-DD"),
+        description,
+        weight24k: weight,
+        purity: purity,
+        category: category,
+        conversion: conversion,
+        issue22k: (roundedNumber).toFixed(2),
+        };
+        await postMeltingBook(backendData, token);
+        
+      if (category === "Gold")
+      {        
+        const utilityData = {
+          _id: balanceData[0]["_id"],
+          meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) - parseFloat(weight)).toFixed(2)
+        }
+        await updateUtility(utilityData, token);
+      }
+      handleOk();
+    }
+    else{
+      setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]));
+    }
+
     // const updated = await postMeltingBook(backendData, token);
     // console.log("Added ",updated);
-
-    form.resetFields();
     setIsLoading(false);
-    handleOk();
 
   };
 
@@ -129,9 +153,27 @@ function MeltingBookAdd({handleOk}) {
         <Input />
       </Form.Item>
       <Form.Item
+        name={["user", "category"]}
+        label="Category"
+        rules={[
+          {
+            required: true,
+          },
+        ]}
+        initialValue="Gold"
+      >
+        <Select
+          options={[
+            { value: "Gold", label: "Gold" },
+            { value: "Bhuka", label: "Bhuka" },
+          ]}
+        />
+      </Form.Item>
+
+      <Form.Item
         name={["user", "weight"]}
         label="Weight (gm)"
-        rules={[{ type: "number", min: 0, required: true }]}
+        rules={[{ type: "number", min: 0, max: closingBalance, required: true }]}
       >
         <InputNumber/>
       </Form.Item>
@@ -159,6 +201,33 @@ function MeltingBookAdd({handleOk}) {
       <Form.Item
         name={["user", "purity"]}
         label="Purity"
+        rules={[
+          {           
+            validator: (_, value) => {
+              const intValue = parseInt(value, 10);
+              if (isNaN(intValue)) {
+                return Promise.reject(new Error("Please enter a valid number."));
+              } else if (intValue < 0) {
+                return Promise.reject(new Error("Value must be greater than or equal to 0."));
+              }
+              return Promise.resolve();
+            },
+            required: true 
+          }
+        ]}
+        transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
+      >
+        <AutoComplete
+          options={purityOptions}
+          // onSelect={onSelect}
+          // onChange={onChange}            
+        >
+        </AutoComplete>
+      </Form.Item>
+
+      <Form.Item
+        name={["user", "conversion"]}
+        label="Conversion"
         rules={[
           {           
             validator: (_, value) => {

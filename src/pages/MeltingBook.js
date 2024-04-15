@@ -9,6 +9,7 @@ import {
   Space, 
 } from "antd";
 import Highlighter from 'react-highlight-words';
+import { getUtilityData, updateUtility } from "../api/utility.js";
 import { fetchMeltingBookList, deleteMeltingBookList } from "../api/meltingBook.js";
 import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
@@ -54,6 +55,10 @@ const MeltingBook = () => {
     const data = [];
     const deleted_data = [];
     // console.log("data", data)
+    
+    const balanceData = await getUtilityData(token);
+    setOpeningBalance(balanceData[0]["meltingBookOpeningBalance"])
+    setClosingBalance(balanceData[0]["meltingBookClosingBalance"])
 
     const docs = await fetchMeltingBookList(page, itemsPerPage, token);
     setFullData(docs);
@@ -114,7 +119,7 @@ const MeltingBook = () => {
     setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
     setTotalLossQty(totalLossQty.toFixed(2));
     
-    setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+    // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 
@@ -128,6 +133,10 @@ const MeltingBook = () => {
         const deleted_data = [];
         // console.log("data", data)
 
+        const balanceData = await getUtilityData(token);
+        setOpeningBalance(balanceData[0]["meltingBookOpeningBalance"])
+        setClosingBalance(balanceData[0]["meltingBookClosingBalance"])
+    
         const docs = await fetchMeltingBookList(page, itemsPerPage, token);
         setFullData(docs);
         // console.log("data", docs);
@@ -176,7 +185,7 @@ const MeltingBook = () => {
         setTotalIssueQty(totalIssueQty.toFixed(2));
         setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
         setTotalLossQty(totalLossQty.toFixed(2));
-        setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+        // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
 
         setIsLoading(false);
     })();
@@ -210,6 +219,25 @@ const MeltingBook = () => {
     const meltingBookId = {
       _id: selectedRowKeys
     }
+    const balanceData = await getUtilityData(token);
+    let currMeltingBookClosingBalance = parseFloat(balanceData[0]["meltingBookClosingBalance"])
+
+    // console.log(selectedRowKeys, rows);
+    selectedRowKeys.map((item, index) => {
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i]["_id"] === item) {
+          // console.log(rows[i]);
+          currMeltingBookClosingBalance += parseFloat(rows[i]["weight24k"]);
+        }
+        }
+      }
+    )
+    const utilityData = {
+      _id: balanceData[0]["_id"],
+      meltingBookClosingBalance: currMeltingBookClosingBalance
+    }
+    await updateUtility(utilityData, token);
+
     // console.log(meltingBookId);
     await deleteMeltingBookList(meltingBookId, token);
 
@@ -382,6 +410,17 @@ const MeltingBook = () => {
       ...getColumnSearchProps('date'),
     },
     {
+      title: "Category",
+      dataIndex: "category",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      ...getColumnSearchProps('category'),
+    },
+    {
       title: "Description",
       dataIndex: "description",
       render: text => (
@@ -389,7 +428,7 @@ const MeltingBook = () => {
           {text}
         </div>
       ),
-      width: '20%',
+      width: '10%',
       ...getColumnSearchProps('description'),
     },
     {
@@ -413,6 +452,17 @@ const MeltingBook = () => {
       ),
       width: '9%',
       ...getColumnSearchProps('purity'),
+    },
+    {
+      title: "Conversion",
+      dataIndex: "conversion",
+      render: text => (
+        <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
+          {text}
+        </div>
+      ),
+      width: '9%',
+      ...getColumnSearchProps('conversion'),
     },
     {
       title: "Issue Wt (Formula)",
@@ -564,7 +614,7 @@ const MeltingBook = () => {
               <div className="flex flex-col">
                 <div className="mb-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
-                  Opening Balance:
+                  Opening Balance:&nbsp;&nbsp;&nbsp;&nbsp;
                     <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={openingBalance}/>
                   </span>
                   <Tooltip title="Add" placement="topRight">
@@ -573,7 +623,7 @@ const MeltingBook = () => {
                 </div>
                 <div className="mt-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
-                      Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/>
+                      Remaining Balance:  <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/>
                     </span>
                     <Tooltip title="Delete" placement="bottomRight">
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
@@ -617,6 +667,8 @@ const MeltingBook = () => {
       >
       <MeltingBookAdd
           handleOk={handleUpdateClose}
+          closingBalance={parseFloat(closingBalance)}
+          setClosingBalance={setClosingBalance}
           />
       </Modal>
 
@@ -660,13 +712,16 @@ const MeltingBook = () => {
           return (
             <>
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-                <Table.Summary.Cell index={0} className="" colSpan={3}>Total</Table.Summary.Cell>
+                <Table.Summary.Cell index={0} className="" colSpan={4}>Total</Table.Summary.Cell>
                 {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
                 {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={3}>
                   {totalWeightQuantity}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={4}>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={3}>
+                  {/* {totalWeightQuantity} */}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={5}>
                   {totalIssueQuantity}
