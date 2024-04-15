@@ -120,7 +120,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
       handleOk();
     }
     else{
-      setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]));
+      setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2));
     }
 
     // const updated = await postMeltingBook(backendData, token);

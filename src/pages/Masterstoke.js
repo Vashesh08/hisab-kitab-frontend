@@ -70,8 +70,8 @@ const MasterStock = () => {
     // console.log("data", data)
 
     const balanceData = await getUtilityData(token);
-    setOpeningBalance(balanceData[0]["masterStockOpeningBalance"]);
-    setClosingBalance(balanceData[0]["masterStockClosingBalance"]);
+    setOpeningBalance(parseFloat(balanceData[0]["masterStockOpeningBalance"]).toFixed(2));
+    setClosingBalance(parseFloat(balanceData[0]["masterStockClosingBalance"]).toFixed(2));
 
     const docs = await fetchMasterStockList(page, itemsPerPage, token);
     // console.log(docs);
@@ -133,8 +133,8 @@ const MasterStock = () => {
         // console.log("data", data)
 
         const balanceData = await getUtilityData(token);
-        setOpeningBalance(balanceData[0]["masterStockOpeningBalance"]);
-        setClosingBalance(balanceData[0]["masterStockClosingBalance"]);
+        setOpeningBalance(parseFloat(balanceData[0]["masterStockOpeningBalance"]).toFixed(2));
+        setClosingBalance(parseFloat(balanceData[0]["masterStockClosingBalance"]).toFixed(2));
 
         const docs = await fetchMasterStockList(page, itemsPerPage, token);
         setFullData(docs);

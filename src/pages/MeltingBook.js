@@ -57,8 +57,8 @@ const MeltingBook = () => {
     // console.log("data", data)
     
     const balanceData = await getUtilityData(token);
-    setOpeningBalance(balanceData[0]["meltingBookOpeningBalance"])
-    setClosingBalance(balanceData[0]["meltingBookClosingBalance"])
+    setOpeningBalance(parseFloat(balanceData[0]["meltingBookOpeningBalance"]).toFixed(2));
+    setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2));
 
     const docs = await fetchMeltingBookList(page, itemsPerPage, token);
     setFullData(docs);
@@ -134,8 +134,8 @@ const MeltingBook = () => {
         // console.log("data", data)
 
         const balanceData = await getUtilityData(token);
-        setOpeningBalance(balanceData[0]["meltingBookOpeningBalance"])
-        setClosingBalance(balanceData[0]["meltingBookClosingBalance"])
+        setOpeningBalance(parseFloat(balanceData[0]["meltingBookOpeningBalance"]).toFixed(2));
+        setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2))
     
         const docs = await fetchMeltingBookList(page, itemsPerPage, token);
         setFullData(docs);
@@ -653,7 +653,7 @@ const MeltingBook = () => {
           </div>
           <div className="	text-xl flex justify-end items-center">
               <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
-                Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
+                Remaining Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
               </span>
             </div>
           </>
