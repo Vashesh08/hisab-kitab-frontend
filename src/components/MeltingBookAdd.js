@@ -8,7 +8,8 @@ import { getUtilityData, updateUtility } from "../api/utility.js";
 function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [categoryType, setCategoryType] = useState("receive");
+
   const purityOptions = [
     {
       label: "91.80",
@@ -47,6 +48,10 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   //   console.log('onSelect', data, typeof data);
   // };
 
+  const handleCategoryType = (value) => {
+    // console.log(`selected transaction type ${value}`);
+    setCategoryType(value);
+  }
 
   const onDateChange = (date, dateString) => {
     // console.log(date, dateString);
@@ -163,6 +168,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
         initialValue="Gold"
       >
         <Select
+          onChange={handleCategoryType}
           options={[
             { value: "Gold", label: "Gold" },
             { value: "Bhuka", label: "Bhuka" },
@@ -170,13 +176,23 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
         />
       </Form.Item>
 
-      <Form.Item
-        name={["user", "weight"]}
-        label="Weight (gm)"
-        rules={[{ type: "number", min: 0, max: closingBalance, required: true }]}
-      >
-        <InputNumber/>
-      </Form.Item>
+      {categoryType === "Gold" ? (
+        <Form.Item
+          name={["user", "weight"]}
+          label="Weight (gm)"
+          rules={[{ type: "number", min: 0, max: closingBalance, required: true }]}
+        >
+          <InputNumber/>
+        </Form.Item>
+      ): (
+        <Form.Item
+          name={["user", "weight"]}
+          label="Weight (gm)"
+          rules={[{ type: "number", min: 0, required: true }]}
+        >
+          <InputNumber/>
+        </Form.Item>        
+      )}
 
       {/* <Form.Item
         name={["user", "purity"]}

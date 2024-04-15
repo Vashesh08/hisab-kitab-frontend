@@ -105,7 +105,7 @@ function ModelAdd({handleOk}) {
       await postMasterStock(backendData, token);
       const utilityData = {
         _id: balanceData[0]["_id"],
-        masterStockClosingBalance: parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(weight))
+        masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(weight))).toFixed(2)
       }
       await updateUtility(utilityData, token);
       // const updated = await postMasterStock(backendData, token);
@@ -127,18 +127,18 @@ function ModelAdd({handleOk}) {
       {
         const utilityData = {
           _id: balanceData[0]["_id"],
-          masterStockOpeningBalance: parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2))),
-          masterStockClosingBalance: parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2))),
-          meltingBookOpeningBalance: parseFloat(balanceData[0]["meltingBookOpeningBalance"]) + parseFloat(weight),
-          meltingBookClosingBalance: parseFloat(balanceData[0]["meltingBookClosingBalance"]) + parseFloat(weight)
+          masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+          masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+          meltingBookOpeningBalance: (parseFloat(balanceData[0]["meltingBookOpeningBalance"]) + parseFloat(weight)).toFixed(2) ,
+          meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) + parseFloat(weight)).toFixed(2)
         }
         await updateUtility(utilityData, token);
       }
       else{
         const utilityData = {
           _id: balanceData[0]["_id"],
-          masterStockOpeningBalance: parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2))),
-          masterStockClosingBalance: parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))
+          masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+          masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2)
         }
         await updateUtility(utilityData, token);  
       }

@@ -60,11 +60,11 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage 
     const renderCards = () => {
         return allKareegarDetails.map((i) => (
             
-        <div className='hello float-left w-1/3 relative p-5 text-center' onClick={() => changePage(i.name)}>
+        <div className='hello float-left w-1/4 relative p-5 text-center' onClick={() => changePage(i.name)}>
             <Row gutter={16}>
             <Col className="hover:text-white" xs={24} xl={24}>
                 <Card 
-                    title={[<div className="fontsize-header">{i.category}</div>]} 
+                    title={[<div className="fontsize-header">{i.name}</div>]} 
                     hoverable 
                     className="hoverable border-gray-800 hover:text-white hover:bg-gray-800"
                     // actions={[
@@ -72,8 +72,8 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage 
                     // ]}
                     >
                 <Meta
-                    avatar={<Avatar src="profilepic.png" size={64} />}
-                    title={[<div className="fontsize">{i.name}</div>]}
+                    // avatar={<Avatar src="profilepic.png" size={64} />}
+                    title={[<div className="fontsize">{i.category}</div>]}
                     description={[
                         <div className="data">
                             <p>Current Balance</p>
@@ -92,7 +92,7 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage 
     <div className="flex flex-wrap">
 
         {renderCards()}
-        <div className='hello float-left w-1/3 relative p-5 text-center'>
+        <div className='hello float-left w-1/4 relative p-5 text-center'>
             <Row gutter={16}>
             <Col className="hover:text-white" xs={24} xl={24}>
                 <Card 

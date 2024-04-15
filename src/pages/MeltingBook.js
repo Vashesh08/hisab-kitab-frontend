@@ -465,7 +465,7 @@ const MeltingBook = () => {
       ...getColumnSearchProps('conversion'),
     },
     {
-      title: "Issue Wt (Formula)",
+      title: "Issue Wt (F)",
       dataIndex: "issue22k",
       render: text => (
         <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
@@ -476,7 +476,7 @@ const MeltingBook = () => {
       ...getColumnSearchProps('issue22k'),
     },
     {
-      title: "Issue Wt (Actual)",
+      title: "Issue Wt",
       dataIndex: "issue22kActual",
       render: text => (
         <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
