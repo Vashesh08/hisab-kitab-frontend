@@ -11,6 +11,94 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   const [categoryType, setCategoryType] = useState("Gold");
   const [numberOfItems, setNumberOfItems] = useState(1);
 
+  const renderCommonItems = (index) => {
+    return (
+      <>
+    <Form.Item
+    name={["user", `purity${index}`]}
+    label={`Purity - ${index + 1}`}
+    rules={[
+      {           
+        validator: (_, value) => {
+          const intValue = parseInt(value, 10);
+          if (isNaN(intValue)) {
+            return Promise.reject(new Error("Please enter a valid number."));
+          } else if (intValue < 0) {
+            return Promise.reject(new Error("Value must be greater than or equal to 0."));
+          }
+          return Promise.resolve();
+        },
+        required: true 
+      }
+    ]}
+    transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
+  >
+    <AutoComplete
+      options={purityOptions}
+      // onSelect={onSelect}
+      // onChange={onChange}            
+    >
+    </AutoComplete>
+  </Form.Item>
+  <Form.Item
+    name={["user", `conversion${index}`]}
+    label={`Conversion - ${index + 1}`}
+    rules={[
+      {
+        validator: (_, value) => {
+          const intValue = parseInt(value, 10);
+          if (isNaN(intValue)) {
+            return Promise.reject(new Error("Please enter a valid number."));
+          } else if (intValue < 0) {
+            return Promise.reject(new Error("Value must be greater than or equal to 0."));
+          }
+          return Promise.resolve();
+        },
+        required: true 
+      }
+    ]}
+    transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
+  >
+    <AutoComplete
+      options={purityOptions}
+      // onSelect={onSelect}
+      // onChange={onChange}            
+    >
+    </AutoComplete>
+  </Form.Item>
+      </>
+    )
+  }
+
+  const renderItems = () => {
+    return [...Array(numberOfItems)].map((_, index) => (
+    (categoryType === "Gold") ? (
+        <>
+        <Form.Item
+          name={["user", `weight${index}`]}
+          label={`Weight (gm) - ${index+1}`}
+          rules={[{ type: "number", min: 0, max: closingBalance, required: true }]}
+        >
+          <InputNumber/>
+        </Form.Item>
+        {renderCommonItems(index)}
+        </>
+    ): (
+      <>
+        <Form.Item
+          name={["user", `weight${index}`]}
+          label={`Weight (gm) - ${index+1}`}
+          rules={[{ type: "number", min: 0, required: true }]}
+        >
+          <InputNumber/>
+        </Form.Item>
+        {renderCommonItems(index)}
+        </>
+      )
+  ))
+  }
+
+
   const purityOptions = [
     {
       label: "91.80",
@@ -86,54 +174,82 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
     setIsLoading(true);
     // console.log(user);
     const balanceData = await getUtilityData(token);
+    
+    const weightKeys = [...Array(numberOfItems)].map((_, index) => `weight${index}`);
+    const weightValues = weightKeys.map((key) => user[key]);
+    
     const purityKeys = [...Array(numberOfItems)].map((_, index) => `purity${index}`);
     const purityValues = purityKeys.map((key) => user[key]);
-    console.log(purityValues)
+
+    const conversionKeys = [...Array(numberOfItems)].map((_, index) => `conversion${index}`);
+    const conversionValues = conversionKeys.map((key) => user[key]);
     
     const {
       date,
       description,
       category,
-      purity: originalPurity,
-      weight: originalWt,
-      conversion: conversionValue,
+      // purity: originalPurity,
+      // weight: originalWt,
+      // conversion: conversionValue,
     } = user;
+  
+    let totalWeight = 0;
+    let totalRoundedNumber = 0;
+    for (let index = 0; index < numberOfItems; index++) {
+      totalWeight += weightValues[index];
+      totalRoundedNumber += ((weightValues[index] * purityValues[index])  / conversionValues[index]);
+    }
     
-    const conversion = parseFloat(conversionValue).toFixed(2);
-    const weight = originalWt.toFixed(2);
-    const purity = parseFloat(originalPurity).toFixed(2);
-    let number = (weight * purity)  / conversion;
-    let roundedNumber = Math.round(number * 100) / 100;
+    console.log(totalWeight, totalRoundedNumber);
+    // const conversion = parseFloat(conversionValues).toFixed(2);
+    // const weight = originalWt.toFixed(2);
+    // const purity = parseFloat(originalPurity).toFixed(2);
+    // let number = (weight * purity)  / conversion;
+    // let roundedNumber = Math.round(number * 100) / 100;
     form.resetFields();
 
-    if (parseFloat(weight) <= parseFloat(balanceData[0]["meltingBookClosingBalance"])){
-
-      
+    if (categoryType === "Bhuka"){
       const backendData = {
         date: moment(date).format("YYYY-MM-DD"),
         description,
-        weight24k: weight,
-        purity: purity,
-        category: category,
-        conversion: conversion,
-        issue22k: (roundedNumber).toFixed(2),
+        weight24k: weightValues,
+        purity: purityValues,
+        category: categoryType,
+        conversion: conversionValues,
+        issue22k: (totalRoundedNumber).toFixed(2),
         };
         await postMeltingBook(backendData, token);
-        
-      if (category === "Gold")
-      {        
-        const utilityData = {
-          _id: balanceData[0]["_id"],
-          meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) - parseFloat(weight)).toFixed(2)
-        }
-        await updateUtility(utilityData, token);
-      }
-      handleOk();
     }
     else{
-      setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2));
-    }
+        if (parseFloat(totalWeight) <= parseFloat(balanceData[0]["meltingBookClosingBalance"])){
 
+          
+          const backendData = {
+            date: moment(date).format("YYYY-MM-DD"),
+            description,
+            weight24k: weightValues,
+            purity: purityValues,
+            category: categoryType,
+            conversion: conversionValues,
+            issue22k: (totalRoundedNumber).toFixed(2),
+            };
+            await postMeltingBook(backendData, token);
+            
+        //   if (category === "Gold")
+        //   {        
+            const utilityData = {
+              _id: balanceData[0]["_id"],
+              meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) - parseFloat(totalWeight)).toFixed(2)
+            }
+            await updateUtility(utilityData, token);
+          // }
+        }
+        else{
+          setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2));
+        }
+      }
+
+      handleOk();
     // const updated = await postMeltingBook(backendData, token);
     // console.log("Added ",updated);
     setIsLoading(false);
@@ -191,7 +307,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
       <Form.Item
           name={["user", "items"]}
           label="Number of Items"
-          rules={[{ type: "number", min: 1, max: 5, required: true }]}
+          rules={[{ type: "number", min: 1, max: 5, required: true, step:1 }]}
           initialValue={numberOfItems}
         >
         <InputNumber
@@ -199,90 +315,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
         />
       </Form.Item>
 
-      {categoryType === "Gold" ? (
-        <>
-      {[...Array(numberOfItems)].map((_, index) => (
-        <Form.Item
-          name={["user", `weight${index}`]}
-          label={`Weight (gm) ${index+1}`}
-          rules={[{ type: "number", min: 0, max: closingBalance, required: true }]}
-        >
-          <InputNumber/>
-        </Form.Item>
-      ))}
-      </>
-    ): (
-      <>
-        {[...Array(numberOfItems)].map((_, index) => (
-        <Form.Item
-          name={["user", `weight${index}`]}
-          label={`Weight (gm) ${index+1}`}
-          rules={[{ type: "number", min: 0, required: true }]}
-        >
-          <InputNumber/>
-        </Form.Item>        
-      ))}
-      </>
-      )}
-  
-        
-  {[...Array(numberOfItems)].map((_, index) => (
-      <Form.Item
-        name={["user", `purity${index}`]}
-        label={`Purity ${index + 1}`}
-        rules={[
-          {           
-            validator: (_, value) => {
-              const intValue = parseInt(value, 10);
-              if (isNaN(intValue)) {
-                return Promise.reject(new Error("Please enter a valid number."));
-              } else if (intValue < 0) {
-                return Promise.reject(new Error("Value must be greater than or equal to 0."));
-              }
-              return Promise.resolve();
-            },
-            required: true 
-          }
-        ]}
-        transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
-      >
-        <AutoComplete
-          options={purityOptions}
-          // onSelect={onSelect}
-          // onChange={onChange}            
-        >
-        </AutoComplete>
-      </Form.Item>
-      ))}
-
-{[...Array(numberOfItems)].map((_, index) => (
-      <Form.Item
-        name={["user", `conversion${index}`]}
-        label={`Conversion ${index + 1}`}
-        rules={[
-          {
-            validator: (_, value) => {
-              const intValue = parseInt(value, 10);
-              if (isNaN(intValue)) {
-                return Promise.reject(new Error("Please enter a valid number."));
-              } else if (intValue < 0) {
-                return Promise.reject(new Error("Value must be greater than or equal to 0."));
-              }
-              return Promise.resolve();
-            },
-            required: true 
-          }
-        ]}
-        transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
-      >
-        <AutoComplete
-          options={purityOptions}
-          // onSelect={onSelect}
-          // onChange={onChange}            
-        >
-        </AutoComplete>
-      </Form.Item>
-     ))}
+          {renderItems()}
 
       <Form.Item
         wrapperCol={{

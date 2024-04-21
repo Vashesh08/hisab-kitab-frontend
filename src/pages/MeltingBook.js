@@ -44,7 +44,7 @@ const MeltingBook = () => {
     const year = curDateEntry.getFullYear().toString().slice(-2); // Get the last two digits of the year          
     const formattedDate = `${day}-${month}-${year}`;
 
-    return formattedDate
+    return formattedDate;
   }
 
   async function updateRows (dataType){
@@ -227,7 +227,12 @@ const MeltingBook = () => {
       for (let i = 0; i < rows.length; i++) {
         if (rows[i]["_id"] === item) {
           // console.log(rows[i]);
-          currMeltingBookClosingBalance += parseFloat(rows[i]["weight24k"]);
+
+          if (rows[i]["category"] === "Gold"){
+            rows[i]["weight24k"].forEach((element) => {
+              currMeltingBookClosingBalance += parseFloat(element);
+            });
+          }
         }
         }
       }
@@ -377,7 +382,35 @@ const MeltingBook = () => {
         ) : (
           getFormattedDate(text)
         )
-      ) : (
+      ) : dataIndex === "weight24k" ?(
+        // searchedColumn === dataIndex ? (<Highlighter
+        //   highlightStyle={{
+        //     backgroundColor: '#ffc069',
+        //     padding: 0,
+        //   }}
+        //   searchWords={[searchText]}
+        //   autoEscape
+        //   textToHighlight={text ? (
+        //     text.join("\n")
+        //   ) : ''}
+        //   />
+        // ) : (
+          text && text.map((eachText) => (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )
+        // )
+      ) : dataIndex === "purity" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+        )
+      ) : dataIndex === "conversion" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+        )
+      ): (
       searchedColumn === dataIndex ? (
         <Highlighter
           highlightStyle={{
@@ -436,7 +469,10 @@ const MeltingBook = () => {
       dataIndex: "weight24k",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
-          {text}
+          {text.map((eachText) => (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )}
         </div>
       ),
       width: '9%',
@@ -447,7 +483,10 @@ const MeltingBook = () => {
       dataIndex: "purity",
       render: text => (
         <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
-          {text}
+          {text.map((eachText) => (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )}
         </div>
       ),
       width: '9%',
@@ -457,8 +496,11 @@ const MeltingBook = () => {
       title: "Conversion",
       dataIndex: "conversion",
       render: text => (
-        <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
-          {text}
+        <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
+          {text.map((eachText) => (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )}
         </div>
       ),
       width: '9%',
