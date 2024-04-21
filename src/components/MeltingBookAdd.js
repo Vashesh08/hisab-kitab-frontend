@@ -8,7 +8,8 @@ import { getUtilityData, updateUtility } from "../api/utility.js";
 function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
-  const [categoryType, setCategoryType] = useState("receive");
+  const [categoryType, setCategoryType] = useState("Gold");
+  const [numberOfItems, setNumberOfItems] = useState(1);
 
   const purityOptions = [
     {
@@ -48,6 +49,13 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   //   console.log('onSelect', data, typeof data);
   // };
 
+  const handleNumberOfItems = (value) => {
+    setNumberOfItems(value);
+    // console.log([...Array(numberOfItems)].map((_, index) => `purity${index + 1}`));
+    // console.log(originalPurity.slice(0, numberOfItems).map((_, index) => `purity${index + 1}`));
+
+  }
+
   const handleCategoryType = (value) => {
     // console.log(`selected transaction type ${value}`);
     setCategoryType(value);
@@ -78,6 +86,9 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
     setIsLoading(true);
     // console.log(user);
     const balanceData = await getUtilityData(token);
+    const purityKeys = [...Array(numberOfItems)].map((_, index) => `purity${index}`);
+    const purityValues = purityKeys.map((key) => user[key]);
+    console.log(purityValues)
     
     const {
       date,
@@ -157,9 +168,10 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
       <Form.Item name={["user", "description"]} label="Description">
         <Input />
       </Form.Item>
+
       <Form.Item
-        name={["user", "category"]}
-        label="Category"
+        name={["user", `category `]}
+        label={`Category`}
         rules={[
           {
             required: true,
@@ -176,49 +188,79 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
         />
       </Form.Item>
 
+      <Form.Item
+          name={["user", "items"]}
+          label="Number of Items"
+          rules={[{ type: "number", min: 1, max: 5, required: true }]}
+          initialValue={numberOfItems}
+        >
+        <InputNumber
+          onChange={handleNumberOfItems}
+        />
+      </Form.Item>
+
       {categoryType === "Gold" ? (
+        <>
+      {[...Array(numberOfItems)].map((_, index) => (
         <Form.Item
-          name={["user", "weight"]}
-          label="Weight (gm)"
+          name={["user", `weight${index}`]}
+          label={`Weight (gm) ${index+1}`}
           rules={[{ type: "number", min: 0, max: closingBalance, required: true }]}
         >
           <InputNumber/>
         </Form.Item>
-      ): (
+      ))}
+      </>
+    ): (
+      <>
+        {[...Array(numberOfItems)].map((_, index) => (
         <Form.Item
-          name={["user", "weight"]}
-          label="Weight (gm)"
+          name={["user", `weight${index}`]}
+          label={`Weight (gm) ${index+1}`}
           rules={[{ type: "number", min: 0, required: true }]}
         >
           <InputNumber/>
         </Form.Item>        
+      ))}
+      </>
       )}
+  
+        
+  {[...Array(numberOfItems)].map((_, index) => (
+      <Form.Item
+        name={["user", `purity${index}`]}
+        label={`Purity ${index + 1}`}
+        rules={[
+          {           
+            validator: (_, value) => {
+              const intValue = parseInt(value, 10);
+              if (isNaN(intValue)) {
+                return Promise.reject(new Error("Please enter a valid number."));
+              } else if (intValue < 0) {
+                return Promise.reject(new Error("Value must be greater than or equal to 0."));
+              }
+              return Promise.resolve();
+            },
+            required: true 
+          }
+        ]}
+        transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
+      >
+        <AutoComplete
+          options={purityOptions}
+          // onSelect={onSelect}
+          // onChange={onChange}            
+        >
+        </AutoComplete>
+      </Form.Item>
+      ))}
 
-      {/* <Form.Item
-        name={["user", "purity"]}
-        label="Purity"
-        initialValue="99.5"
+{[...Array(numberOfItems)].map((_, index) => (
+      <Form.Item
+        name={["user", `conversion${index}`]}
+        label={`Conversion ${index + 1}`}
         rules={[
           {
-            required: true,
-          },
-        ]}
-      >
-        <Select
-          onChange={handleChange}
-          options={[
-            { value: "99.5", label: "99.5" },
-            { value: "100", label: "100" },
-            { value: "91.80", label: "91.80" },
-          ]}
-        />
-      </Form.Item> */}
-
-      <Form.Item
-        name={["user", "purity"]}
-        label="Purity"
-        rules={[
-          {           
             validator: (_, value) => {
               const intValue = parseInt(value, 10);
               if (isNaN(intValue)) {
@@ -240,33 +282,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
         >
         </AutoComplete>
       </Form.Item>
-
-      <Form.Item
-        name={["user", "conversion"]}
-        label="Conversion"
-        rules={[
-          {           
-            validator: (_, value) => {
-              const intValue = parseInt(value, 10);
-              if (isNaN(intValue)) {
-                return Promise.reject(new Error("Please enter a valid number."));
-              } else if (intValue < 0) {
-                return Promise.reject(new Error("Value must be greater than or equal to 0."));
-              }
-              return Promise.resolve();
-            },
-            required: true 
-          }
-        ]}
-        transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
-      >
-        <AutoComplete
-          options={purityOptions}
-          // onSelect={onSelect}
-          // onChange={onChange}            
-        >
-        </AutoComplete>
-      </Form.Item>
+     ))}
 
       <Form.Item
         wrapperCol={{
