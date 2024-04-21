@@ -8,7 +8,7 @@ import { getUtilityData, updateUtility } from "../api/utility.js";
 function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
-  const [categoryType, setCategoryType] = useState("Gold");
+  const [categoryType, setCategoryType] = useState(["Gold", "Gold", "Gold", "Gold", "Gold"]);
   const [numberOfItems, setNumberOfItems] = useState(1);
 
   const renderCommonItems = (index) => {
@@ -16,7 +16,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
       <>
     <Form.Item
     name={["user", `purity${index}`]}
-    label={`Purity - ${index + 1}`}
+    label={`Purity ${index + 1}`}
     rules={[
       {           
         validator: (_, value) => {
@@ -42,7 +42,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   </Form.Item>
   <Form.Item
     name={["user", `conversion${index}`]}
-    label={`Conversion - ${index + 1}`}
+    label={`Conversion ${index + 1}`}
     rules={[
       {
         validator: (_, value) => {
@@ -72,11 +72,31 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
 
   const renderItems = () => {
     return [...Array(numberOfItems)].map((_, index) => (
-    (categoryType === "Gold") ? (
+      <>
+      <Form.Item
+        name={["user", `category${index}`]}
+        label={`Category ${index+1}`}
+        rules={[
+          {
+            required: true,
+          },
+        ]}
+        initialValue={categoryType[index]}
+      >
+        <Select
+          onChange={(e) => handleCategoryType(e, index)} 
+          options={[
+            { value: "Gold", label: "Gold" },
+            { value: "Bhuka", label: "Bhuka" },
+          ]}
+        />
+      </Form.Item>
+
+    {(categoryType[index] === "Gold") ? (
         <>
         <Form.Item
           name={["user", `weight${index}`]}
-          label={`Weight (gm) - ${index+1}`}
+          label={`Weight (gm) ${index+1}`}
           rules={[{ type: "number", min: 0, max: closingBalance, required: true }]}
         >
           <InputNumber/>
@@ -87,7 +107,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
       <>
         <Form.Item
           name={["user", `weight${index}`]}
-          label={`Weight (gm) - ${index+1}`}
+          label={`Weight (gm) ${index+1}`}
           rules={[{ type: "number", min: 0, required: true }]}
         >
           <InputNumber/>
@@ -95,6 +115,8 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
         {renderCommonItems(index)}
         </>
       )
+    }
+      </>
   ))
   }
 
@@ -141,12 +163,17 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
     setNumberOfItems(value);
     // console.log([...Array(numberOfItems)].map((_, index) => `purity${index + 1}`));
     // console.log(originalPurity.slice(0, numberOfItems).map((_, index) => `purity${index + 1}`));
-
   }
 
-  const handleCategoryType = (value) => {
-    // console.log(`selected transaction type ${value}`);
-    setCategoryType(value);
+  const handleCategoryType = (value, index) => {
+    // console.log(`selected transaction type ${value} ${index}`);
+    // setCategoryType(value);
+    let newArrayCopy = Array.from(categoryType);
+    newArrayCopy[index] = value;
+    // console.log("New Array Copy:", newArrayCopy);
+
+    setCategoryType([...newArrayCopy.slice()]);
+    // console.log(categoryType);
   }
 
   const onDateChange = (date, dateString) => {
@@ -184,43 +211,38 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
     const conversionKeys = [...Array(numberOfItems)].map((_, index) => `conversion${index}`);
     const conversionValues = conversionKeys.map((key) => user[key]);
     
+    const categoryKeys = [...Array(numberOfItems)].map((_, index) => `category${index}`);
+    const categoryValues = categoryKeys.map((key) => user[key]);
+
     const {
       date,
       description,
-      category,
-      // purity: originalPurity,
-      // weight: originalWt,
-      // conversion: conversionValue,
     } = user;
   
     let totalWeight = 0;
     let totalRoundedNumber = 0;
     for (let index = 0; index < numberOfItems; index++) {
-      totalWeight += weightValues[index];
+      if (categoryType[index] === "Gold"){
+        totalWeight += weightValues[index];
+      };
       totalRoundedNumber += ((weightValues[index] * purityValues[index])  / conversionValues[index]);
     }
     
-    console.log(totalWeight, totalRoundedNumber);
-    // const conversion = parseFloat(conversionValues).toFixed(2);
-    // const weight = originalWt.toFixed(2);
-    // const purity = parseFloat(originalPurity).toFixed(2);
-    // let number = (weight * purity)  / conversion;
-    // let roundedNumber = Math.round(number * 100) / 100;
     form.resetFields();
 
-    if (categoryType === "Bhuka"){
-      const backendData = {
-        date: moment(date).format("YYYY-MM-DD"),
-        description,
-        weight24k: weightValues,
-        purity: purityValues,
-        category: categoryType,
-        conversion: conversionValues,
-        issue22k: (totalRoundedNumber).toFixed(2),
-        };
-        await postMeltingBook(backendData, token);
-    }
-    else{
+    // if (categoryType === "Bhuka"){
+    //   const backendData = {
+    //     date: moment(date).format("YYYY-MM-DD"),
+    //     description,
+    //     weight24k: weightValues,
+    //     purity: purityValues,
+    //     category: categoryType,
+    //     conversion: conversionValues,
+    //     issue22k: (totalRoundedNumber).toFixed(2),
+    //     };
+    //     await postMeltingBook(backendData, token);
+    // }
+    // else{
         if (parseFloat(totalWeight) <= parseFloat(balanceData[0]["meltingBookClosingBalance"])){
 
           
@@ -229,7 +251,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
             description,
             weight24k: weightValues,
             purity: purityValues,
-            category: categoryType,
+            category: categoryValues,
             conversion: conversionValues,
             issue22k: (totalRoundedNumber).toFixed(2),
             };
@@ -247,7 +269,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
         else{
           setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2));
         }
-      }
+      // }
 
       handleOk();
     // const updated = await postMeltingBook(backendData, token);
@@ -285,7 +307,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
         <Input />
       </Form.Item>
 
-      <Form.Item
+      {/* <Form.Item
         name={["user", `category `]}
         label={`Category`}
         rules={[
@@ -302,7 +324,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
             { value: "Bhuka", label: "Bhuka" },
           ]}
         />
-      </Form.Item>
+      </Form.Item> */}
 
       <Form.Item
           name={["user", "items"]}

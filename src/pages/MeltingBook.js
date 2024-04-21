@@ -228,11 +228,11 @@ const MeltingBook = () => {
         if (rows[i]["_id"] === item) {
           // console.log(rows[i]);
 
-          if (rows[i]["category"] === "Gold"){
-            rows[i]["weight24k"].forEach((element) => {
-              currMeltingBookClosingBalance += parseFloat(element);
+            rows[i]["weight24k"].forEach((element, index) => {
+              if (rows[i]["category"][index] === "Gold"){
+                currMeltingBookClosingBalance += parseFloat(element);
+              }
             });
-          }
         }
         }
       }
@@ -410,6 +410,11 @@ const MeltingBook = () => {
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
+      ) : dataIndex === "category" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+        )
       ): (
       searchedColumn === dataIndex ? (
         <Highlighter
@@ -447,7 +452,10 @@ const MeltingBook = () => {
       dataIndex: "category",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
+          {text.map((eachText) => (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )}
         </div>
       ),
       width: '10%',
