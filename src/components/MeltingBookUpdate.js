@@ -79,7 +79,7 @@ function MeltingBookUpdate({handleOk, textData}) {
         name={["user", "issue22kActual"]}
         label="Issue Wt (Actual)"
         rules={[{ type: "number", min: 0, required: true }]}
-        initialValue={textData.issue22k}
+        initialValue={Number(textData.issue22k)}
         >
         <InputNumber />
         </Form.Item>
