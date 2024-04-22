@@ -9,27 +9,27 @@ import {
   Space, 
 } from "antd";
 import Highlighter from 'react-highlight-words';
-import { fetchMeltingBookList, deleteMeltingBookList } from "../api/meltingBook.js";
-import  MeltingBookAdd from "../components/MeltingBookAdd.js"
+import { fetchKareegarBookList, deleteKareegarBookList } from "../api/kareegarBook.js";
+import KareegarBookAdd from "../components/KareegarAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
-import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
 import { EditOutlined, DeleteOutlined, LeftOutlined , PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
+import { getKareegarData, updateKareegarBalance } from "../api/kareegarDetail.js";
+import KaareegarChangeBoxWt from "../components/KareegarChangeBoxWt.js"
 
-const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
+const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(1000000); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [updateData, setUpdateData] = useState([]);
   const [fullData, setFullData] = useState([]);
   const [totalWeightQuantity, setTotalWeight] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
   const [totalLossQuantity, setTotalLossQty] = useState(0);
-  const [openingBalance, setOpeningBalance] = useState(0);
+  const [boxWt, setBoxWt] = useState(0);
   const [closingBalance, setClosingBalance] = useState(0);
 
   const getFormattedDate = (date) => {
@@ -49,14 +49,14 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
     // console.log(event.target.value, isNaN(event.target.value))
     if (!isNaN(parseFloat(event.target.value))){
       // console.log(event.target.value, parseFloat(event.target.value))
-      setOpeningBalance(parseFloat(event.target.value));
+      // setOpeningBalance(parseFloat(event.target.value));
       // console.log(openingBalance);
       setClosingBalance((parseFloat(event.target.value) + parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(2));
       // console.log((parseFloat(openingBalance) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
       // console.log(openingBalance, closingBalance);
     }
     else{
-      setOpeningBalance(0);
+      // setOpeningBalance(0);
       setClosingBalance((parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(2));
     }
   };
@@ -65,12 +65,16 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
 
     setIsLoading(true);
     const token = localStorage.getItem("token");
+    const kareegarUtilityData =  await getKareegarData(token);
+    const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
+    setBoxWt(kareegarData["boxWt"]);
+
     // send request to check authenticated
     const data = [];
     const deleted_data = [];
     // console.log("data", data)
 
-    const docs = await fetchMeltingBookList(page, itemsPerPage, token);
+    const docs = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -123,7 +127,7 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
     setTotalIssueQty(totalIssueQty.toFixed(2));
     setTotalLossQty(totalLossQty.toFixed(2));
     
-    setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+    setClosingBalance((totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 
@@ -131,13 +135,18 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
         (async () => {
 
         setIsLoading(true);
-            const token = localStorage.getItem("token");
+          
+          const token = localStorage.getItem("token");
+          const kareegarUtilityData =  await getKareegarData(token);
+          const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
+          setBoxWt(kareegarData["boxWt"])
+    
         // send request to check authenticated
         const data = [];
         const deleted_data = [];
         // console.log("data", data)
 
-        const docs = await fetchMeltingBookList(page, itemsPerPage, token);
+        const docs = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
@@ -180,7 +189,7 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
         setTotalIssueQty(totalIssueQty.toFixed(2));
         setTotalLossQty(totalLossQty.toFixed(2));
 
-        setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+        setClosingBalance((totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
         setIsLoading(false);
     })();
     }, [page, itemsPerPage]);
@@ -190,18 +199,16 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isBoxWtModalOpen, setIsBoxWtModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
-  const showAddPopup = (text) => {
-    // console.log(text);
-    setIsEditModalOpen(true);
-    setUpdateData(text)
-  };
+  const showBoxWtModal = () => {
+    setIsBoxWtModalOpen(true);
+  }
 
   const showDeletePopup = (text) => {
     setIsDeleteModalOpen(true)
@@ -210,11 +217,37 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
   const deleteModal = async () => {
     setIsLoading(true);
     const token = localStorage.getItem("token");
-    const meltingBookId = {
-      _id: selectedRowKeys
+    const data =  await getKareegarData(token);
+    const kareegarData = data.find(item => item._id === kareegarId);
+    let balance = parseFloat(kareegarData["balance"]);
+    // console.log(kareegarData, balance);
+    
+    selectedRowKeys.map((item, index) => {
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i]["_id"] === item){
+          if (rows[i]["type"] === "Issue"){
+              balance -= parseFloat(rows[i]["issue_wt"]);
+          }
+          else{
+            balance += parseFloat(rows[i]["recv_wt"]);
+          }
+        }
+      }
+    })
+    
+    const kareegarBalanceData = {
+      '_id': kareegarId,
+      "balance": balance.toFixed(2)
     }
+    console.log(balance);
+    await updateKareegarBalance(kareegarBalanceData, token);
+
+    const kareegarBookId = {
+      "kareegarBookId": selectedRowKeys
+    }
+    
     // console.log(meltingBookId);
-    await deleteMeltingBookList(meltingBookId, token);
+    await deleteKareegarBookList(kareegarBookId, token);
 
     updateRows("valid");
     setSelectedRowKeys([]);
@@ -223,18 +256,16 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
   }
   const handleCancel = () => {
     // updateRows("valid");
+    setIsBoxWtModalOpen(false);
     setIsModalOpen(false);
-    setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
-    setUpdateData([]);
   };
 
   const handleUpdateClose = () => {
     updateRows("valid");
+    setIsBoxWtModalOpen(false);
     setIsModalOpen(false);
-    setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
-    setUpdateData([]);
   }
   
   const [searchText, setSearchText] = useState('');
@@ -380,20 +411,20 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
         </div>
       ),
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
-      width: '9%',
+      width: '10%',
       sortDirections: ['ascend', "descend", 'ascend'],
       ...getColumnSearchProps('date'),
     },
     {
-      title: "Name",
-      dataIndex: "name",
+      title: "Type",
+      dataIndex: "type",
       render: text => (
-        <div style={{ minWidth:'100px', maxWidth: '140px', overflow: 'auto'}}>
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
-      width: '9%',
-      ...getColumnSearchProps('name'),
+      width: '10%',
+      ...getColumnSearchProps('type'),
     },
     {
       title: "Category",
@@ -403,7 +434,7 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
           {text}
         </div>
       ),
-      width: '9%',
+      width: '11%',
       ...getColumnSearchProps('category'),
     },
     {
@@ -414,81 +445,43 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
           {text}
         </div>
       ),
-      width: '12%',
+      width: '14%',
       ...getColumnSearchProps('description'),
-    },
-    {
-      title: "Box Wt",
-      dataIndex: "box_wt",
-      render: text => (
-        <div style={{ minWidth:'85', maxWidth: '85px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '9%',
-      ...getColumnSearchProps('box_wt'),
-    },
-    {
-      title: "Metal (gm) + Box Wt",
-      children: [
-        {
-          title: "Issue",
-          dataIndex: "issue22k",
-          render: text => (
-            <div style={{ minWidth: '120px', maxWidth: '120px', whiteSpace:"nowrap !important", textAlign: 'center'}}>
-              {text}
-            </div>
-          ),
-          width: '9%',
-          ...getColumnSearchProps('issue22k'),
-        },
-        {
-          title: "Receive",
-          dataIndex: "receive22k",
-          render: text => (
-            <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
-              {text}
-            </div>
-          ),
-          width: '8%',
-          ...getColumnSearchProps('receive22k'),    
-        }
-      ]
     },
     {
       title: "Net Weight Metal (gm)	",
       children: [
         {
           title: "Issue",
-          dataIndex: "issue22k",
+          dataIndex: "issue_wt",
           render: text => (
             <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
               {text}
             </div>
           ),
-          width: '9%',
+          width: '10%',
           ...getColumnSearchProps('issue22k'),
         },
         {
           title: "Receive",
-          dataIndex: "receive22k",
+          dataIndex: "recv_wt",
           render: text => (
             <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
               {text}
             </div>
           ),
-          width: '8%',
+          width: '10%',
           ...getColumnSearchProps('receive22k'),    
         },
         {
           title: "Loss",
-          dataIndex: "loss22k",
+          dataIndex: "loss_wt",
           render: text => (
             <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
               {text}
             </div>
           ),
-          width: '8%',
+          width: '10%',
           ...getColumnSearchProps('loss22k'),
         }
       ]
@@ -498,46 +491,27 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
       children: [
         {
           title: "Issue",
-          dataIndex: "issue22k",
+          dataIndex: "beads_issue_wt",
           render: text => (
             <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
               {text}
             </div>
           ),
-          width: '9%',
+          width: '10%',
           ...getColumnSearchProps('issue22k'),
         },
         {
           title: "Receive",
-          dataIndex: "receive22k",
+          dataIndex: "beads_recv_wt",
           render: text => (
             <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
               {text}
             </div>
           ),
-          width: '8%',
+          width: '10%',
           ...getColumnSearchProps('receive22k'),    
         }
       ]
-    },
-    {
-      title: "Action",
-      key: "action",
-      width: "8%",
-      
-      render: (text, record, index) => (
-        <>
-          {text.is_receiver_updated || text.is_deleted_flag ? (
-          <div></div>
-        ) : (
-          <div style={{ textAlign:"center"}}>
-          <Space>
-            <EditOutlined style={{ color:"#1f2937", fontSize: '175%'}} onClick={() => showAddPopup(text)}/>
-          </Space>
-          </div>
-        )}
-        </>
-      )
     }
   ];
 
@@ -621,14 +595,17 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
                 <LeftOutlined onClick={() => setKareegarDetailsPage(true)}/>
-                {kareegarId}
+                {kareegarName}
               </div>
 
               <div className="flex flex-col">
                 <div className="mb-1 flex justify-between items-center h-12">
-                  <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
-                  Opening Balance:
-                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " onChange={handleOpeningChange} value={openingBalance}/>
+                  <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2 flex items-center">
+                  Box Weight:
+                    <input className="ml-4 mr-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " onChange={handleOpeningChange} value={boxWt}/>
+                    <Tooltip title="Edit Box Wt" placement="top">
+                      <EditOutlined style={{ fontSize: "125%" }} onClick={showBoxWtModal}/>
+                    </Tooltip>
                   </span>
                   <Tooltip title="Add" placement="topRight">
                     <PlusCircleOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showModal} />
@@ -636,7 +613,7 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
                 </div>
                 <div className="mt-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
-                      Closing Balance: &nbsp; <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/>
+                  Close Daily Account: &nbsp; <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/>
                     </span>
                     <Tooltip title="Delete" placement="bottomRight">
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
@@ -654,7 +631,7 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >{kareegarId}</div>
+              }} className="text-center text-[#00203FFF]" >{kareegarName}</div>
 
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
@@ -662,13 +639,14 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
           </div>
           <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
             <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
-              Opening Balance:
-              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" onChange={handleOpeningChange} value={openingBalance}/>
+              Box Weight:
+              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" onChange={handleOpeningChange} value={boxWt}/>
+              <EditOutlined />
             </span>
           </div>
           <div className="	text-xl flex justify-end items-center">
               <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
-                Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
+                Close Daily Account: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
               </span>
             </div>
           </>
@@ -680,9 +658,22 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
         onCancel={handleCancel}
         footer={null}
       >
-      <MeltingBookAdd
+      <KareegarBookAdd
+          kareegarId={kareegarId}
           handleOk={handleUpdateClose}
           />
+      </Modal>
+
+      <Modal
+      title="Change Box Weight"
+      open={isBoxWtModalOpen}
+      onCancel={handleCancel}
+      footer={null}
+      >
+        <KaareegarChangeBoxWt
+        kareegarId={kareegarId}
+        handleOk={handleUpdateClose}
+        />
       </Modal>
 
       <Modal
@@ -701,18 +692,6 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
         </div>
       </Modal>
 
-      <Modal
-        title="Add Receive Quantity"
-        open={isEditModalOpen}
-        onCancel={handleCancel}
-        footer={null}
-      >
-      <MeltingBookUpdate
-          handleOk={handleUpdateClose}
-          textData={updateData}
-          />
-      </Modal>
-
       <Table
         rowSelection={rowSelection}
         columns={columns}
@@ -727,8 +706,8 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
                 <Table.Summary.Cell index={0} className="" colSpan={4}>Total</Table.Summary.Cell>
                 {/* <Table.Summary.Cell index={4}></Table.Summary.Cell> */}
-                <Table.Summary.Cell index={5}></Table.Summary.Cell>
-                <Table.Summary.Cell index={6}></Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={5}></Table.Summary.Cell> */}
+                {/* <Table.Summary.Cell index={6}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={7}></Table.Summary.Cell>
                 <Table.Summary.Cell index={8}>
                   {/* {totalWeightQuantity} */}
@@ -744,8 +723,6 @@ const KareegarBook = ({ kareegarId , setKareegarDetailsPage }) => {
                 <Table.Summary.Cell index={12}>
                   {/* {totalLossQuantity} */}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={13}></Table.Summary.Cell>
-                <Table.Summary.Cell index={14}></Table.Summary.Cell>
               </Table.Summary.Row>
             </>
           );

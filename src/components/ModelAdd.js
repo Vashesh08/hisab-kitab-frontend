@@ -1,7 +1,7 @@
 import { useState } from "react";
 import React from "react";
 import { postMasterStock } from "../api/masterStock.js";
-import moment from 'moment'
+import dayjs from 'dayjs'; // Import Day.js
 import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } from "antd";
 import { getUtilityData, updateUtility } from "../api/utility.js";
@@ -10,6 +10,7 @@ function ModelAdd({handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [transactionType, setTransactionType] = useState("receive");
+  const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
 
   const purityOptions = [
     {
@@ -45,13 +46,10 @@ function ModelAdd({handleOk}) {
     // console.log(`selected transaction type ${value}`);
     setTransactionType(value);
   }
-
-  const onDateChange = (date, dateString) => {
-    // console.log(date, dateString);
-  };
-  const disabledDate = current => {
+  
+  const disabledDate = (current) => {
     // Disable dates after the current date
-    return current && current > moment().endOf('day');
+    return current && dayjs(current).isAfter(dayjs().endOf('day'));
   };
 
   const layout = {
@@ -94,7 +92,7 @@ function ModelAdd({handleOk}) {
     if (issueReceive === "issue"){
       const backendData = {
         type: "Issue",
-        date: moment(date).format("YYYY-MM-DD"),
+        date: dayjs(date, "YYYY-MM-DD"),
         // category: goodsType,
         description,
         weight: weight,
@@ -114,7 +112,7 @@ function ModelAdd({handleOk}) {
     else{
       const backendData = {
         type: "Receive",
-        date: moment(date).format("YYYY-MM-DD"),
+        date: dayjs(date, "YYYY-MM-DD"),
         category: metal,
         description,
         weight: weight,
@@ -168,6 +166,19 @@ function ModelAdd({handleOk}) {
       }}
       validateMessages={validateMessages}
     >
+            <Form.Item
+        name={["user", "date"]}
+        label="Date"
+        rules={[
+          {
+            type: "Date",
+          },
+        ]}
+        initialValue={currentDate}
+      >
+        <DatePicker format="DD MMM, YYYY" disabledDate={disabledDate} />
+      </Form.Item>
+
       <Form.Item
         name={["user", "issueReceive"]}
         label="Receive / Issue"
@@ -185,17 +196,6 @@ function ModelAdd({handleOk}) {
             { value: "issue", label: "Issue" },
           ]}
         />
-      </Form.Item>
-      <Form.Item
-        name={["user", "date"]}
-        label="Date"
-        rules={[
-          {
-            type: "Date",
-          },
-        ]}
-      >
-        <DatePicker format="DD MMM, YYYY" onChange={onDateChange} disabledDate={disabledDate} />
       </Form.Item>
         { transactionType === "receive" ? (
       

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { postMeltingBook } from "../api/meltingBook.js";
-import moment from 'moment'
+import dayjs from 'dayjs'; // Import Day.js
 import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } from "antd";
 import { getUtilityData, updateUtility } from "../api/utility.js";
@@ -10,6 +10,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   const [isLoading, setIsLoading] = useState(false);
   const [categoryType, setCategoryType] = useState(["Gold", "Gold", "Gold", "Gold", "Gold"]);
   const [numberOfItems, setNumberOfItems] = useState(1);
+  const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
 
   const renderCommonItems = (index) => {
     return (
@@ -176,12 +177,9 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
     // console.log(categoryType);
   }
 
-  const onDateChange = (date, dateString) => {
-    // console.log(date, dateString);
-  };
-  const disabledDate = current => {
+  const disabledDate = (current) => {
     // Disable dates after the current date
-    return current && current > moment().endOf('day');
+    return current && dayjs(current).isAfter(dayjs().endOf('day'));
   };
 
   const layout = {
@@ -247,7 +245,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
 
           
           const backendData = {
-            date: moment(date).format("YYYY-MM-DD"),
+            date: dayjs(date, "YYYY-MM-DD"),
             description,
             weight24k: weightValues,
             purity: purityValues,
@@ -300,8 +298,9 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
             type: "Date",
           },
         ]}
+        initialValue={currentDate}
       >
-        <DatePicker format="DD MMM, YYYY" onChange={onDateChange} disabledDate={disabledDate} />
+        <DatePicker format="DD MMM, YYYY" disabledDate={disabledDate} />
       </Form.Item>
       <Form.Item name={["user", "description"]} label="Description">
         <Input />
