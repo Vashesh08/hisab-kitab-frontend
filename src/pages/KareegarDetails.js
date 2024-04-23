@@ -104,6 +104,9 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
                             <p style={{ whiteSpace: 'nowrap', overflow: 'auto' }}>
                             Current Balance: {i.balance}
                             </p>
+                            <p style={{ whiteSpace: 'nowrap', overflow: 'auto' }}>
+                            Beads Balance: {i.beads_balance}
+                            </p>
                          </div>
                        ]} />
                 </Card>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { postMeltingBook } from "../api/meltingBook.js";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "./Loading.js";
@@ -11,6 +11,83 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   const [categoryType, setCategoryType] = useState(["Gold", "Gold", "Gold", "Gold", "Gold"]);
   const [numberOfItems, setNumberOfItems] = useState(1);
   const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
+  const [meltingIssueWt, setMeltingIssueWt] = useState(0);
+  const [formWeightValues, setFormWeightValues] = useState([0, 0, 0, 0, 0]);
+  const [formPurityValues, setFormPurityValues] = useState([0, 0, 0, 0, 0]);
+  const [formConversionValues, setFormConversionValues] = useState([0, 0, 0, 0, 0]);
+  const [issueActualWt, setIssueActualWt] = useState(0);
+  
+  const handleActualIssueWt = (value) => {
+    setIssueActualWt(value);
+  }
+
+  const onChangeWt = (event, type, index) => {
+    console.log("ele", event)
+    if (event && event.target && event.target.value) {
+      const value = event.target.value;
+    console.log(type, index, value)
+    if (type === "weight"){
+      let newFormWeightValues = Array.from(formWeightValues);
+      newFormWeightValues[index] = value;
+      setFormWeightValues([...newFormWeightValues.slice()]);
+    }
+    else if (type === "purity"){
+      let newFormPurityValues = Array.from(formPurityValues);
+      newFormPurityValues[index] = value;
+      setFormPurityValues([...newFormPurityValues.slice()]);
+    }
+    else if (type === "conversion"){
+      let newFormConversionValues = Array.from(formConversionValues);
+      newFormConversionValues[index] = value;
+      setFormConversionValues([...newFormConversionValues.slice()]);      
+    }
+    }
+    
+    // const weightKeys = [...Array(numberOfItems)].map((_, index) => `weight${index}`);
+    // const weightValues = weightKeys.map((key) => (user && user[key]) || 0);
+    
+    // const purityKeys = [...Array(numberOfItems)].map((_, index) => `purity${index}`);
+    // const purityValues = purityKeys.map((key) => (user && user[key]) || 0);
+
+    // const conversionKeys = [...Array(numberOfItems)].map((_, index) => `conversion${index}`);
+    // const conversionValues = conversionKeys.map((key) => (user && user[key]) || 0);
+    // console.log("conversion", conversionKeys, conversionValues, user[conversionValues[0]])
+    // let totalRoundedNumber = 0;
+    // for (let index = 0; index < numberOfItems; index++) {
+    //   if (
+    //       (!isNaN(formWeightValues[index])) && 
+    //       (!isNaN(formPurityValues[index])) && 
+    //       (!isNaN(formConversionValues[index])) && 
+    //       (formConversionValues[index] !== 0)
+    //     ){
+    //     totalRoundedNumber += ((parseFloat(formWeightValues[index]) * parseFloat(formPurityValues[index]))  / parseFloat(formConversionValues[index]));
+    //   }
+    // //   // console.log("Vashesh", totalRoundedNumber);
+    // }
+    // console.log(totalRoundedNumber);
+    // setMeltingIssueWt(totalRoundedNumber);
+  }
+
+  useEffect(() => {
+    setIsLoading(true);
+    let totalRoundedNumber = 0;
+    for (let index = 0; index < numberOfItems; index++) {
+      if (
+        formWeightValues[index] !== 0 &&
+        formPurityValues[index] !== 0 &&
+        formConversionValues[index] !== 0
+      ) {
+        totalRoundedNumber += parseFloat(formWeightValues[index]) *
+          parseFloat(formPurityValues[index]) /
+          parseFloat(formConversionValues[index]);
+      }
+    }
+    console.log(totalRoundedNumber);
+    setMeltingIssueWt(totalRoundedNumber.toFixed(2));
+    setIssueActualWt(totalRoundedNumber.toFixed(2));
+    setIsLoading(false);
+  }, [formWeightValues, formPurityValues, formConversionValues, numberOfItems]);
+  
 
   const renderCommonItems = (index) => {
     return (
@@ -33,6 +110,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
       }
     ]}
     transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
+    onChange={(e) => onChangeWt(e, "purity", index)} 
   >
     <AutoComplete
       options={purityOptions}
@@ -59,11 +137,12 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
       }
     ]}
     transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
+    onChange={(e) => onChangeWt(e, "conversion", index)}
   >
     <AutoComplete
       options={purityOptions}
       // onSelect={onSelect}
-      // onChange={onChange}            
+      onChange={onChangeWt}            
     >
     </AutoComplete>
   </Form.Item>
@@ -99,6 +178,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
           name={["user", `weight${index}`]}
           label={`Weight (gm) ${index+1}`}
           rules={[{ type: "number", min: 0, max: closingBalance, required: true }]}
+          onChange={(e) => onChangeWt(e, "weight", index)} 
         >
           <InputNumber/>
         </Form.Item>
@@ -110,6 +190,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
           name={["user", `weight${index}`]}
           label={`Weight (gm) ${index+1}`}
           rules={[{ type: "number", min: 0, required: true }]}
+          onChange={(e) => onChangeWt(e, "weight", index)} 
         >
           <InputNumber/>
         </Form.Item>
@@ -161,7 +242,9 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   // };
 
   const handleNumberOfItems = (value) => {
-    setNumberOfItems(value);
+    if (value >= 1 && value <= 5) {
+      setNumberOfItems(value);
+    }
     // console.log([...Array(numberOfItems)].map((_, index) => `purity${index + 1}`));
     // console.log(originalPurity.slice(0, numberOfItems).map((_, index) => `purity${index + 1}`));
   }
@@ -215,6 +298,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
     const {
       date,
       description,
+      // issue22kActual
     } = user;
   
     let totalWeight = 0;
@@ -252,6 +336,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
             category: categoryValues,
             conversion: conversionValues,
             issue22k: (totalRoundedNumber).toFixed(2),
+            issue22kActual: parseFloat(issueActualWt).toFixed(2),
             };
             await postMeltingBook(backendData, token);
             
@@ -328,7 +413,9 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
       <Form.Item
           name={["user", "items"]}
           label="Number of Items"
-          rules={[{ type: "number", min: 1, max: 5, required: true, step:1 }]}
+          rules={[
+            { type: "number", min: 1, max: 5, required: true, step:1 }
+          ]}
           initialValue={numberOfItems}
         >
         <InputNumber
@@ -337,6 +424,28 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
       </Form.Item>
 
           {renderItems()}
+
+          <Form.Item
+          name={["user", "issue22k"]}
+          label="Issue Weight Formula"
+          // initialValue={meltingIssueWt}
+          >
+            {meltingIssueWt}
+            {/* <InputNumber value={meltingIssueWt} style={{color: "black", backgroundColor:"white"}} disabled={true}></InputNumber> */}
+          </Form.Item>
+          
+          <Form.Item
+          name={["user", "issue22kActual"]}
+          label="Issue Weight Actual"
+          // initialValue={meltingIssueWt}
+          >
+            <InputNumber 
+            value={issueActualWt}
+            onChange={handleActualIssueWt}
+            />
+            <Input value={issueActualWt} hidden={true}/>
+           </Form.Item>
+
 
       <Form.Item
         wrapperCol={{

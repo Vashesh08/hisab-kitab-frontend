@@ -514,17 +514,17 @@ const MeltingBook = () => {
       width: '9%',
       ...getColumnSearchProps('conversion'),
     },
-    {
-      title: "Issue Wt (F)",
-      dataIndex: "issue22k",
-      render: text => (
-        <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('issue22k'),
-    },
+    // {
+    //   title: "Issue Wt (F)",
+    //   dataIndex: "issue22k",
+    //   render: text => (
+    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+    //       {text}
+    //     </div>
+    //   ),
+    //   width: '10%',
+    //   ...getColumnSearchProps('issue22k'),
+    // },
     {
       title: "Issue Wt",
       dataIndex: "issue22kActual",
@@ -773,9 +773,9 @@ const MeltingBook = () => {
                 <Table.Summary.Cell index={3}>
                   {/* {totalWeightQuantity} */}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={5}>
+                {/* <Table.Summary.Cell index={5}>
                   {totalIssueQuantity}
-                </Table.Summary.Cell>
+                </Table.Summary.Cell> */}
                 <Table.Summary.Cell index={6}>
                   {totalIssueActualQuantity}
                   {/* TODO Add Total Issue Weight {totalIssueQuantity} */}

@@ -28,10 +28,11 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
   const [todayData, setTodayData] = useState([]);
-  const [totalWeightQuantity, setTotalWeight] = useState(0);
-  const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
+  const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalLossQuantity, setTotalLossQty] = useState(0);
+  const [totalBeadsIssueQuantity, setTotalBeadsIssueQty] = useState(0);
+  const [totalBeadsRecvQuantity, setTotalBeadsRecvQty] = useState(0);
   const [boxWt, setBoxWt] = useState(0);
   // const [closingBalance, setClosingBalance] = useState(0);
 
@@ -96,50 +97,138 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     if (dataType === "all"){
       docs.reverse();
       setRows(docs);
+      let totalIssueQty = 0.0;
+      let totalRecvQty = 0.0;
+      let totalLossQty = 0.0;
+      let totalBeadsIssueQty = 0.0;
+      let totalBeadsRecvQty = 0.0;
+      data.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
+        // console.log(weight24k, receive22k, issue22k, loss22k);
+        if (isNaN(parseFloat(issue_wt))) {
+          issue_wt = 0; // Set it to zero if it's NaN
+        } 
+        if (isNaN(parseFloat(recv_wt))) {
+          recv_wt = 0; // Set it to zero if it's NaN
+        } 
+        if (isNaN(parseFloat(loss_wt))){
+          loss_wt = 0 // Set it to zero if it's NaN
+        }
+        if (isNaN(parseFloat(beads_issue_wt))){
+          beads_issue_wt = 0  // Set it to zero if it's NaN
+        }
+        if (isNaN(parseFloat(beads_recv_wt))){
+          beads_recv_wt = 0  // Set it to zero if it's NaN
+        }
+        totalIssueQty += parseFloat(issue_wt);
+        totalRecvQty += parseFloat(recv_wt);
+        totalLossQty += parseFloat(loss_wt);
+        totalBeadsIssueQty += parseFloat(beads_issue_wt);
+        totalBeadsRecvQty += parseFloat(beads_recv_wt);
+      });
+      // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
+      setTotalIssueQty(totalIssueQty.toFixed(2));
+      setTotalRecvQty(totalRecvQty.toFixed(2));
+      setTotalLossQty(totalLossQty.toFixed(2));
+      setTotalBeadsIssueQty(totalBeadsIssueQty.toFixed(2));
+      setTotalBeadsRecvQty(totalBeadsRecvQty.toFixed(2));
+  
     }
     else if (dataType === "valid"){
       data.reverse();
 
       // setRows(currentDateData);
       setRows(data);
+      let totalIssueQty = 0.0;
+      let totalRecvQty = 0.0;
+      let totalLossQty = 0.0;
+      let totalBeadsIssueQty = 0.0;
+      let totalBeadsRecvQty = 0.0;
+      data.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
+        // console.log(weight24k, receive22k, issue22k, loss22k);
+        if (isNaN(parseFloat(issue_wt))) {
+          issue_wt = 0; // Set it to zero if it's NaN
+        } 
+        if (isNaN(parseFloat(recv_wt))) {
+          recv_wt = 0; // Set it to zero if it's NaN
+        } 
+        if (isNaN(parseFloat(loss_wt))){
+          loss_wt = 0 // Set it to zero if it's NaN
+        }
+        if (isNaN(parseFloat(beads_issue_wt))){
+          beads_issue_wt = 0  // Set it to zero if it's NaN
+        }
+        if (isNaN(parseFloat(beads_recv_wt))){
+          beads_recv_wt = 0  // Set it to zero if it's NaN
+        }
+        totalIssueQty += parseFloat(issue_wt);
+        totalRecvQty += parseFloat(recv_wt);
+        totalLossQty += parseFloat(loss_wt);
+        totalBeadsIssueQty += parseFloat(beads_issue_wt);
+        totalBeadsRecvQty += parseFloat(beads_recv_wt);
+      });
+      // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
+      setTotalIssueQty(totalIssueQty.toFixed(2));
+      setTotalRecvQty(totalRecvQty.toFixed(2));
+      setTotalLossQty(totalLossQty.toFixed(2));
+      setTotalBeadsIssueQty(totalBeadsIssueQty.toFixed(2));
+      setTotalBeadsRecvQty(totalBeadsRecvQty.toFixed(2));
+  
     }
     else if (dataType === "today"){
-      setRows(currentDateData);      
+      setRows(currentDateData);
+      let totalIssueQty = 0.0;
+      let totalRecvQty = 0.0;
+      let totalLossQty = 0.0;
+      let totalBeadsIssueQty = 0.0;
+      let totalBeadsRecvQty = 0.0;
+      currentDateData.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
+        // console.log(weight24k, receive22k, issue22k, loss22k);
+        if (isNaN(parseFloat(issue_wt))) {
+          issue_wt = 0; // Set it to zero if it's NaN
+        } 
+        if (isNaN(parseFloat(recv_wt))) {
+          recv_wt = 0; // Set it to zero if it's NaN
+        } 
+        if (isNaN(parseFloat(loss_wt))){
+          loss_wt = 0 // Set it to zero if it's NaN
+        }
+        if (isNaN(parseFloat(beads_issue_wt))){
+          beads_issue_wt = 0  // Set it to zero if it's NaN
+        }
+        if (isNaN(parseFloat(beads_recv_wt))){
+          beads_recv_wt = 0  // Set it to zero if it's NaN
+        }
+        totalIssueQty += parseFloat(issue_wt);
+        totalRecvQty += parseFloat(recv_wt);
+        totalLossQty += parseFloat(loss_wt);
+        totalBeadsIssueQty += parseFloat(beads_issue_wt);
+        totalBeadsRecvQty += parseFloat(beads_recv_wt);
+      });
+      // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
+      setTotalIssueQty(totalIssueQty.toFixed(2));
+      setTotalRecvQty(totalRecvQty.toFixed(2));
+      setTotalLossQty(totalLossQty.toFixed(2));
+      setTotalBeadsIssueQty(totalBeadsIssueQty.toFixed(2));
+      setTotalBeadsRecvQty(totalBeadsRecvQty.toFixed(2));
+     
     }
     else{
       deleted_data.reverse();
       setRows(deleted_data);
+      let totalIssueQty = 0.0;
+      let totalRecvQty = 0.0;
+      let totalLossQty = 0.0;
+      let totalBeadsIssueQty = 0.0;
+      let totalBeadsRecvQty = 0.0;
+      // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
+      setTotalIssueQty(totalIssueQty.toFixed(2));
+      setTotalRecvQty(totalRecvQty.toFixed(2));
+      setTotalLossQty(totalLossQty.toFixed(2));
+      setTotalBeadsIssueQty(totalBeadsIssueQty.toFixed(2));
+      setTotalBeadsRecvQty(totalBeadsRecvQty.toFixed(2));
+  
     }
 
-    let totalWeight = 0.000;
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    let totalLossQty = 0.0;
-    data.forEach(({ weight24k, receive22k, issue22k, loss22k}) => {
-      // console.log(weight24k, receive22k, issue22k, loss22k);
-      if (isNaN(parseFloat(receive22k))) {
-        receive22k = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(issue22k))) {
-        issue22k = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(weight24k))){
-        weight24k = 0 // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(loss22k))){
-        loss22k = 0  // Set it to zero if it's NaN
-      }
-      totalWeight += parseFloat(weight24k);
-      totalRecvQty += parseFloat(receive22k);
-      totalIssueQty += parseFloat(issue22k);
-      totalLossQty += parseFloat(loss22k);
-    });
-    // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-    setTotalWeight(totalWeight.toFixed(2));
-    setTotalRecvQty(totalRecvQty.toFixed(2));
-    setTotalIssueQty(totalIssueQty.toFixed(2));
-    setTotalLossQty(totalLossQty.toFixed(2));
-    
     // setClosingBalance((totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
@@ -180,35 +269,41 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         currentDateData.reverse();
         setRows(currentDateData);
 
-        let totalWeight = 0.000;
-        let totalRecvQty = 0.0;
         let totalIssueQty = 0.0;
+        let totalRecvQty = 0.0;
         let totalLossQty = 0.0;
-        data.forEach(({ weight24k, receive22k, issue22k, loss22k}) => {
+        let totalBeadsIssueQty = 0.0;
+        let totalBeadsRecvQty = 0.0;
+        currentDateData.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
           // console.log(weight24k, receive22k, issue22k, loss22k);
-          if (isNaN(parseFloat(receive22k))) {
-            receive22k = 0; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(issue_wt))) {
+            issue_wt = 0; // Set it to zero if it's NaN
           } 
-          if (isNaN(parseFloat(issue22k))) {
-            issue22k = 0; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(recv_wt))) {
+            recv_wt = 0; // Set it to zero if it's NaN
           } 
-          if (isNaN(parseFloat(weight24k))){
-            weight24k = 0 // Set it to zero if it's NaN
+          if (isNaN(parseFloat(loss_wt))){
+            loss_wt = 0 // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(loss22k))){
-            loss22k = 0  // Set it to zero if it's NaN
+          if (isNaN(parseFloat(beads_issue_wt))){
+            beads_issue_wt = 0  // Set it to zero if it's NaN
           }
-          totalWeight += parseFloat(weight24k);
-          totalRecvQty += parseFloat(receive22k);
-          totalIssueQty += parseFloat(issue22k);
-          totalLossQty += parseFloat(loss22k);
+          if (isNaN(parseFloat(beads_recv_wt))){
+            beads_recv_wt = 0  // Set it to zero if it's NaN
+          }
+          totalIssueQty += parseFloat(issue_wt);
+          totalRecvQty += parseFloat(recv_wt);
+          totalLossQty += parseFloat(loss_wt);
+          totalBeadsIssueQty += parseFloat(beads_issue_wt);
+          totalBeadsRecvQty += parseFloat(beads_recv_wt);
         });
         // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-        setTotalWeight(totalWeight.toFixed(2));
-        setTotalRecvQty(totalRecvQty.toFixed(2));
         setTotalIssueQty(totalIssueQty.toFixed(2));
+        setTotalRecvQty(totalRecvQty.toFixed(2));
         setTotalLossQty(totalLossQty.toFixed(2));
-
+        setTotalBeadsIssueQty(totalBeadsIssueQty.toFixed(2));
+        setTotalBeadsRecvQty(totalBeadsRecvQty.toFixed(2));
+    
         // setClosingBalance((totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
         setIsLoading(false);
     })();
@@ -245,6 +340,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     const data =  await getKareegarData(token);
     const kareegarData = data.find(item => item._id === kareegarId);
     let balance = parseFloat(kareegarData["balance"]);
+    let beads_balance = parseFloat(kareegarData["beads_balance"]);
     // console.log(kareegarData, balance);
     
     selectedRowKeys.map((item, index) => {
@@ -252,9 +348,15 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         if (rows[i]["_id"] === item){
           if (rows[i]["type"] === "Issue"){
               balance -= parseFloat(rows[i]["issue_wt"]);
+              if (rows[i]["beads_issue_wt"] !== "" && !isNaN(rows[i]["beads_issue_wt"])){
+                beads_balance -= parseFloat(rows[i]["beads_issue_wt"]);
+              }
           }
           else{
             balance += parseFloat(rows[i]["recv_wt"]);
+            if (rows[i]["beads_recv_wt"] !== "" && !isNaN(rows[i]["beads_recv_wt"])){
+              beads_balance -= parseFloat(rows[i]["beads_recv_wt"]);
+            }
           }
           if (rows[i]["loss_wt"] && !isNaN(rows[i]["loss_wt"]) && rows[i]["loss_wt"] > 0) {
             balance += parseFloat(rows[i]["loss_wt"]);
@@ -757,18 +859,19 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
                 {/* <Table.Summary.Cell index={6}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={7}></Table.Summary.Cell>
                 <Table.Summary.Cell index={8}>
-                  {/* {totalWeightQuantity} */}
+                  {totalIssueQuantity}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={9}>
+                  {totalRecvQuantity}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={10}>
-                  {/* {totalIssueQuantity} */}
+                  {totalLossQuantity}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={11}>
-                  {/* {totalRecvQuantity} */}
+                  {totalBeadsIssueQuantity}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={12}>
-                  {/* {totalLossQuantity} */}
+                  {totalBeadsRecvQuantity}
                 </Table.Summary.Cell>
               </Table.Summary.Row>
             </>

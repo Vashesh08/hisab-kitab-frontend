@@ -95,11 +95,16 @@ function KareegarAddItems({ kareegarId, handleOk}) {
       await postKareegarBook(backendData, token);
       // console.log(issue_wt,  typeof issue_wt)
       let balance = (parseFloat(kareegarData.balance) + parseFloat(issue_wt)).toFixed(2);
+      let beads_issue_wt_balance = (parseFloat(kareegarData.beads_balance))
       // const updated = await postMasterStock(backendData, token);
       // console.log("Added ", balance);
+      if (!isNaN(beads_issue_wt)){
+          beads_issue_wt_balance += beads_issue_wt; 
+      }
       const kareegarBalanceData = {
         '_id': kareegarId,
-        "balance": balance
+        "balance": balance,
+        "beads_balance": beads_issue_wt_balance
       }
       await updateKareegarBalance(kareegarBalanceData, token);
     }
@@ -117,11 +122,16 @@ function KareegarAddItems({ kareegarId, handleOk}) {
       // const updated = await postMasterStock(backendData, token);
       // console.log(recv_wt, typeof recv_wt)
       let balance = (parseFloat(kareegarData.balance) - parseFloat(recv_wt)).toFixed(2);
+      let beads_recv_wt_balance = (parseFloat(kareegarData.beads_balance))
       // console.log("Added ", balance);
+      if (!isNaN(beads_issue_wt)){
+        beads_recv_wt_balance -= beads_recv_wt; 
+      }
 
       const kareegarBalanceData = {
         '_id': kareegarId,
-        "balance": balance
+        "balance": balance,
+        "beads_balance": beads_recv_wt_balance
       }
       await updateKareegarBalance(kareegarBalanceData, token);
     }
