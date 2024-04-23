@@ -6,7 +6,7 @@ import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker } from "antd";
 import { getKareegarData, updateKareegarBalance } from "../api/kareegarDetail.js";
 
-function KareegarAdd({ kareegarId, handleOk}) {
+function KareegarAddItems({ kareegarId, handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [transactionType, setTransactionType] = useState("Issue");
@@ -258,4 +258,4 @@ function KareegarAdd({ kareegarId, handleOk}) {
   );
 }
 
-export default KareegarAdd;
+export default KareegarAddItems;

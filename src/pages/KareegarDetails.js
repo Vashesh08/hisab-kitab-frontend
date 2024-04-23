@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
 import "../style/Cards.css"
-import { Avatar, Card, Col, Row, Modal } from "antd";
+import { Button, Avatar, Card, Col, Row, Modal } from "antd";
 import { getKareegarData, deleteKareegarData } from "../api/kareegarDetail.js";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import Loading from "../components/Loading.js";
-import KareegarAdd from "../components/KareegarAdd.js";
+import AddKareegar from "../components/AddKareegar.js";
 
 export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage, setKareegarName }) {
     const { Meta } = Card;
     const [allKareegarDetails, setAllKareegarDetails] = useState([])
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedKareegarId, setSelectedKareegarId] = useState(null);
+    const [selectedKareegarName, setSelectedKareegarName] = useState(null);
+  
     async function updateData (){
         setIsLoading(true);
 
@@ -27,6 +30,8 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
 
     const handleCancel = () => {
         setIsModalOpen(false);
+        setIsDeleteModalOpen(false);
+        setSelectedKareegarId(null);
     };
     
     const handleUpdateClose = () => {
@@ -41,21 +46,29 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         setKareegarDetailsPage(false);
       }
 
-    async function deleteIcon(kareegarId){
+    async function deleteIcon(){
         setIsLoading(true);
         const token = localStorage.getItem("token");
         const kareegarDataId = {
-            "kareegarIds": kareegarId
+            "kareegarIds": selectedKareegarId
         }
 
         await deleteKareegarData(kareegarDataId, token);
-        console.log(kareegarId, "Delete ICon clicked");
+        // console.log(kareegarId, "Delete ICon clicked");
         
         setAllKareegarDetails(await getKareegarData(token));
-            
+        
+        setIsDeleteModalOpen(false);
         setIsLoading(false);
     }
 
+    const showDeletePopup = (id, name) => {
+        setIsDeleteModalOpen(true);
+        setSelectedKareegarId(id);
+        setSelectedKareegarName(name);
+      }
+    
+    
     useEffect(() => {
         (async () => {
             setIsLoading(true);
@@ -80,7 +93,7 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
                     hoverable 
                     className="hoverable border-gray-800 hover:text-white hover:bg-gray-800"
                     actions={[
-                        <DeleteOutlined key="delete" onClick={event => { event.stopPropagation(); deleteIcon(i._id)}} style={{ fontSize:"200%" }} />
+                        <DeleteOutlined key="delete" onClick={event => { event.stopPropagation(); showDeletePopup(i._id, i.name)}} style={{ fontSize:"200%" }} />
                     ]}
                     >
                 <Meta
@@ -133,12 +146,28 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         </div>
     
     <Modal
+        title={`Are you sure you want to delete Kareegar ${selectedKareegarName}`}
+        open={isDeleteModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <div className="flex justify-center	">
+        <Button className="bg-[#ABD6DFFF] mr-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={deleteIcon}>
+            Yes
+        </Button>
+        <Button className="bg-[#ABD6DFFF] ml-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={handleCancel}>
+            No
+        </Button>
+        </div>
+      </Modal>
+
+    <Modal
         title="Add Kareegar Details"
         open={isModalOpen}
         onCancel={handleCancel}
         footer={null}
     >
-      <KareegarAdd
+      <AddKareegar
           handleOk={handleUpdateClose}
           />
     </Modal>

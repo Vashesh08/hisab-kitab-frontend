@@ -8,15 +8,17 @@ import {
   Input,
   Space, 
 } from "antd";
+import dayjs from 'dayjs'; // Import Day.js
 import Highlighter from 'react-highlight-words';
 import { fetchKareegarBookList, deleteKareegarBookList } from "../api/kareegarBook.js";
-import KareegarBookAdd from "../components/KareegarAdd.js"
+import KareegarAddItems from "../components/KareegarAddItems.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import { EditOutlined, DeleteOutlined, LeftOutlined , PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
 import { getKareegarData, updateKareegarBalance } from "../api/kareegarDetail.js";
 import KaareegarChangeBoxWt from "../components/KareegarChangeBoxWt.js"
+import KaareegarClose from "../components/KareegarClose.js";
 
 const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => {
   const screenWidth = window.innerWidth;
@@ -25,12 +27,13 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
+  const [todayData, setTodayData] = useState([]);
   const [totalWeightQuantity, setTotalWeight] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
   const [totalLossQuantity, setTotalLossQty] = useState(0);
   const [boxWt, setBoxWt] = useState(0);
-  const [closingBalance, setClosingBalance] = useState(0);
+  // const [closingBalance, setClosingBalance] = useState(0);
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -51,13 +54,13 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       // console.log(event.target.value, parseFloat(event.target.value))
       // setOpeningBalance(parseFloat(event.target.value));
       // console.log(openingBalance);
-      setClosingBalance((parseFloat(event.target.value) + parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(2));
+      // setClosingBalance((parseFloat(event.target.value) + parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(2));
       // console.log((parseFloat(openingBalance) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
       // console.log(openingBalance, closingBalance);
     }
     else{
       // setOpeningBalance(0);
-      setClosingBalance((parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(2));
+      // setClosingBalance((parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(2));
     }
   };
 
@@ -72,6 +75,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     // send request to check authenticated
     const data = [];
     const deleted_data = [];
+    const currentDateData = [];
+    const today = dayjs();
     // console.log("data", data)
 
     const docs = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
@@ -83,6 +88,9 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       }
       else{
         data.push(docs[eachEntry]);
+        if (today.isSame(dayjs(docs[eachEntry].date), 'day')){
+          currentDateData.push(docs[eachEntry]);
+        }
       }
     }
     if (dataType === "all"){
@@ -91,7 +99,12 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     }
     else if (dataType === "valid"){
       data.reverse();
+
+      // setRows(currentDateData);
       setRows(data);
+    }
+    else if (dataType === "today"){
+      setRows(currentDateData);      
     }
     else{
       deleted_data.reverse();
@@ -127,7 +140,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     setTotalIssueQty(totalIssueQty.toFixed(2));
     setTotalLossQty(totalLossQty.toFixed(2));
     
-    setClosingBalance((totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+    // setClosingBalance((totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 
@@ -144,6 +157,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         // send request to check authenticated
         const data = [];
         const deleted_data = [];
+        const currentDateData = [];
+        const today = dayjs();
         // console.log("data", data)
 
         const docs = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
@@ -155,10 +170,15 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           }
           else{
             data.push(docs[eachEntry]);
+            if (today.isSame(dayjs(docs[eachEntry].date), 'day')){
+              currentDateData.push(docs[eachEntry]);
+            }
+            // currentDateData.push()
           }
         }
-        data.reverse();
-        setRows(data);
+        // data.reverse();
+        currentDateData.reverse();
+        setRows(currentDateData);
 
         let totalWeight = 0.000;
         let totalRecvQty = 0.0;
@@ -189,7 +209,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         setTotalIssueQty(totalIssueQty.toFixed(2));
         setTotalLossQty(totalLossQty.toFixed(2));
 
-        setClosingBalance((totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+        // setClosingBalance((totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
         setIsLoading(false);
     })();
     }, [page, itemsPerPage]);
@@ -201,6 +221,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isBoxWtModalOpen, setIsBoxWtModalOpen] = useState(false);
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -208,6 +229,10 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
 
   const showBoxWtModal = () => {
     setIsBoxWtModalOpen(true);
+  }
+
+  const showCompleteModal = () => {
+    setIsCompleteModalOpen(true);
   }
 
   const showDeletePopup = (text) => {
@@ -231,6 +256,9 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           else{
             balance += parseFloat(rows[i]["recv_wt"]);
           }
+          if (rows[i]["loss_wt"] && !isNaN(rows[i]["loss_wt"]) && rows[i]["loss_wt"] > 0) {
+            balance += parseFloat(rows[i]["loss_wt"]);
+          }
         }
       }
     })
@@ -249,7 +277,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     // console.log(meltingBookId);
     await deleteKareegarBookList(kareegarBookId, token);
 
-    updateRows("valid");
+    updateRows("today");
     setSelectedRowKeys([]);
     setIsDeleteModalOpen(false);
     setIsLoading(false);
@@ -258,13 +286,15 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     // updateRows("valid");
     setIsBoxWtModalOpen(false);
     setIsModalOpen(false);
+    setIsCompleteModalOpen(false);
     setIsDeleteModalOpen(false);
   };
 
   const handleUpdateClose = () => {
-    updateRows("valid");
+    updateRows("today");
     setIsBoxWtModalOpen(false);
     setIsModalOpen(false);
+    setIsCompleteModalOpen(false);
     setIsDeleteModalOpen(false);
   }
   
@@ -602,7 +632,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
                 <div className="mb-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2 flex items-center">
                   Box Weight:
-                    <input className="ml-4 mr-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " onChange={handleOpeningChange} value={boxWt}/>
+                    <input className="ml-4 mr-4 text-[#00203FFF] text-right w-24 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " onChange={handleOpeningChange} value={boxWt}/>
                     <Tooltip title="Edit Box Wt" placement="top">
                       <EditOutlined style={{ fontSize: "125%" }} onClick={showBoxWtModal}/>
                     </Tooltip>
@@ -613,7 +643,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
                 </div>
                 <div className="mt-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
-                  Close Daily Account: &nbsp; <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/>
+                  Close Daily Account: <PlusCircleOutlined className="ml-12 float-end" style={{ fontSize:"125%"}} onClick={showCompleteModal}/> 
+                   {/* <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/> */}
                     </span>
                     <Tooltip title="Delete" placement="bottomRight">
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
@@ -637,16 +668,20 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
             <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={showDeletePopup} />
           </div>
-          <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
-            <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
+          <div className="border-b-8 border-t-8 border-transparent text-xl flex justify-end items-center">
+            <span className="text-[#00203FFF] whitespace-nowrap font-medium w-full bg-[#ABD6DFFF] p-2">
+              <span className="relative top-1">
               Box Weight:
-              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" onChange={handleOpeningChange} value={boxWt}/>
-              <EditOutlined />
+              </span>
+              <span className="float-end">
+                <input className="text-[#00203FFF] text-right px-2 w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" onChange={handleOpeningChange} value={boxWt}/>
+                <EditOutlined className="relative top-1 ml-2" style={{ fontSize: "140%" }} onClick={showBoxWtModal}/>
+              </span>
             </span>
           </div>
           <div className="	text-xl flex justify-end items-center">
               <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
-                Close Daily Account: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
+                Close Daily Account: <PlusCircleOutlined className=" float-end" style={{ fontSize:"140%"}} onClick={showCompleteModal}/> 
               </span>
             </div>
           </>
@@ -658,7 +693,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         onCancel={handleCancel}
         footer={null}
       >
-      <KareegarBookAdd
+      <KareegarAddItems
           kareegarId={kareegarId}
           handleOk={handleUpdateClose}
           />
@@ -671,6 +706,18 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       footer={null}
       >
         <KaareegarChangeBoxWt
+        kareegarId={kareegarId}
+        handleOk={handleUpdateClose}
+        />
+      </Modal>
+
+      <Modal
+      title="Close Daily Account"
+      open={isCompleteModalOpen}
+      onCancel={handleCancel}
+      footer={null}
+      >
+        <KaareegarClose
         kareegarId={kareegarId}
         handleOk={handleUpdateClose}
         />
