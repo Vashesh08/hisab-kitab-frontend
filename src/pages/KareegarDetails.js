@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../style/Cards.css"
-import { Button, Avatar, Card, Col, Row, Modal } from "antd";
+import { Button, Card, Col, Row, Modal } from "antd";
 import { getKareegarData, deleteKareegarData } from "../api/kareegarDetail.js";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import Loading from "../components/Loading.js";

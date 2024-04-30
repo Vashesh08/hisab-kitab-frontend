@@ -105,6 +105,9 @@ export default function Sidebar({ changeVisibility }) {
               <ListItem onClick={() => changePage("kareegardetails")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                 Kareegar Book
               </ListItem>
+              <ListItem onClick={() => changePage("lossacct")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                Loss Book
+              </ListItem>
             </List>
           </AccordionBody>
         </Accordion>

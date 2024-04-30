@@ -19,6 +19,7 @@ import { Tooltip } from 'antd';
 import { getKareegarData, updateKareegarBalance } from "../api/kareegarDetail.js";
 import KaareegarChangeBoxWt from "../components/KareegarChangeBoxWt.js"
 import KaareegarClose from "../components/KareegarClose.js";
+import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
 
 const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => {
   const screenWidth = window.innerWidth;
@@ -27,7 +28,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
-  const [todayData, setTodayData] = useState([]);
+  // const [todayData, setTodayData] = useState([]);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalLossQuantity, setTotalLossQty] = useState(0);
@@ -342,7 +343,10 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     let balance = parseFloat(kareegarData["balance"]);
     let beads_balance = parseFloat(kareegarData["beads_balance"]);
     // console.log(kareegarData, balance);
-    
+    const lossAcctData = await fetchLossAcctList(page, itemsPerPage, token);
+    const lossIds = [];
+    console.log(lossAcctData)
+
     selectedRowKeys.map((item, index) => {
       for (let i = 0; i < rows.length; i++) {
         if (rows[i]["_id"] === item){
@@ -360,10 +364,22 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           }
           if (rows[i]["loss_wt"] && !isNaN(rows[i]["loss_wt"]) && rows[i]["loss_wt"] > 0) {
             balance += parseFloat(rows[i]["loss_wt"]);
+            const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Kareegar")
+            console.log(item, matchedData, rows[i]);
+            if (matchedData){
+              lossIds.push(matchedData._id);  
+            }
+
           }
         }
       }
     })
+
+    console.log(lossIds);
+    const deleteFromLossAcct = {
+      lossId: lossIds,
+    }
+    await deleteLossAcctList(deleteFromLossAcct, token);
     
     const kareegarBalanceData = {
       '_id': kareegarId,
@@ -593,6 +609,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           ),
           width: '10%',
           ...getColumnSearchProps('issue22k'),
+          align: 'right',
         },
         {
           title: "Receive",
@@ -604,6 +621,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           ),
           width: '10%',
           ...getColumnSearchProps('receive22k'),    
+          align: 'right',
         },
         {
           title: "Loss",
@@ -615,6 +633,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           ),
           width: '10%',
           ...getColumnSearchProps('loss22k'),
+          align: 'right',
         }
       ]
     },
@@ -631,6 +650,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           ),
           width: '10%',
           ...getColumnSearchProps('issue22k'),
+          align: 'right',
         },
         {
           title: "Receive",
@@ -641,7 +661,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
             </div>
           ),
           width: '10%',
-          ...getColumnSearchProps('receive22k'),    
+          ...getColumnSearchProps('receive22k'),  
+          align: 'right',  
         }
       ]
     }

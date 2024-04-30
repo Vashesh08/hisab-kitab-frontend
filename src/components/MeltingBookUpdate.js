@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { updateMeltingBook } from "../api/meltingBook.js";
 import Loading from "./Loading.js";
 import { Button, Form, InputNumber } from "antd";
+import { postLossAcct } from "../api/LossAcct.js";
+import dayjs from 'dayjs';
 
 function MeltingBookUpdate({handleOk, textData}) {
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
-  
+    
     const validateMessages = {
         // eslint-disable-next-line
         required: "${label} is required!",
@@ -50,6 +52,16 @@ function MeltingBookUpdate({handleOk, textData}) {
         };
         // console.log("Vashesh", backendData);
         await updateMeltingBook(backendData, token);
+        
+        const lossData = {
+          "type": "Melting",
+          "date": dayjs(),
+          "lossWt": (textData.issue22kActual - recv_weight).toFixed(2),
+          "transactionId": textData._id,
+          "description": "Melting Loss"
+        }
+
+        await postLossAcct(lossData, token)
         // const updated = await updateMeltingBook(backendData, token);
         // console.log("Added ",updated);
         

@@ -17,6 +17,7 @@ import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
 import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
+import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
 
 const MeltingBook = () => {
   const screenWidth = window.innerWidth;
@@ -220,10 +221,19 @@ const MeltingBook = () => {
       _id: selectedRowKeys
     }
     const balanceData = await getUtilityData(token);
+    const lossAcctData = await fetchLossAcctList(page, itemsPerPage, token);
+    const lossIds = [];
+    
     let currMeltingBookClosingBalance = parseFloat(balanceData[0]["meltingBookClosingBalance"])
 
     // console.log(selectedRowKeys, rows);
     selectedRowKeys.map((item, index) => {
+
+      const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Melting")
+      if (matchedData){
+        lossIds.push(matchedData._id);  
+      }
+
       for (let i = 0; i < rows.length; i++) {
         if (rows[i]["_id"] === item) {
           // console.log(rows[i]);
@@ -237,6 +247,12 @@ const MeltingBook = () => {
         }
       }
     )
+
+    const deleteFromLossAcct = {
+      lossId: lossIds,
+    }
+    await deleteLossAcctList(deleteFromLossAcct, token);
+
     const utilityData = {
       _id: balanceData[0]["_id"],
       meltingBookClosingBalance: currMeltingBookClosingBalance
@@ -412,7 +428,7 @@ const MeltingBook = () => {
         )
       ) : dataIndex === "category" ?(
         text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+          <div style={{textAlign:"left"}}>{eachText}</div>
         )
         )
       ): (
@@ -453,7 +469,7 @@ const MeltingBook = () => {
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
+            <div style={{textAlign:"left"}}>{eachText}</div>
           )
           )}
         </div>
@@ -485,6 +501,7 @@ const MeltingBook = () => {
       ),
       width: '9%',
       ...getColumnSearchProps('weight24k'),
+      align: 'right',
     },
     {
       title: "Purity",
@@ -499,6 +516,7 @@ const MeltingBook = () => {
       ),
       width: '9%',
       ...getColumnSearchProps('purity'),
+      align: 'right',
     },
     {
       title: "Conversion",
@@ -513,6 +531,7 @@ const MeltingBook = () => {
       ),
       width: '9%',
       ...getColumnSearchProps('conversion'),
+      align: 'right',
     },
     // {
     //   title: "Issue Wt (F)",
@@ -535,6 +554,7 @@ const MeltingBook = () => {
       ),
       width: '10%',
       ...getColumnSearchProps('issue22kActual'),
+      align: 'right',
     },
     {
       title: "Receive Wt",
@@ -546,6 +566,7 @@ const MeltingBook = () => {
       ),
       width: '15%',
       ...getColumnSearchProps('receive22k'),
+      align: 'right',
     },
     {
       title: "Loss Qty",
@@ -557,6 +578,7 @@ const MeltingBook = () => {
       ),
       width: '12%',
       ...getColumnSearchProps('loss22k'),
+      align: 'right',
     },
     {
       title: "Action",

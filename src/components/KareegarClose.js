@@ -5,7 +5,7 @@ import { Button, Form, InputNumber } from "antd";
 import { getKareegarData, updateKareegarBalance } from "../api/kareegarDetail.js";
 import { postKareegarBook } from "../api/kareegarBook.js";
 import dayjs from 'dayjs'; // Import Day.js
-
+import { postLossAcct } from "../api/LossAcct.js";
 
 function KareegarClose({ kareegarId, handleOk}){
     const [form] = Form.useForm();
@@ -78,7 +78,18 @@ function KareegarClose({ kareegarId, handleOk}){
           recv_wt: (parseFloat(closingWt) - parseFloat(boxWt)).toFixed(2),
           loss_wt: (parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ).toFixed(2),
         }
-        await postKareegarBook(backendData, token);
+
+        const updatedData = await postKareegarBook(backendData, token);
+        console.log("updatedData",updatedData);
+
+        const lossData = {
+          "type": "Kareegar",
+          "date": dayjs(),
+          "lossWt": (parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ).toFixed(2),
+          "transactionId": updatedData.kareegarBook_id, 
+          "description": kareegarData.name + " Loss for " + getFormattedDate(dayjs())
+        }
+        await postLossAcct(lossData, token)
 
         const today = dayjs();
         const tomorrow = today.add(1, 'day');

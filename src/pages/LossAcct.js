@@ -4,32 +4,25 @@ import {
   Divider,
   Table,
   Button,
-  Modal,
   Input,
   Space,
 } from "antd";
 
 import Highlighter from 'react-highlight-words';
-import { fetchMasterStockList, deleteMasterStockList } from "../api/masterStock.js";
-import  ModelAdd from "../components/ModelAdd.js"
+import { fetchLossAcctList } from "../api/LossAcct.js";
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
-import { DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
+import { BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
-import { getUtilityData, updateUtility } from "../api/utility.js";
 
-const MasterStock = () => {
+const LossAcct = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(1000000); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
-  const [totalWeightQuantity, setTotalWeight] = useState(0);
-  const [totalRecvQuantity, setTotalRecvQty] = useState(0);
-  const [totalIssueQuantity, setTotalIssueQty] = useState(0);
-  const [openingBalance, setOpeningBalance] = useState(0);
-  const [closingBalance, setClosingBalance] = useState(0);
+  const [totalLossQuantity, setTotalLossQty] = useState(0);
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -44,22 +37,6 @@ const MasterStock = () => {
     return formattedDate
   }
 
-  // const handleOpeningChange = (event) => {
-  //   // console.log(event.target.value, isNaN(event.target.value))
-  //   if (!isNaN(parseFloat(event.target.value))){
-  //     // console.log(event.target.value, parseFloat(event.target.value))
-  //     setOpeningBalance(parseFloat(event.target.value));
-  //     // console.log(openingBalance);
-  //     setClosingBalance((parseFloat(event.target.value) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
-  //     // console.log((parseFloat(openingBalance) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
-  //     // console.log(openingBalance, closingBalance);
-  //   }
-  //   else{
-  //     setOpeningBalance(0);
-  //     setClosingBalance((parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
-  //   }
-  // };
-  
   async function updateRows (dataType){
 
     setIsLoading(true);
@@ -69,13 +46,10 @@ const MasterStock = () => {
     const deleted_data = [];
     // console.log("data", data)
 
-    const balanceData = await getUtilityData(token);
-    setOpeningBalance(parseFloat(balanceData[0]["masterStockOpeningBalance"]).toFixed(2));
-    setClosingBalance(parseFloat(balanceData[0]["masterStockClosingBalance"]).toFixed(2));
-
-    const docs = await fetchMasterStockList(page, itemsPerPage, token);
+    const docs = await fetchLossAcctList(page, itemsPerPage, token);
     // console.log(docs);
     setFullData(docs);
+    // console.log(docs);
     for (let eachEntry in docs) {
       if (docs[eachEntry].is_deleted_flag){
         deleted_data.push(docs[eachEntry]);
@@ -98,27 +72,14 @@ const MasterStock = () => {
     }
     
 
-    let totalWeight = 0.0;
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    data.forEach(({ weight, receive22k, issue22k }) => {
-      if (isNaN(parseFloat(receive22k))) {
-        receive22k = 0; // Set it to zero if it's NaN
+    let totalLoss = 0.0;
+    data.forEach(({ lossWt }) => {
+      if (isNaN(parseFloat(lossWt))) {
+        lossWt = 0; // Set it to zero if it's NaN
       } 
-      if (isNaN(parseFloat(issue22k))) {
-        issue22k = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(weight))){
-        weight = 0;  // Set it to zero if it's NaN
-      }    
-      totalWeight += parseFloat(weight);
-      totalRecvQty += parseFloat(receive22k);
-      totalIssueQty += parseFloat(issue22k);
+      totalLoss += parseFloat(lossWt);
     });
-    setTotalWeight(totalWeight.toFixed(2));
-    setTotalRecvQty(totalRecvQty.toFixed(2));
-    setTotalIssueQty(totalIssueQty.toFixed(2));
-    // setClosingBalance((openingBalance + totalWeight - (2 * totalIssueQty)).toFixed(2));
+    setTotalLossQty(totalLoss.toFixed(2));
     setIsLoading(false);
   };
 
@@ -132,12 +93,9 @@ const MasterStock = () => {
         const deleted_data = [];
         // console.log("data", data)
 
-        const balanceData = await getUtilityData(token);
-        setOpeningBalance(parseFloat(balanceData[0]["masterStockOpeningBalance"]).toFixed(2));
-        setClosingBalance(parseFloat(balanceData[0]["masterStockClosingBalance"]).toFixed(2));
-
-        const docs = await fetchMasterStockList(page, itemsPerPage, token);
+        const docs = await fetchLossAcctList(page, itemsPerPage, token);
         setFullData(docs);
+        // console.log(docs);
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_deleted_flag){
             deleted_data.push(docs[eachEntry]);
@@ -149,27 +107,14 @@ const MasterStock = () => {
         data.reverse();
         setRows(data);
         
-        let totalWeight = 0.0;
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        data.forEach(({ weight, receive22k, issue22k }) => {
-          if (isNaN(parseFloat(receive22k))) {
-            receive22k = 0; // Set it to zero if it's NaN
+        let totalLoss = 0.0;
+        data.forEach(({ lossWt }) => {
+          if (isNaN(parseFloat(lossWt))) {
+            lossWt = 0; // Set it to zero if it's NaN
           } 
-          if (isNaN(parseFloat(issue22k))) {
-            issue22k = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(weight))){
-            weight = 0;  // Set it to zero if it's NaN
-          }    
-          totalWeight += parseFloat(weight);
-          totalRecvQty += parseFloat(receive22k);
-          totalIssueQty += parseFloat(issue22k);
+          totalLoss += parseFloat(lossWt);
         });
-        setTotalWeight(totalWeight.toFixed(2));
-        setTotalRecvQty(totalRecvQty.toFixed(2));
-        setTotalIssueQty(totalIssueQty.toFixed(2));
-        // setClosingBalance((openingBalance + totalWeight - (2 * totalIssueQty)).toFixed(2));
+        setTotalLossQty(totalLoss.toFixed(2));
         setIsLoading(false);
 
     })();
@@ -178,84 +123,6 @@ const MasterStock = () => {
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const showDeletePopup = (text) => {
-    setIsDeleteModalOpen(true)
-  }
-  
-  const deleteModal = async () => {
-    setIsLoading(true);
-    const token = localStorage.getItem("token");
-    const masterStockId = {
-      masterstockId: selectedRowKeys
-    }
-    console.log(selectedRowKeys, rows);
-
-    const balanceData = await getUtilityData(token);
-
-    let curMasterStockOpeningBalance = parseFloat(balanceData[0]["masterStockOpeningBalance"]);
-    let curMasterStockClosingBalance = parseFloat(balanceData[0]["masterStockClosingBalance"]);
-    let curMeltingBookOpeningBalance = parseFloat(balanceData[0]["meltingBookOpeningBalance"]);
-    let curMeltingBookClosingBalance = parseFloat(balanceData[0]["meltingBookClosingBalance"]);
-    
-    selectedRowKeys.map((item, index) => {
-      for (let i = 0; i < rows.length; i++) {
-        if (rows[i]["_id"] === item) {
-          console.log(rows[i])
-          if (rows[i]["type"] === "Issue"){
-              curMasterStockClosingBalance += parseFloat(rows[i]["weight"])
-          }
-          else{
-              if (rows[i]["category"] === "metal"){
-                curMasterStockOpeningBalance -= parseFloat(rows[i]["receive22k"])
-                curMasterStockClosingBalance -= parseFloat(rows[i]["receive22k"])
-                curMeltingBookOpeningBalance -= parseFloat(rows[i]["weight"])
-                curMeltingBookClosingBalance -= parseFloat(rows[i]["weight"])
-              }
-              else{
-                curMasterStockOpeningBalance -= parseFloat(rows[i]["receive22k"])
-                curMasterStockClosingBalance -= parseFloat(rows[i]["receive22k"])
-              }
-          }
-        }
-        }
-      }
-    )
-    
-    const utilityData = {
-      _id: balanceData[0]["_id"],
-      masterStockOpeningBalance: curMasterStockOpeningBalance,
-      masterStockClosingBalance: curMasterStockClosingBalance,
-      meltingBookOpeningBalance: curMeltingBookOpeningBalance,
-      meltingBookClosingBalance: curMeltingBookClosingBalance
-    }
-    await updateUtility(utilityData, token);
-
-    await deleteMasterStockList(masterStockId, token );
-
-    await updateRows("valid");
-    setIsDeleteModalOpen(false);
-    setIsLoading(false);
-    setSelectedRowKeys([]);
-  }
-  const handleCancel = () => {
-    // updateRows("valid");
-    setIsModalOpen(false);
-    setIsDeleteModalOpen(false);
-  };
-
-  const handleUpdateClose = () => {
-    updateRows("valid");
-    setIsModalOpen(false);
-    setIsDeleteModalOpen(false);  
-  }
 
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
@@ -418,17 +285,6 @@ const MasterStock = () => {
       ...getColumnSearchProps('type'),
     },
     {
-      title: "Category",
-      dataIndex: "category",
-      render: text => (
-        <div style={{ maxWidth: '200px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('category'),
-    },
-    {
       title: "Description",
       dataIndex: "description",
       render: text => (
@@ -436,78 +292,20 @@ const MasterStock = () => {
           {text}
         </div>
       ),
-      width: '15%',
+      width: '50%',
       ...getColumnSearchProps('description'),
     },
     {
-      title: "Weight",
-      dataIndex: "weight",
+      title: "Loss Weight",
+      dataIndex: "lossWt",
       render: text => (
-        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
           {text}
         </div>
       ),
-      width: '9%',
-      ...getColumnSearchProps('weight'),
+      width: '15%',
+      ...getColumnSearchProps('lossWt'),
       align: 'right',
-    },
-    {
-      title: "Purity",
-      dataIndex: "purity",
-      render: text => (
-        <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
-          {text}
-        </div>
-      ),
-      width: '9%',
-      ...getColumnSearchProps('purity'),
-      align: 'right',
-    },
-    {
-      title: "Receive Wt",
-      dataIndex: "receive22k",
-      render: text => (
-        <div style={{minWidth: '140px', maxWidth: '140px', overflow: 'auto', textAlign: 'end !important'}}>
-          {text}
-        </div>
-      ),
-      width: '12%',
-      ...getColumnSearchProps('receive22k'),
-      align: 'right',
-    },
-    {
-      title: "Issue Wt",
-      dataIndex: "issue22k",
-      render: text => (
-        <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('issue22k'),
-      align: 'right',
-    },
-    {
-      title: "Issuer",
-      dataIndex: "issuer",
-      render: text => (
-        <div style={{ minWidth: '100px', maxWidth: '200px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('issuer'),
-    },
-    {
-      title: "Receiver",
-      dataIndex: "receiver",
-      render: text => (
-        <div style={{ minWidth: '100px', maxWidth: '200px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('receiver'),
     },
   ];
 
@@ -590,10 +388,10 @@ const MasterStock = () => {
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Master Stock
+                Loss Acct
               </div>
 
-              <div className="flex flex-col">
+              {/* <div className="flex flex-col">
                 <div className="mb-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
                     Opening Balance:
@@ -611,7 +409,7 @@ const MasterStock = () => {
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
                   </Tooltip>
                 </div>
-              </div>
+              </div> */}
             </div>
             <br/>
             </>
@@ -621,9 +419,9 @@ const MasterStock = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Master Stock</div>
+              }} className="text-center text-[#00203FFF]" >Loss Acct</div>
 
-          <div className="text-xl border-b-8 border-transparent	border-transparent  border-t-4 pt-4 flex justify-between items-center">
+          {/* <div className="text-xl border-b-8 border-transparent	border-transparent  border-t-4 pt-4 flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
             <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={showDeletePopup} />
           </div>
@@ -637,40 +435,13 @@ const MasterStock = () => {
               <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
                 Closing Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-32 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
               </span>
-            </div>
+            </div> */}
             <br/>
         </>
         
       )}
 
 
-      <Modal
-        title="Add Item"
-        open={isModalOpen}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <ModelAdd
-          handleOk={handleUpdateClose}
-          />
-      </Modal>
-
-      <Modal
-        title="Are you sure you want to delete the selected rows ?"
-        open={isDeleteModalOpen}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <div className="flex justify-center	">
-          <Button className="bg-[#ABD6DFFF] mr-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={deleteModal}>
-              Yes
-          </Button>
-          <Button className="bg-[#ABD6DFFF] ml-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={handleCancel}>
-              No
-          </Button>
-        </div>
-      </Modal>
-      
       <Table
         rowSelection={rowSelection}
         columns={columns}
@@ -683,22 +454,11 @@ const MasterStock = () => {
           return (
             <>
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-                <Table.Summary.Cell index={0} className="" colSpan={4}>Total</Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
-                {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
+                <Table.Summary.Cell index={0} className="" colSpan={3}>Total</Table.Summary.Cell>
                 <Table.Summary.Cell index={4}></Table.Summary.Cell>
                 <Table.Summary.Cell index={5}>
-                  {totalWeightQuantity}
+                  {totalLossQuantity}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={6}></Table.Summary.Cell>
-                <Table.Summary.Cell index={7}>
-                  {totalRecvQuantity}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={8}>
-                  {totalIssueQuantity}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={9}></Table.Summary.Cell>
-                <Table.Summary.Cell index={10}></Table.Summary.Cell>
               </Table.Summary.Row>
             </>
           );
@@ -710,4 +470,4 @@ const MasterStock = () => {
   );
 };
 
-export default MasterStock;
+export default LossAcct;
