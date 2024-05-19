@@ -124,10 +124,9 @@ function KareegarAddItems({ kareegarId, handleOk}) {
       let balance = (parseFloat(kareegarData.balance) - parseFloat(recv_wt)).toFixed(2);
       let beads_recv_wt_balance = (parseFloat(kareegarData.beads_balance))
       // console.log("Added ", balance);
-      if (!isNaN(beads_issue_wt)){
+      if (!isNaN(beads_recv_wt)){
         beads_recv_wt_balance -= beads_recv_wt; 
       }
-
       const kareegarBalanceData = {
         '_id': kareegarId,
         "balance": balance,

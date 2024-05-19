@@ -345,11 +345,12 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     // console.log(kareegarData, balance);
     const lossAcctData = await fetchLossAcctList(page, itemsPerPage, token);
     const lossIds = [];
-    console.log(lossAcctData)
-
+    console.log(lossAcctData);
+    console.log(selectedRowKeys);
     selectedRowKeys.map((item, index) => {
       for (let i = 0; i < rows.length; i++) {
         if (rows[i]["_id"] === item){
+          console.log("row", rows[i]);
           if (rows[i]["type"] === "Issue"){
               balance -= parseFloat(rows[i]["issue_wt"]);
               if (rows[i]["beads_issue_wt"] !== "" && !isNaN(rows[i]["beads_issue_wt"])){
@@ -359,7 +360,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           else{
             balance += parseFloat(rows[i]["recv_wt"]);
             if (rows[i]["beads_recv_wt"] !== "" && !isNaN(rows[i]["beads_recv_wt"])){
-              beads_balance -= parseFloat(rows[i]["beads_recv_wt"]);
+              beads_balance += parseFloat(rows[i]["beads_recv_wt"]);
             }
           }
           if (rows[i]["loss_wt"] && !isNaN(rows[i]["loss_wt"]) && rows[i]["loss_wt"] > 0) {
@@ -369,8 +370,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
             if (matchedData){
               lossIds.push(matchedData._id);  
             }
-
           }
+          console.log("balance", balance, beads_balance);
         }
       }
     })
@@ -383,7 +384,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     
     const kareegarBalanceData = {
       '_id': kareegarId,
-      "balance": balance.toFixed(2)
+      "balance": balance.toFixed(2),
+      "beads_balance": beads_balance.toFixed(2)
     }
     console.log(balance);
     await updateKareegarBalance(kareegarBalanceData, token);

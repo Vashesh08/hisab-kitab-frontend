@@ -107,7 +107,9 @@ const MeltingBook = () => {
       if (isNaN(parseFloat(issue22kActual))){
         issue22kActual = 0; // Set it to zero if it's NaN
       }
-      totalWeight += parseFloat(weight24k);
+      const sumOfWeights = weight24k.map(Number).reduce((acc, curr) => acc + curr, 0);
+      // console.log(sumOfWeights);
+      totalWeight += parseFloat(sumOfWeights);
       totalRecvQty += parseFloat(receive22k);
       totalIssueQty += parseFloat(issue22k);
       totalIssueActualQty += parseFloat(issue22kActual);
@@ -173,8 +175,10 @@ const MeltingBook = () => {
           }
           if (isNaN(parseFloat(issue22kActual))){
             issue22kActual = 0; // Set it to zero if it's NaN
-          }    
-          totalWeight += parseFloat(weight24k);
+          }
+          const sumOfWeights = weight24k.map(Number).reduce((acc, curr) => acc + curr, 0);
+          // console.log(sumOfWeights);
+          totalWeight += parseFloat(sumOfWeights);
           totalRecvQty += parseFloat(receive22k);
           totalIssueQty += parseFloat(issue22k);
           totalIssueActualQty += parseFloat(issue22kActual);

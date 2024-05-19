@@ -77,6 +77,7 @@ function KareegarClose({ kareegarId, handleOk}){
           description: `Closing Acc - Loss for ${getFormattedDate(currentDate)}`,
           recv_wt: (parseFloat(closingWt) - parseFloat(boxWt)).toFixed(2),
           loss_wt: (parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ).toFixed(2),
+          beads_recv_wt: (parseFloat(kareegarData.beads_balance).toFixed(2))
         }
 
         const updatedData = await postKareegarBook(backendData, token);
