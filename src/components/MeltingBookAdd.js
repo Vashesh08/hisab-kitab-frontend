@@ -22,10 +22,10 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
   }
 
   const onChangeWt = (event, type, index) => {
-    console.log("ele", event)
+    // console.log("ele", event)
     if (event && event.target && event.target.value) {
       const value = event.target.value;
-    console.log(type, index, value)
+    // console.log(type, index, value)
     if (type === "weight"){
       let newFormWeightValues = Array.from(formWeightValues);
       newFormWeightValues[index] = value;
@@ -43,6 +43,21 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
     }
     }
     
+    let totalRoundedNumber = 0;
+    for (let index = 0; index < numberOfItems; index++) {
+      if (
+        formWeightValues[index] !== 0 &&
+        formPurityValues[index] !== 0 &&
+        formConversionValues[index] !== 0
+      ) {
+        totalRoundedNumber += parseFloat(formWeightValues[index]) *
+          parseFloat(formPurityValues[index]) /
+          parseFloat(formConversionValues[index]);
+      }
+    }
+    // console.log(totalRoundedNumber);
+    setMeltingIssueWt(totalRoundedNumber.toFixed(2));
+    setIssueActualWt(totalRoundedNumber.toFixed(2));
     // const weightKeys = [...Array(numberOfItems)].map((_, index) => `weight${index}`);
     // const weightValues = weightKeys.map((key) => (user && user[key]) || 0);
     
@@ -82,7 +97,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
           parseFloat(formConversionValues[index]);
       }
     }
-    console.log(totalRoundedNumber);
+    // console.log(totalRoundedNumber);
     setMeltingIssueWt(totalRoundedNumber.toFixed(2));
     setIssueActualWt(totalRoundedNumber.toFixed(2));
     setIsLoading(false);
