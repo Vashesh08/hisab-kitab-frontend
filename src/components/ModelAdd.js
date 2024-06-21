@@ -98,6 +98,7 @@ function ModelAdd({handleOk}) {
         weight: weight,
         issuer: issuerName,
         receiver: receiverName,
+        purity: purity,
         issue22k: weight
       };
       await postMasterStock(backendData, token);
@@ -276,6 +277,34 @@ function ModelAdd({handleOk}) {
             // step={0.01}
           />
           </Form.Item>
+          <Form.Item
+            name={["user", "purity"]}
+            label="Purity"
+            rules={[
+              {           
+                validator: (_, value) => {
+                  const intValue = parseInt(value, 10);
+                  if (isNaN(intValue)) {
+                    return Promise.reject(new Error("Please enter a valid number."));
+                  } else if (intValue < 0) {
+                    return Promise.reject(new Error("Value must be greater than or equal to 0."));
+                  }
+                  return Promise.resolve();
+                },
+                required: true 
+              }
+            ]}
+            transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
+          >
+            <AutoComplete
+              options={purityOptions}
+              // onSelect={onSelect}
+              // onChange={onChange}            
+            >
+            </AutoComplete>
+          </Form.Item>
+          
+
         </>
         )
         }

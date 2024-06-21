@@ -383,7 +383,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
               beads_balance += parseFloat(rows[i]["beads_recv_wt"]);
             }
           }
-          if (rows[i]["loss_wt"] && !isNaN(rows[i]["loss_wt"]) && rows[i]["loss_wt"] > 0) {
+          if (rows[i]["loss_wt"] !== "" && !isNaN(rows[i]["loss_wt"])) {
             balance += parseFloat(rows[i]["loss_wt"]);
             const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Kareegar")
             console.log(item, matchedData, rows[i]);
