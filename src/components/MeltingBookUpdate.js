@@ -53,15 +53,17 @@ function MeltingBookUpdate({handleOk, textData}) {
         // console.log("Vashesh", backendData);
         await updateMeltingBook(backendData, token);
         
-        const lossData = {
-          "type": "Melting",
-          "date": dayjs(),
-          "lossWt": (textData.issue22kActual - recv_weight).toFixed(2),
-          "transactionId": textData._id,
-          "description": "Melting Loss"
+        if ((textData.issue22kActual - recv_weight) > 0){
+          const lossData = {
+            "type": "Melting",
+            "date": textData.date,
+            "lossWt": (textData.issue22kActual - recv_weight).toFixed(2),
+            "transactionId": textData._id,
+            "description": "Melting Loss"
+          }
+          await postLossAcct(lossData, token)
         }
 
-        await postLossAcct(lossData, token)
         // const updated = await updateMeltingBook(backendData, token);
         // console.log("Added ",updated);
         

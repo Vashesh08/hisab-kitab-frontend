@@ -127,6 +127,17 @@ const MeltingBook = () => {
   };
 
     useEffect(() => {
+        const handleKeyDown = (event) => {
+            // Check if the specific key combination is pressed
+            if ((event.ctrlKey && event.key === 'q') || (event.ctrlKey && event.key === 'Q')) { // Ctrl + S
+                event.preventDefault();
+                showModal();
+            }
+        };
+
+        // Add event listener for keydown event
+        window.addEventListener('keydown', handleKeyDown);
+
         (async () => {
 
         setIsLoading(true);
@@ -194,6 +205,12 @@ const MeltingBook = () => {
 
         setIsLoading(false);
     })();
+
+    // Clean up the event listener on component unmount
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+    };
+  
     }, [page, itemsPerPage]);
 
 

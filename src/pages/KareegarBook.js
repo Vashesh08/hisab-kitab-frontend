@@ -235,6 +235,21 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   };
 
     useEffect(() => {
+      const handleKeyDown = (event) => {
+            // Check if the specific key combination is pressed
+            if (event.key === 'Escape') { // Back Button
+                event.preventDefault();
+                setKareegarDetailsPage(true);
+            }
+            if ((event.ctrlKey && event.key === 'q') || (event.ctrlKey && event.key === 'Q')) { // Show Modal
+              event.preventDefault();
+              showModal();
+            }
+        };
+
+        // Add event listener for keydown event
+        window.addEventListener('keydown', handleKeyDown);
+
         (async () => {
 
         setIsLoading(true);
@@ -308,6 +323,11 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         // setClosingBalance((totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
         setIsLoading(false);
     })();
+
+    // Clean up the event listener on component unmount
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+    };
     }, [page, itemsPerPage]);
 
 

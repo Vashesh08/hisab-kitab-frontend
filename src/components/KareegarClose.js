@@ -1,7 +1,7 @@
 import { useState } from "react";
 import React from "react";
 import Loading from "./Loading";
-import { Button, Form, InputNumber } from "antd";
+import { Button, Form, InputNumber,DatePicker } from "antd";
 import { getKareegarData, updateKareegarBalance } from "../api/kareegarDetail.js";
 import { postKareegarBook } from "../api/kareegarBook.js";
 import dayjs from 'dayjs'; // Import Day.js
@@ -12,6 +12,11 @@ function KareegarClose({ kareegarId, handleOk}){
     const [isLoading, setIsLoading] = useState(false);
     const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
 
+    const disabledDate = (current) => {
+      // Disable dates after the current date
+      return current && dayjs(current).isAfter(dayjs().endOf('day'));
+    };
+  
     const getFormattedDate = (date) => {
       const dateEntry = date;
       const curDateEntry = new Date(dateEntry);
@@ -56,6 +61,7 @@ function KareegarClose({ kareegarId, handleOk}){
         const token = localStorage.getItem("token");
 
         const {
+            date,
             closingWt
         } = user;
 
@@ -73,7 +79,8 @@ function KareegarClose({ kareegarId, handleOk}){
         const backendData = {
           kareegar_id: kareegarId,
           type: "Receive",
-          date: currentDate,
+          date: dayjs(date, "YYYY-MM-DD"),
+          // date: currentDate,
           description: `Closing Acc - Loss for ${getFormattedDate(currentDate)}`,
           recv_wt: (parseFloat(closingWt) - parseFloat(boxWt)).toFixed(2),
           loss_wt: (parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ).toFixed(2),
@@ -83,23 +90,25 @@ function KareegarClose({ kareegarId, handleOk}){
         const updatedData = await postKareegarBook(backendData, token);
         console.log("updatedData",updatedData);
 
-        const lossData = {
-          "type": "Kareegar",
-          "date": dayjs(),
-          "lossWt": (parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ).toFixed(2),
-          "transactionId": updatedData.kareegarBook_id, 
-          "description": kareegarData.name + " Loss for " + getFormattedDate(dayjs())
+        if ((parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ) > 0){
+          const lossData = {
+            "type": "Kareegar",
+            "date": date,
+            "lossWt": (parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ).toFixed(2),
+            "transactionId": updatedData.kareegarBook_id, 
+            "description": kareegarData.name + " Loss for " + getFormattedDate(date)
+          }
+          await postLossAcct(lossData, token)
         }
-        await postLossAcct(lossData, token)
 
-        const today = dayjs();
-        const tomorrow = today.add(1, 'day');
+        // const today = dayjs();
+        const tomorrow = date.add(1, 'day');
 
         const backendData2 = {
           kareegar_id: kareegarId,
           type: "Issue",
           date: tomorrow,
-          description: `Opening Balance - ${getFormattedDate(currentDate)}`,
+          description: `Opening Balance - ${getFormattedDate(tomorrow)}`,
           issue_wt: (parseFloat(closingWt) - parseFloat(boxWt)).toFixed(2),
           beads_issue_wt: (parseFloat(kareegarData.beads_balance).toFixed(2))
         }
@@ -126,7 +135,19 @@ function KareegarClose({ kareegarId, handleOk}){
           }}
           validateMessages={validateMessages}
         >
-
+        <Form.Item
+          name={["user", "date"]}
+          label="Date"
+          rules={[
+            {
+              type: "Date",
+            },
+          ]}
+          initialValue={currentDate}
+        >
+          <DatePicker format="DD MMM, YYYY" disabledDate={disabledDate} />
+        </Form.Item>
+        
              <Form.Item
         name={["user", "closingWt"]}
         label="Close Weight (gm)"

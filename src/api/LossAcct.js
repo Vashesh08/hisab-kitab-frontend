@@ -3,7 +3,7 @@ import convertObjectToFormData from "../utils/convertObjectToFormData";
 import config from '../config';
 
 export async function fetchLossAcctList(page, itemsPerPage, token) {
-    const response = await fetch(`${config.API_URL}/admin/lossAcct-list`, {
+    const response = await fetch(`${config.API_URL}/admin/lossAcct-list?page=${page}&itemsPerPage=${itemsPerPage}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
