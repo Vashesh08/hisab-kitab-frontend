@@ -11,7 +11,7 @@ root.render(
   <React.StrictMode>
     <Router>
         <Routes>
-          <Route exact path='/goldking' element={<App />}></Route>
+          <Route exact path='/secure' element={<App />}></Route>
           <Route exact path='/' element={<App />}></Route>
         </Routes>
     </Router>
