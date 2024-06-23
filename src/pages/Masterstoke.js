@@ -21,7 +21,7 @@ import { getUtilityData, updateUtility } from "../api/utility.js";
 const MasterStock = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
-  const [itemsPerPage] = useState(1000000); // Change this to show all
+  const [itemsPerPage] = useState(100000000); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
