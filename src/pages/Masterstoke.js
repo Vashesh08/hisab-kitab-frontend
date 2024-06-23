@@ -222,23 +222,25 @@ const MasterStock = () => {
     let curMeltingBookOpeningBalance = parseFloat(balanceData[0]["meltingBookOpeningBalance"]);
     let curMeltingBookClosingBalance = parseFloat(balanceData[0]["meltingBookClosingBalance"]);
     
+    const docs = await fetchMasterStockList(page, itemsPerPage, token);
+
     selectedRowKeys.map((item, index) => {
-      for (let i = 0; i < rows.length; i++) {
-        if (rows[i]["_id"] === item) {
-          console.log(rows[i])
-          if (rows[i]["type"] === "Issue"){
-              curMasterStockClosingBalance += parseFloat(rows[i]["weight"])
+      for (let i = 0; i < docs.length; i++) {
+        if (docs[i]["_id"] === item && !docs[i]["is_deleted_flag"]) {
+          console.log(docs[i])
+          if (docs[i]["type"] === "Issue"){
+              curMasterStockClosingBalance += parseFloat(docs[i]["weight"])
           }
           else{
-              if (rows[i]["category"] === "metal"){
-                curMasterStockOpeningBalance -= parseFloat(rows[i]["receive22k"])
-                curMasterStockClosingBalance -= parseFloat(rows[i]["receive22k"])
-                curMeltingBookOpeningBalance -= parseFloat(rows[i]["weight"])
-                curMeltingBookClosingBalance -= parseFloat(rows[i]["weight"])
+              if (docs[i]["category"] === "metal"){
+                curMasterStockOpeningBalance -= parseFloat(docs[i]["receive22k"])
+                curMasterStockClosingBalance -= parseFloat(docs[i]["receive22k"])
+                curMeltingBookOpeningBalance -= parseFloat(docs[i]["weight"])
+                curMeltingBookClosingBalance -= parseFloat(docs[i]["weight"])
               }
               else{
-                curMasterStockOpeningBalance -= parseFloat(rows[i]["receive22k"])
-                curMasterStockClosingBalance -= parseFloat(rows[i]["receive22k"])
+                curMasterStockOpeningBalance -= parseFloat(docs[i]["receive22k"])
+                curMasterStockClosingBalance -= parseFloat(docs[i]["receive22k"])
               }
           }
         }

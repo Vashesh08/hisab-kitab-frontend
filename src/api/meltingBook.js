@@ -35,7 +35,7 @@ export async function fetchMeltingBookList(page, itemsPerPage, token) {
 
 export async function deleteMeltingBookList(meltingBookId, token) {
     // console.log(meltingBookId);
-    const formData = await convertObjectToFormData(meltingBookId); // TODO 
+    const formData = await convertObjectToFormData(meltingBookId);  
     // Var name to be changed later
     // console.log("vas",formData);
 

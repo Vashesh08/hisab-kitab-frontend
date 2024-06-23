@@ -247,20 +247,22 @@ const MeltingBook = () => {
     
     let currMeltingBookClosingBalance = parseFloat(balanceData[0]["meltingBookClosingBalance"])
 
+    const docs = await fetchMeltingBookList(page, itemsPerPage, token);
+
     // console.log(selectedRowKeys, rows);
     selectedRowKeys.map((item, index) => {
 
       const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Melting")
       if (matchedData){
-        lossIds.push(matchedData._id);  
+        lossIds.push(matchedData._id);
       }
 
-      for (let i = 0; i < rows.length; i++) {
-        if (rows[i]["_id"] === item) {
+      for (let i = 0; i < docs.length; i++) {
+        if (docs[i]["_id"] === item && !docs[i]["is_deleted_flag"]) {
           // console.log(rows[i]);
 
-            rows[i]["weight24k"].forEach((element, index) => {
-              if (rows[i]["category"][index] === "Gold"){
+            docs[i]["weight24k"].forEach((element, index) => {
+              if (docs[i]["category"][index] === "Gold"){
                 currMeltingBookClosingBalance += parseFloat(element);
               }
             });
@@ -821,7 +823,7 @@ const MeltingBook = () => {
                 </Table.Summary.Cell> */}
                 <Table.Summary.Cell index={6}>
                   {totalIssueActualQuantity}
-                  {/* TODO Add Total Issue Weight {totalIssueQuantity} */}
+                  {/* Add Total Issue Weight {totalIssueQuantity} */}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={7}>
                   {totalRecvQuantity}

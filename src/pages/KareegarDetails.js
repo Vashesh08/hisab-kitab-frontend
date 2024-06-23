@@ -55,7 +55,8 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
 
         await deleteKareegarData(kareegarDataId, token);
         // console.log(kareegarId, "Delete ICon clicked");
-        
+        // TODO when delete kareegar delete all his losses and all his entries
+
         setAllKareegarDetails(await getKareegarData(token));
         
         setIsDeleteModalOpen(false);

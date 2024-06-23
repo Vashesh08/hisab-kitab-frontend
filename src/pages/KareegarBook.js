@@ -367,26 +367,29 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     const lossIds = [];
     console.log(lossAcctData);
     console.log(selectedRowKeys);
+
+    const docs = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
+
     selectedRowKeys.map((item, index) => {
-      for (let i = 0; i < rows.length; i++) {
-        if (rows[i]["_id"] === item){
-          console.log("row", rows[i]);
-          if (rows[i]["type"] === "Issue"){
-              balance -= parseFloat(rows[i]["issue_wt"]);
-              if (rows[i]["beads_issue_wt"] !== "" && !isNaN(rows[i]["beads_issue_wt"])){
-                beads_balance -= parseFloat(rows[i]["beads_issue_wt"]);
+      for (let i = 0; i < docs.length; i++) {
+        if (docs[i]["_id"] === item && !docs[i]["is_deleted_flag"]){
+          console.log("row", docs[i]);
+          if (docs[i]["type"] === "Issue"){
+              balance -= parseFloat(docs[i]["issue_wt"]);
+              if (docs[i]["beads_issue_wt"] !== "" && !isNaN(docs[i]["beads_issue_wt"])){
+                beads_balance -= parseFloat(docs[i]["beads_issue_wt"]);
               }
           }
           else{
-            balance += parseFloat(rows[i]["recv_wt"]);
-            if (rows[i]["beads_recv_wt"] !== "" && !isNaN(rows[i]["beads_recv_wt"])){
-              beads_balance += parseFloat(rows[i]["beads_recv_wt"]);
+            balance += parseFloat(docs[i]["recv_wt"]);
+            if (docs[i]["beads_recv_wt"] !== "" && !isNaN(docs[i]["beads_recv_wt"])){
+              beads_balance += parseFloat(docs[i]["beads_recv_wt"]);
             }
           }
-          if (rows[i]["loss_wt"] !== "" && !isNaN(rows[i]["loss_wt"])) {
-            balance += parseFloat(rows[i]["loss_wt"]);
+          if (docs[i]["loss_wt"] !== "" && !isNaN(docs[i]["loss_wt"])) {
+            balance += parseFloat(docs[i]["loss_wt"]);
             const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Kareegar")
-            console.log(item, matchedData, rows[i]);
+            console.log(item, matchedData, docs[i]);
             if (matchedData){
               lossIds.push(matchedData._id);  
             }

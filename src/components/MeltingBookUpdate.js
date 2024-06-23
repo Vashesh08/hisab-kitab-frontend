@@ -67,7 +67,6 @@ function MeltingBookUpdate({handleOk, textData}) {
         // const updated = await updateMeltingBook(backendData, token);
         // console.log("Added ",updated);
         
-        // TODO ADD TO LOSS ACCT HERE
 
         form.resetFields();
         setIsLoading(false);
