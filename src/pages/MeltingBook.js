@@ -34,6 +34,10 @@ const MeltingBook = () => {
   const [totalLossQuantity, setTotalLossQty] = useState(0);
   const [openingBalance, setOpeningBalance] = useState(0);
   const [closingBalance, setClosingBalance] = useState(0);
+  const [opening995Balance, setOpening995Balance] = useState(0);
+  const [closing995Balance, setClosing995Balance] = useState(0);
+  const [opening100Balance, setOpening100Balance] = useState(0);
+  const [closing100Balance, setClosing100Balance] = useState(0);
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -60,6 +64,10 @@ const MeltingBook = () => {
     const balanceData = await getUtilityData(token);
     setOpeningBalance(parseFloat(balanceData[0]["meltingBookOpeningBalance"]).toFixed(2));
     setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2));
+    setOpening995Balance(parseFloat(balanceData[0]["meltingBookOpening995Balance"]).toFixed(2));
+    setClosing995Balance(parseFloat(balanceData[0]["meltingBookClosing995Balance"]).toFixed(2));
+    setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
+    setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
 
     const docs = await fetchMeltingBookList(page, itemsPerPage, token);
     setFullData(docs);
@@ -150,6 +158,10 @@ const MeltingBook = () => {
         const balanceData = await getUtilityData(token);
         setOpeningBalance(parseFloat(balanceData[0]["meltingBookOpeningBalance"]).toFixed(2));
         setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2))
+        setOpening995Balance(parseFloat(balanceData[0]["meltingBookOpening995Balance"]).toFixed(2));
+        setClosing995Balance(parseFloat(balanceData[0]["meltingBookClosing995Balance"]).toFixed(2));
+        setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
+        setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
     
         const docs = await fetchMeltingBookList(page, itemsPerPage, token);
         setFullData(docs);
@@ -246,6 +258,8 @@ const MeltingBook = () => {
     const lossIds = [];
     
     let currMeltingBookClosingBalance = parseFloat(balanceData[0]["meltingBookClosingBalance"])
+    let currMeltingBookClosing995Balance = parseFloat(balanceData[0]["meltingBookClosing995Balance"])
+    let currMeltingBookClosing100Balance = parseFloat(balanceData[0]["meltingBookClosing100Balance"])
 
     const docs = await fetchMeltingBookList(page, itemsPerPage, token);
 
@@ -262,8 +276,17 @@ const MeltingBook = () => {
           // console.log(rows[i]);
 
             docs[i]["weight24k"].forEach((element, index) => {
+              console.log(element)
               if (docs[i]["category"][index] === "Gold"){
-                currMeltingBookClosingBalance += parseFloat(element);
+                if (parseFloat(docs[i]["purity"][index]) === 99.5){
+                  currMeltingBookClosing995Balance += parseFloat(element);
+                }
+                else if (parseFloat(docs[i]["purity"][index]) === 100){
+                  currMeltingBookClosing100Balance += parseFloat(element);
+                }
+                else{
+                  currMeltingBookClosingBalance += parseFloat(element);
+                }
               }
             });
         }
@@ -278,7 +301,9 @@ const MeltingBook = () => {
 
     const utilityData = {
       _id: balanceData[0]["_id"],
-      meltingBookClosingBalance: currMeltingBookClosingBalance
+      meltingBookClosingBalance: currMeltingBookClosingBalance,
+      meltingBookClosing995Balance: currMeltingBookClosing995Balance,
+      meltingBookClosing100Balance: currMeltingBookClosing100Balance,
     }
     await updateUtility(utilityData, token);
 
@@ -470,7 +495,6 @@ const MeltingBook = () => {
       )
       )
   });
-
 
   const columns = [
     {
@@ -694,7 +718,7 @@ const MeltingBook = () => {
 
   return (
     <div>
-        {screenWidth > 800 ? (
+        {screenWidth > 953 ? (
           <>
             <div className="text-xl border-transparent flex justify-between items-center">
             <div style={{ 
@@ -708,18 +732,58 @@ const MeltingBook = () => {
 
               <div className="flex flex-col">
                 <div className="mb-1 flex justify-between items-center h-12">
-                  <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
-                  Opening Balance:&nbsp;&nbsp;&nbsp;&nbsp;
-                    <input className="ml-4 text-[#00203FFF] text-right w-32 px-2 text-lg h-7 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={openingBalance}/>
-                  </span>
-                  <Tooltip title="Add" placement="topRight">
+                <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
+                    <span className="!w-52 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    Purity
+                    </span>
+                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    99.5
+                    </span>
+                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    100
+                    </span>
+                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2">
+                    Others
+                    </span>
+                  </div>
+                    <Tooltip title="Add" placement="topRight">
                     <PlusCircleOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showModal} />
                   </Tooltip>
                 </div>
-                <div className="mt-1 flex justify-between items-center h-12">
-                  <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
-                      Remaining Balance:  <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/>
+                <div className="mt-1 mb-1 flex justify-end h-12 mr-12">
+                <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
+                    <span className="!w-52 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    Opening Balance
                     </span>
+                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    {opening995Balance}
+                    </span>
+                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    {opening100Balance}
+                    </span>
+                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2">
+                    {openingBalance}
+                    </span>
+                  </div>
+                    {/* <Tooltip title="Delete" placement="bottomRight">
+                    <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
+                  </Tooltip> */}
+                </div>
+                <div className="mt-1 flex justify-end h-12">
+                <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
+                    <span className="!w-52 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    Remaining Balance
+                    </span>
+                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    {closing995Balance}
+                    </span>
+                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    {closing100Balance}
+                    </span>
+                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2">
+                    {closingBalance}
+                    </span>
+                  </div>
                     <Tooltip title="Delete" placement="bottomRight">
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
                   </Tooltip>
@@ -728,7 +792,7 @@ const MeltingBook = () => {
             </div>
             <br/>
           </>
-        ) : (
+        ) : screenWidth > 500 ? (
           <>
             <div style={{
               fontSize: '250%',
@@ -740,7 +804,49 @@ const MeltingBook = () => {
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
             <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={showDeletePopup} />
           </div>
-          <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
+          <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
+            <span className="!w-2/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            Purity
+            </span>
+            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            99.5
+            </span>
+            <span className="!w-1/5	text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            100
+            </span>
+            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1">
+            Others
+            </span>
+          </div>
+          <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
+            <span className="!w-2/5 text-left !h-12 !text-[#00203FFF] !text-lg  py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            Opening Balance
+            </span>
+            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            {opening995Balance}
+            </span>
+            <span className="!w-1/5	text-left !h-12 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            {opening100Balance}
+            </span>
+            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1">
+            {openingBalance}
+            </span>
+          </div>
+          <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
+            <span className="!w-2/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            Closing Balance
+            </span>
+            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            {closing995Balance}
+            </span>
+            <span className="!w-1/5	text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            {closing100Balance}
+            </span>
+            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1">
+            {closingBalance}
+            </span>
+          </div>
+          {/* <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
             <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
               Opening Balance:
               <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" readOnly={true} value={openingBalance}/>
@@ -750,7 +856,62 @@ const MeltingBook = () => {
               <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
                 Remaining Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
               </span>
-            </div>
+            </div> */}
+          </>
+        ): (
+          <>
+            <div style={{
+              fontSize: '250%',
+              fontWeight: 'bolder',
+              lineHeight: "2em",
+              }} className="text-center text-[#00203FFF]" >Melting Book</div>
+
+          <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
+            <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
+            <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={showDeletePopup} />
+          </div>
+          <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
+            <span className="!w-1/4 flex items-center justify-center text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            Purity
+            </span>
+            <span className="!w-1/4 flex items-center justify-center text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            99.5
+            </span>
+            <span className="!w-1/4	flex items-center justify-center text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            100
+            </span>
+            <span className="!w-1/4 flex items-center justify-center text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1">
+            Others
+            </span>
+          </div>
+          <div className="text-[#00203FFF] !h-24 whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
+            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] whitespace-break-spaces !text-lg  py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            Opening Balance
+            </span>
+            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            {opening995Balance}
+            </span>
+            <span className="!w-1/4	flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            {opening100Balance}
+            </span>
+            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1">
+            {openingBalance}
+            </span>
+          </div>
+          <div className="text-[#00203FFF] !h-24 whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
+            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] whitespace-break-spaces !text-lg  py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            Remaining Balance
+            </span>
+            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            {closing995Balance}
+            </span>
+            <span className="!w-1/4	flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            {closing100Balance}
+            </span>
+            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1">
+            {closingBalance}
+            </span>
+          </div>
           </>
         )}
 
@@ -764,6 +925,8 @@ const MeltingBook = () => {
           handleOk={handleUpdateClose}
           closingBalance={parseFloat(closingBalance)}
           setClosingBalance={setClosingBalance}
+          setClosing995Balance={setClosing995Balance}
+          setClosing100Balance={setClosing100Balance}
           />
       </Modal>
 

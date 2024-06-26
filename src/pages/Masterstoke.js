@@ -221,6 +221,10 @@ const MasterStock = () => {
     let curMasterStockClosingBalance = parseFloat(balanceData[0]["masterStockClosingBalance"]);
     let curMeltingBookOpeningBalance = parseFloat(balanceData[0]["meltingBookOpeningBalance"]);
     let curMeltingBookClosingBalance = parseFloat(balanceData[0]["meltingBookClosingBalance"]);
+    let curMeltingBookOpening995Balance = parseFloat(balanceData[0]["meltingBookOpening995Balance"]);
+    let curMeltingBookClosing995Balance = parseFloat(balanceData[0]["meltingBookClosing995Balance"]);
+    let curMeltingBookOpening100Balance = parseFloat(balanceData[0]["meltingBookOpening100Balance"]);
+    let curMeltingBookClosing100Balance = parseFloat(balanceData[0]["meltingBookClosing100Balance"]);
     
     const docs = await fetchMasterStockList(page, itemsPerPage, token);
 
@@ -235,8 +239,19 @@ const MasterStock = () => {
               if (docs[i]["category"] === "metal"){
                 curMasterStockOpeningBalance -= parseFloat(docs[i]["receive22k"])
                 curMasterStockClosingBalance -= parseFloat(docs[i]["receive22k"])
-                curMeltingBookOpeningBalance -= parseFloat(docs[i]["weight"])
-                curMeltingBookClosingBalance -= parseFloat(docs[i]["weight"])
+                console.log(docs[i]["purity"]);
+                if (docs[i]["purity"] === 99.5){
+                  curMeltingBookOpening995Balance -= parseFloat(docs[i]["weight"])
+                  curMeltingBookClosing995Balance -= parseFloat(docs[i]["weight"])
+                }
+                else if (docs[i]["purity"] === 100){
+                  curMeltingBookOpening100Balance -= parseFloat(docs[i]["weight"])
+                  curMeltingBookClosing100Balance -= parseFloat(docs[i]["weight"])
+                }
+                else{
+                  curMeltingBookOpeningBalance -= parseFloat(docs[i]["weight"])
+                  curMeltingBookClosingBalance -= parseFloat(docs[i]["weight"])
+                }
               }
               else{
                 curMasterStockOpeningBalance -= parseFloat(docs[i]["receive22k"])
@@ -253,7 +268,11 @@ const MasterStock = () => {
       masterStockOpeningBalance: curMasterStockOpeningBalance,
       masterStockClosingBalance: curMasterStockClosingBalance,
       meltingBookOpeningBalance: curMeltingBookOpeningBalance,
-      meltingBookClosingBalance: curMeltingBookClosingBalance
+      meltingBookClosingBalance: curMeltingBookClosingBalance,
+      meltingBookOpening995Balance: curMeltingBookOpening995Balance,
+      meltingBookClosing995Balance: curMeltingBookClosing995Balance,
+      meltingBookOpening100Balance: curMeltingBookOpening100Balance,
+      meltingBookClosing100Balance: curMeltingBookClosing100Balance
     }
     await updateUtility(utilityData, token);
 

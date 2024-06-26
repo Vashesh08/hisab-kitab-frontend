@@ -373,7 +373,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     selectedRowKeys.map((item, index) => {
       for (let i = 0; i < docs.length; i++) {
         if (docs[i]["_id"] === item && !docs[i]["is_deleted_flag"]){
-          console.log("row", docs[i]);
+          // console.log("row", docs[i]);
           if (docs[i]["type"] === "Issue"){
               balance -= parseFloat(docs[i]["issue_wt"]);
               if (docs[i]["beads_issue_wt"] !== "" && !isNaN(docs[i]["beads_issue_wt"])){

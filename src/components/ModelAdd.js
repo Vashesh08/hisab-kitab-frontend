@@ -124,14 +124,37 @@ function ModelAdd({handleOk}) {
       };
       if (metal === "metal")
       {
-        const utilityData = {
-          _id: balanceData[0]["_id"],
-          masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
-          masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
-          meltingBookOpeningBalance: (parseFloat(balanceData[0]["meltingBookOpeningBalance"]) + parseFloat(weight)).toFixed(2) ,
-          meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) + parseFloat(weight)).toFixed(2)
+        console.log(purity, typeof purity, purity === "99.50");
+        if (parseFloat(purity) === 99.5){
+          const utilityData = {
+            _id: balanceData[0]["_id"],
+            masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+            masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+            meltingBookOpening995Balance: (parseFloat(balanceData[0]["meltingBookOpening995Balance"]) + parseFloat(weight)).toFixed(2) ,
+            meltingBookClosing995Balance: (parseFloat(balanceData[0]["meltingBookClosing995Balance"]) + parseFloat(weight)).toFixed(2)
+          }
+          await updateUtility(utilityData, token);
         }
-        await updateUtility(utilityData, token);
+        else if (parseFloat(purity) === 100){
+          const utilityData = {
+            _id: balanceData[0]["_id"],
+            masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+            masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+            meltingBookOpening100Balance: (parseFloat(balanceData[0]["meltingBookOpening100Balance"]) + parseFloat(weight)).toFixed(2) ,
+            meltingBookClosing100Balance: (parseFloat(balanceData[0]["meltingBookClosing100Balance"]) + parseFloat(weight)).toFixed(2)
+          }
+          await updateUtility(utilityData, token);
+        }
+        else{
+          const utilityData = {
+            _id: balanceData[0]["_id"],
+            masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+            masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+            meltingBookOpeningBalance: (parseFloat(balanceData[0]["meltingBookOpeningBalance"]) + parseFloat(weight)).toFixed(2) ,
+            meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) + parseFloat(weight)).toFixed(2)
+          }
+          await updateUtility(utilityData, token);
+        }
       }
       else{
         const utilityData = {

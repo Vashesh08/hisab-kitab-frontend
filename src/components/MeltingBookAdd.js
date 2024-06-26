@@ -5,7 +5,7 @@ import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } from "antd";
 import { getUtilityData, updateUtility } from "../api/utility.js";
 
-function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
+function MeltingBookAdd({handleOk, closingBalance, setClosingBalance, setClosing995Balance, setClosing100Balance}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [categoryType, setCategoryType] = useState(["Gold", "Gold", "Gold", "Gold", "Gold"]);
@@ -342,6 +342,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
     
     const categoryKeys = [...Array(numberOfItems)].map((_, index) => `category${index}`);
     const categoryValues = categoryKeys.map((key) => user[key]);
+    // console.log(purityValues, weightValues, conversionValues);
 
     const {
       date,
@@ -350,10 +351,21 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
     } = user;
   
     let totalWeight = 0;
+    let totalWeight995 = 0
+    let totalWeight100 = 0
     let totalRoundedNumber = 0;
     for (let index = 0; index < numberOfItems; index++) {
       if (categoryType[index] === "Gold"){
-        totalWeight += weightValues[index];
+        // console.log(purityValues[index], parseFloat(purityValues[index]) === 99.5, parseFloat(purityValues[index]) === 100);
+        if (parseFloat(purityValues[index]) === 99.5){
+          totalWeight995 += weightValues[index];
+        }
+        else if (parseFloat(purityValues[index]) === 100){
+          totalWeight100 += weightValues[index];
+        }
+        else {
+          totalWeight += weightValues[index];
+        }
       };
       totalRoundedNumber += ((weightValues[index] * purityValues[index])  / conversionValues[index]);
     }
@@ -373,7 +385,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
     //     await postMeltingBook(backendData, token);
     // }
     // else{
-        if (parseFloat(totalWeight) <= parseFloat(balanceData[0]["meltingBookClosingBalance"])){
+        if ((parseFloat(totalWeight) <= parseFloat(balanceData[0]["meltingBookClosingBalance"])) && (parseFloat(totalWeight995) <= parseFloat(balanceData[0]["meltingBookClosing995Balance"])) && (parseFloat(totalWeight100) <= parseFloat(balanceData[0]["meltingBookClosing100Balance"]))){
 
           
           const backendData = {
@@ -392,13 +404,25 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance}) {
         //   {        
             const utilityData = {
               _id: balanceData[0]["_id"],
-              meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) - parseFloat(totalWeight)).toFixed(2)
+              meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) - parseFloat(totalWeight)).toFixed(2),
+              meltingBookClosing995Balance: (parseFloat(balanceData[0]["meltingBookClosing995Balance"]) - parseFloat(totalWeight995)).toFixed(2),
+              meltingBookClosing100Balance: (parseFloat(balanceData[0]["meltingBookClosing100Balance"]) - parseFloat(totalWeight100)).toFixed(2)
             }
             await updateUtility(utilityData, token);
           // }
         }
         else{
           setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2));
+          setClosing995Balance(parseFloat(balanceData[0]["meltingBookClosing995Balance"]).toFixed(2));
+          setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
+          //TODO throw error
+          setFormWeightValues([0, 0, 0, 0, 0]);
+          setFormPurityValues([0, 0, 0, 0, 0]);
+          setFormConversionValues([0, 0, 0, 0, 0]);
+          setMeltingIssueWt(0);
+          setIssueActualWt(0);
+          setIsLoading(false);
+          return
         }
       // }
 

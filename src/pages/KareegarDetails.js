@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "../style/Cards.css"
 import { Button, Card, Col, Row, Modal } from "antd";
-import { getKareegarData, deleteKareegarData } from "../api/kareegarDetail.js";
+import { getKareegarData, deleteKareegarData, updateKareegarBalance } from "../api/kareegarDetail.js";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import Loading from "../components/Loading.js";
 import AddKareegar from "../components/AddKareegar.js";
+import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
+import { deleteKareegarBookList, fetchKareegarBookList } from "../api/kareegarBook.js";
 
 export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage, setKareegarName }) {
     const { Meta } = Card;
@@ -54,6 +56,67 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         }
 
         await deleteKareegarData(kareegarDataId, token);
+        const docs = await fetchKareegarBookList(1, 100000000, selectedKareegarId, token);
+        const data =  await getKareegarData(token);
+        const kareegarData = data.find(item => item._id === selectedKareegarId);
+        let balance = parseFloat(kareegarData["balance"]);
+        let beads_balance = parseFloat(kareegarData["beads_balance"]);
+        // console.log(kareegarData, balance);
+        
+        const lossAcctData = await fetchLossAcctList(1, 100000000, token);
+        const lossIds = [];
+        const selectedIds = [];
+
+        for (let i = 0; i < docs.length; i++) {
+            if (!docs[i]["is_deleted_flag"]){
+            //   console.log("row", docs[i]);
+                selectedIds.push(docs[i]["_id"]);
+              if (docs[i]["type"] === "Issue"){
+                  balance -= parseFloat(docs[i]["issue_wt"]);
+                  if (docs[i]["beads_issue_wt"] !== "" && !isNaN(docs[i]["beads_issue_wt"])){
+                    beads_balance -= parseFloat(docs[i]["beads_issue_wt"]);
+                  }
+              }
+              else{
+                balance += parseFloat(docs[i]["recv_wt"]);
+                if (docs[i]["beads_recv_wt"] !== "" && !isNaN(docs[i]["beads_recv_wt"])){
+                  beads_balance += parseFloat(docs[i]["beads_recv_wt"]);
+                }
+              }
+              if (docs[i]["loss_wt"] !== "" && !isNaN(docs[i]["loss_wt"])) {
+                balance += parseFloat(docs[i]["loss_wt"]);
+                const matchedData = lossAcctData.find(row => row.transactionId === docs[i]["_id"] && row.type === "Kareegar")
+                if (matchedData){
+                  lossIds.push(matchedData._id);  
+                }
+              }
+              console.log("balance", balance, beads_balance);
+            }
+          }
+          console.log("lossIds",lossIds);
+        
+          const deleteFromLossAcct = {
+            lossId: lossIds,
+          }
+          await deleteLossAcctList(deleteFromLossAcct, token);
+      
+          const kareegarBalanceData = {
+            '_id': kareegarDataId,
+            "balance": balance.toFixed(2),
+            "beads_balance": beads_balance.toFixed(2)
+          }
+
+          await updateKareegarBalance(kareegarBalanceData, token);
+
+          const kareegarBookId = {
+            "kareegarBookId": selectedIds
+          }
+          
+          // console.log(meltingBookId);
+          await deleteKareegarBookList(kareegarBookId, token);
+      
+      
+      
         // console.log(kareegarId, "Delete ICon clicked");
         // TODO when delete kareegar delete all his losses and all his entries
 
