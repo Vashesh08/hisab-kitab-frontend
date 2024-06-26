@@ -5,7 +5,7 @@ import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } from "antd";
 import { getUtilityData, updateUtility } from "../api/utility.js";
 
-function MeltingBookAdd({handleOk, closingBalance, setClosingBalance, setClosing995Balance, setClosing100Balance}) {
+function MeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance, setClosing100Balance}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [categoryType, setCategoryType] = useState(["Gold", "Gold", "Gold", "Gold", "Gold"]);
@@ -16,7 +16,8 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance, setClosing
   const [formPurityValues, setFormPurityValues] = useState([0, 0, 0, 0, 0]);
   const [formConversionValues, setFormConversionValues] = useState([0, 0, 0, 0, 0]);
   const [issueActualWt, setIssueActualWt] = useState(0);
-  
+  const [error, setError] = useState(false);
+
   const handleActualIssueWt = (value) => {
     setIssueActualWt(value);
   }
@@ -176,8 +177,8 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance, setClosing
           const intValue = parseInt(value, 10);
           if (isNaN(intValue)) {
             return Promise.reject(new Error("Please enter a valid number."));
-          } else if (intValue < 0) {
-            return Promise.reject(new Error("Value must be greater than or equal to 0."));
+          } else if (intValue <= 0) {
+            return Promise.reject(new Error("Value must be greater than 0."));
           }
           return Promise.resolve();
         },
@@ -225,7 +226,7 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance, setClosing
         <Form.Item
           name={["user", `weight${index}`]}
           label={`Weight (gm) ${index+1}`}
-          rules={[{ type: "number", min: 0, max: closingBalance, required: true }]}
+          rules={[{ type: "number", min: 0, required: true }]}
           onChange={(e) => onChangeWt(e, "weight", index)} 
         >
           <InputNumber/>
@@ -410,12 +411,14 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance, setClosing
             }
             await updateUtility(utilityData, token);
           // }
+          setError(false);
         }
         else{
           setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2));
           setClosing995Balance(parseFloat(balanceData[0]["meltingBookClosing995Balance"]).toFixed(2));
           setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
           //TODO throw error
+          setError(true);
           setFormWeightValues([0, 0, 0, 0, 0]);
           setFormPurityValues([0, 0, 0, 0, 0]);
           setFormConversionValues([0, 0, 0, 0, 0]);
@@ -447,6 +450,13 @@ function MeltingBookAdd({handleOk, closingBalance, setClosingBalance, setClosing
       }}
       validateMessages={validateMessages}
     >
+      {error ? (
+        <>
+        <div className="text-red-600 text-center py-3"> Melting Weight is more than Available Stock </div>
+        </>
+      ) : (
+        <></>
+      )}
       <Form.Item
         name={["user", "date"]}
         label="Date"
