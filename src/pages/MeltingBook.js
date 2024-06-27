@@ -731,18 +731,18 @@ const MeltingBook = () => {
               </div>
 
               <div className="flex flex-col">
-                <div className="mb-1 flex justify-between items-center h-12">
-                <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
-                    <span className="!w-52 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                <div className="mb-1 flex justify-between items-center h-10">
+                <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto font-medium h-10 bg-[#ABD6DFFF] p-1 border-white border-x-2 border-y-1 flex items-center justify-center">
+                    <span className="!w-48 !h-10 !text-[#00203FFF] !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
                     Purity
                     </span>
-                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    <span className="!w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
                     99.5
                     </span>
-                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    <span className="!w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
                     100
                     </span>
-                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2">
+                    <span className="!w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1">
                     Others
                     </span>
                   </div>
@@ -750,18 +750,18 @@ const MeltingBook = () => {
                     <PlusCircleOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showModal} />
                   </Tooltip>
                 </div>
-                <div className="mt-1 mb-1 flex justify-end h-12 mr-12">
-                <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
-                    <span className="!w-52 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                <div className="flex justify-end h-10 mr-12">
+                <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto h-10 font-light	bg-[#ABD6DFFF] p-1 border-white border-x-2 border-y-1 flex items-center justify-center">
+                    <span className="!w-48 !h-10 !text-[#00203FFF] font-medium !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
                     Opening Balance
                     </span>
-                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
                     {opening995Balance}
                     </span>
-                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
                     {opening100Balance}
                     </span>
-                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2">
+                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1">
                     {openingBalance}
                     </span>
                   </div>
@@ -769,18 +769,18 @@ const MeltingBook = () => {
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
                   </Tooltip> */}
                 </div>
-                <div className="mt-1 flex justify-end h-12">
-                <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
-                    <span className="!w-52 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                <div className="mt-1 flex justify-end h-10">
+                <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto h-10 font-light	bg-[#ABD6DFFF] p-1 border-white border-x-2 border-y-1 flex items-center justify-center">
+                    <span className="!w-48 !h-10 !text-[#00203FFF] font-medium !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
                     Remaining Balance
                     </span>
-                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
                     {closing995Balance}
                     </span>
-                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2 border-r-[#00203FFF] border-r-2">
+                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
                     {closing100Balance}
                     </span>
-                    <span className="!w-24 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-8 pl-2">
+                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1">
                     {closingBalance}
                     </span>
                   </div>
