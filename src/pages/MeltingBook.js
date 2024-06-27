@@ -804,59 +804,49 @@ const MeltingBook = () => {
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
             <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={showDeletePopup} />
           </div>
-          <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
-            <span className="!w-2/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+          
+          <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto h-10 font-medium bg-[#ABD6DFFF] p-1 border-white border-2 flex items-center justify-center">
+            <span className="!w-2/5 text-left !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
             Purity
             </span>
-            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="!w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
             99.5
             </span>
-            <span className="!w-1/5	text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="!w-1/5	text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
             100
             </span>
-            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1">
+            <span className="!w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1">
             Others
             </span>
           </div>
-          <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
-            <span className="!w-2/5 text-left !h-12 !text-[#00203FFF] !text-lg  py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+          <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto h-10 font-light bg-[#ABD6DFFF] p-1 border-white border-2 flex items-center justify-center">
+            <span className="!w-2/5 font-medium text-left !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
             Opening Balance
             </span>
-            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="overflow-auto !w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
             {opening995Balance}
             </span>
-            <span className="!w-1/5	text-left !h-12 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="overflow-auto !w-1/5	text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
             {opening100Balance}
             </span>
-            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1">
+            <span className="overflow-auto !w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1">
             {openingBalance}
             </span>
           </div>
-          <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
-            <span className="!w-2/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+          <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto h-10 font-light bg-[#ABD6DFFF] p-1 border-white border-2 flex items-center justify-center">
+            <span className="!w-2/5 font-medium text-left !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
             Closing Balance
             </span>
-            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="overflow-auto !w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
             {closing995Balance}
             </span>
-            <span className="!w-1/5	text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="overflow-auto !w-1/5	text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
             {closing100Balance}
             </span>
-            <span className="!w-1/5 text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1">
+            <span className="overflow-auto !w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1">
             {closingBalance}
             </span>
           </div>
-          {/* <div className="border-b-8 border-t-8 border-transparent	text-xl flex justify-end items-center">
-            <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
-              Opening Balance:
-              <input className="text-[#00203FFF] text-right px-2	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline" readOnly={true} value={openingBalance}/>
-            </span>
-          </div>
-          <div className="	text-xl flex justify-end items-center">
-              <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
-                Remaining Balance: &nbsp; <span className="text-[#00203FFF] px-2 text-right	float-end w-24 border-current	border-0 bg-[#ABD6DFFF] outline-blue-50 outline">{closingBalance}</span> 
-              </span>
-            </div> */}
           </>
         ): (
           <>
@@ -870,46 +860,46 @@ const MeltingBook = () => {
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
             <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={showDeletePopup} />
           </div>
-          <div className="text-[#00203FFF] whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
-            <span className="!w-1/4 flex items-center justify-center text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+          <div className="text-[#00203FFF] whitespace-nowrap w-auto h-10 font-medium bg-[#ABD6DFFF] p-2 border-white border-2 flex items-center justify-center">
+            <span className="overflow-x-auto !w-1/4 flex items-center justify-center text-left !h-10 !text-[#00203FFF] py-2 pr-10 pl-5 border-r-white border-r-2">
             Purity
             </span>
-            <span className="!w-1/4 flex items-center justify-center text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="!w-1/4 flex items-center justify-center text-right !h-10 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
             99.5
             </span>
-            <span className="!w-1/4	flex items-center justify-center text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="!w-1/4	flex items-center justify-center text-right !h-10 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
             100
             </span>
-            <span className="!w-1/4 flex items-center justify-center text-left !h-12 !text-[#00203FFF] !text-lg py-2 pr-1 pl-1">
+            <span className="!w-1/4 flex items-center justify-center text-right !h-10 !text-[#00203FFF] py-2 pr-2 pl-10">
             Others
             </span>
           </div>
-          <div className="text-[#00203FFF] !h-24 whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
-            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] whitespace-break-spaces !text-lg  py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+          <div className="text-[#00203FFF] !h-20 whitespace-nowrap w-auto font-light bg-[#ABD6DFFF] p-2 border-white border-2 flex items-center justify-center">
+            <span className="overflow-x-auto !w-1/4 font-medium flex items-center justify-center text-left !h-20 !text-[#00203FFF] whitespace-break-spaces py-2 pl-8 pr-8 border-r-white border-r-2">
             Opening Balance
             </span>
-            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="!w-1/4 flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
             {opening995Balance}
             </span>
-            <span className="!w-1/4	flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="!w-1/4	flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
             {opening100Balance}
             </span>
-            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1">
+            <span className="!w-1/4 flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10">
             {openingBalance}
             </span>
           </div>
-          <div className="text-[#00203FFF] !h-24 whitespace-nowrap w-auto h-12 font-medium bg-[#ABD6DFFF] p-2 border-[#00203FFF] border-2 flex items-center justify-center">
-            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] whitespace-break-spaces !text-lg  py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+          <div className="text-[#00203FFF] !h-20 whitespace-nowrap w-auto font-light bg-[#ABD6DFFF] p-2 border-white border-2 flex items-center justify-center">
+            <span className="overflow-x-auto !w-1/4 font-medium flex items-center justify-center text-left !h-20 !text-[#00203FFF] whitespace-break-spaces py-2 pl-4 border-r-white border-r-2">
             Remaining Balance
             </span>
-            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="overflow-x-auto !w-1/4 flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
             {closing995Balance}
             </span>
-            <span className="!w-1/4	flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-[#00203FFF] border-r-2">
+            <span className="overflow-x-auto !w-1/4	flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
             {closing100Balance}
             </span>
-            <span className="!w-1/4 flex items-center justify-center text-left !h-24 !text-[#00203FFF] py-2 pr-1 pl-1">
-            {closingBalance}
+            <span className="overflow-x-auto !w-1/4 flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10">
+            10000000{closingBalance}
             </span>
           </div>
           </>
