@@ -79,7 +79,7 @@ function KareegarAddItems({ kareegarId, handleOk}) {
       beads_recv_wt,
     } = user;
 
-    const data =  await getKareegarData(token);
+    const data =  await getKareegarData(1,100000000,token);
     const kareegarData = data.find(item => item._id === kareegarId);
     
     if (issueReceive === "Issue"){

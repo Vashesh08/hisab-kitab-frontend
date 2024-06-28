@@ -65,7 +65,7 @@ function KareegarClose({ kareegarId, handleOk}){
             closingWt
         } = user;
 
-        const data =  await getKareegarData(token);
+        const data =  await getKareegarData(1, 100000000, token);
         const kareegarData = data.find(item => item._id === kareegarId);
         let balance = parseFloat(kareegarData.balance)
         let boxWt = parseFloat(kareegarData.boxWt)

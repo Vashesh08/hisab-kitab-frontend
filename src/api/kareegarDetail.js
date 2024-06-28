@@ -2,9 +2,9 @@
 import convertObjectToFormData from "../utils/convertObjectToFormData";
 import config from '../config';
 
-export async function getKareegarData(token) {
+export async function getKareegarData(page, itemsPerPage, token) {
     // send request to check authenticated
-    const res = await fetch(`${config.API_URL}/admin/kareegar-list`, {
+    const res = await fetch(`${config.API_URL}/admin/kareegar-list?page=${page}&itemsPerPage=${itemsPerPage}`, {
       method: 'get',
       headers: {
           'Authorization': `Bearer ${token}`,

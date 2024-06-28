@@ -70,7 +70,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
 
     setIsLoading(true);
     const token = localStorage.getItem("token");
-    const kareegarUtilityData =  await getKareegarData(token);
+    const kareegarUtilityData =  await getKareegarData(page,itemsPerPage, token);
     const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
     setBoxWt(kareegarData["boxWt"]);
 
@@ -255,7 +255,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         setIsLoading(true);
           
           const token = localStorage.getItem("token");
-          const kareegarUtilityData =  await getKareegarData(token);
+          const kareegarUtilityData =  await getKareegarData(page, itemsPerPage, token);
           const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
           setBoxWt(kareegarData["boxWt"])
     
@@ -358,7 +358,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const deleteModal = async () => {
     setIsLoading(true);
     const token = localStorage.getItem("token");
-    const data =  await getKareegarData(token);
+    const data =  await getKareegarData(page, itemsPerPage, token);
     const kareegarData = data.find(item => item._id === kareegarId);
     let balance = parseFloat(kareegarData["balance"]);
     let beads_balance = parseFloat(kareegarData["beads_balance"]);

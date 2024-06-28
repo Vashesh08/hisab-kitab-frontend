@@ -21,7 +21,7 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         setIsLoading(true);
 
         const token = localStorage.getItem("token");
-        setAllKareegarDetails(await getKareegarData(token));
+        setAllKareegarDetails(await getKareegarData(1, 100000000,token));
 
         setIsLoading(false);
     }
@@ -57,7 +57,7 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
 
         await deleteKareegarData(kareegarDataId, token);
         const docs = await fetchKareegarBookList(1, 100000000, selectedKareegarId, token);
-        const data =  await getKareegarData(token);
+        const data =  await getKareegarData(1, 100000000, token);
         const kareegarData = data.find(item => item._id === selectedKareegarId);
         let balance = parseFloat(kareegarData["balance"]);
         let beads_balance = parseFloat(kareegarData["beads_balance"]);
@@ -119,7 +119,7 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
       
         // console.log(kareegarId, "Delete ICon clicked");
         
-        setAllKareegarDetails(await getKareegarData(token));
+        setAllKareegarDetails(await getKareegarData(1, 100000000, token));
         
         setIsDeleteModalOpen(false);
         setIsLoading(false);
@@ -136,7 +136,7 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         (async () => {
             setIsLoading(true);
             const token = localStorage.getItem("token");
-            setAllKareegarDetails(await getKareegarData(token));
+            setAllKareegarDetails(await getKareegarData(1, 100000000, token));
             // console.log(allKareegarDetails);
             setIsLoading(false);
         })();
