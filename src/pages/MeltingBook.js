@@ -899,7 +899,7 @@ const MeltingBook = () => {
             {closing100Balance}
             </span>
             <span className="overflow-x-auto !w-1/4 flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10">
-            10000000{closingBalance}
+            {closingBalance}
             </span>
           </div>
           </>
