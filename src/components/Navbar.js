@@ -45,7 +45,8 @@ export default function Navbar(checkLoggedIn) {
         // console.log(localStorage.getItem("token"));
         // Redirect the user to the login page
     //     navigate('/');
-    checkLoggedIn.checkLoggedIn.checkLoggedIn();
+    // console.log(typeof checkLoggedIn.checkLoggedIn);
+    checkLoggedIn.checkLoggedIn();
     // checkLoggedIn.checkLoggedIn();
       };  
 

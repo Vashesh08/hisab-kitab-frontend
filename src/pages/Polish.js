@@ -721,6 +721,16 @@ const Polish = () => {
               fontWeight: 'bolder',
               lineHeight: "2em",
               }} className="text-center text-[#00203FFF]" >Polish Book</div>
+          <div className="border-b-8 border-t-8 border-transparent	p-2 bg-[#ABD6DFFF] text-xl flex justify-between items-center">
+            <span className="text-[#00203FFF] font-medium	 w-full " onClick={showAcctClosingModal} >
+              Close Daily Acct:
+              </span>
+              <span>
+            <Tooltip title="Close Daily Acct" placement="topRight">
+              <EnterOutlined style={{ fontSize: '125%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showAcctClosingModal} />
+            </Tooltip>
+            </span>
+          </div>
 
           <div className="text-xl border-b-8 border-transparent	border-transparent  border-t-4 pt-4 flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />

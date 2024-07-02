@@ -9,12 +9,12 @@ function App() {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const checkLoggedIn = () => {
     const session_key = localStorage.getItem('token');
-
-    if (session_key !== null) {
-      setLoggedIn(true);
+    // console.log("session_key",session_key);
+    if (session_key === null) {
+      setLoggedIn(false);
     }
     else{
-      setLoggedIn(false);
+      setLoggedIn(true);
     }
   };
 

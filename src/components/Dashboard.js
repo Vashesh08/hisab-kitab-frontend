@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Navbar from "./Navbar.js";
 import SideNav from "./SideNav.js";
 
-function Dashboard({isVisible}, checkLoggedIn) {
+function Dashboard({isVisible, checkLoggedIn}) {
 
   const [currentPage, setCurrentPage] = useState('home');
 
