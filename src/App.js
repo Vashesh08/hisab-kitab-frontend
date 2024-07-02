@@ -21,8 +21,10 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (event) => {
         // Check if the specific key combination is pressed
-        if ((event.ctrlKey && event.key === 'h') || (event.ctrlKey && event.key === 'H')) { // Show Modal
-            event.preventDefault();
+        // console.log("pressed", event);
+        if (event.ctrlKey && event.keyCode === 72) { // Show Modal
+          console.log("changed from " + isVisible);
+          event.preventDefault();
             setIsVisible(prev => !prev); // Toggle isVisible
         }
     };
@@ -30,7 +32,10 @@ function App() {
     // Add event listener for keydown event
     window.addEventListener('keydown', handleKeyDown);
     checkLoggedIn();
-  }, [isLoggedIn]);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isLoggedIn, isVisible]);
 
   if (isLoggedIn){
     return <Dashboard isVisible={isVisible} checkLoggedIn={checkLoggedIn}/>
