@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Dashboard from './components/Dashboard';
 
 function App() {
+  const [isVisible, setIsVisible] = useState(false);
   const [isLoggedIn, setLoggedIn] = useState(false);
   const checkLoggedIn = () => {
     const session_key = localStorage.getItem('token');
@@ -18,11 +19,21 @@ function App() {
   };
 
   useEffect(() => {
+    const handleKeyDown = (event) => {
+        // Check if the specific key combination is pressed
+        if ((event.ctrlKey && event.key === 'h') || (event.ctrlKey && event.key === 'H')) { // Show Modal
+            event.preventDefault();
+            setIsVisible(prev => !prev); // Toggle isVisible
+        }
+    };
+
+    // Add event listener for keydown event
+    window.addEventListener('keydown', handleKeyDown);
     checkLoggedIn();
   }, [isLoggedIn]);
 
   if (isLoggedIn){
-    return <Dashboard checkLoggedIn={checkLoggedIn}/>
+    return <Dashboard isVisible={isVisible} checkLoggedIn={checkLoggedIn}/>
   }
   return (
       <div className="App">

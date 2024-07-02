@@ -21,9 +21,9 @@ function Login(checkLoggedIn) {
           "password": password,
         });
 
-        if ('token' in response) {
-            console.log("invalid login");
-        }
+        if ('token' in response.data) {
+            console.log("valid login");
+        
 
         // Assuming your backend sends a token upon successful authentication
         // const token = response.data.token;
@@ -36,6 +36,7 @@ function Login(checkLoggedIn) {
         // navigate('/dashboard');
         // console.log(checkLoggedIn)
         checkLoggedIn.checkLoggedIn();
+      }
       } catch (error) {
         // Handle authentication failure-[]
         console.log("Some Error. Log In Again", error)

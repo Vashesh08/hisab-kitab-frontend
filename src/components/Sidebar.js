@@ -17,7 +17,7 @@ import {
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
  
-export default function Sidebar({ changeVisibility }) {
+export default function Sidebar({ changeVisibility, isVisible }) {
   const [open, setOpen] = React.useState(0);
  
   const changePage = (value) => {
@@ -74,16 +74,17 @@ export default function Sidebar({ changeVisibility }) {
             </List>
           </AccordionBody>
         </Accordion>
-        <Accordion
-          open={open === 2}
-          icon={
-            <ChevronDownIcon
-              strokeWidth={2.5}
-              className={`mx-auto h-4 w-4 transition-transform ${open === 2 ? "rotate-180" : ""}`}
-            />
-          }
-        >
-          <ListItem className="p-0" selected={open === 2}>
+          {isVisible ? (
+            <Accordion
+            open={open === 2}
+            icon={
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`mx-auto h-4 w-4 transition-transform ${open === 2 ? "rotate-180" : ""}`}
+              />
+            }
+          >
+            <ListItem className="p-0" selected={open === 2}>
             <AccordionHeader onClick={() => handleOpen(2)} className="border-b-0 p-3 text-white hover:text-black active:text-black">
               <ListItemPrefix>
                 <BookOpenIcon className="h-5 w-5" />
@@ -93,25 +94,32 @@ export default function Sidebar({ changeVisibility }) {
               </Typography>
             </AccordionHeader>
           </ListItem>
-          <AccordionBody className="py-1">
-            <List className="p-0 items-center">
-              <ListItem onClick={() => changePage("masterstock")}
-               className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
-                Master Stock
-              </ListItem>
-              <ListItem onClick={() => changePage("meltingbook")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
-                Melting Book
-              </ListItem>
-              <ListItem onClick={() => changePage("kareegardetails")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
-                Kareegar Book
-              </ListItem>
-              <ListItem onClick={() => changePage("lossacct")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
-                Loss Book
-              </ListItem>
-            </List>
-          </AccordionBody>
-        </Accordion>
-      </List>
-    </Card>
+          
+            <AccordionBody className="py-1">
+              <List className="p-0 items-center">
+                <ListItem onClick={() => changePage("masterstock")}
+                className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                  Master Stock
+                </ListItem>
+                <ListItem onClick={() => changePage("meltingbook")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                  Melting Book
+                </ListItem>
+                <ListItem onClick={() => changePage("kareegardetails")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                  Kareegar Book
+                </ListItem>
+                <ListItem onClick={() => changePage("polish")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                  Polish Book
+                </ListItem>
+                <ListItem onClick={() => changePage("lossacct")} className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                  Loss Book
+                </ListItem>
+              </List>
+            </AccordionBody>
+            </Accordion>
+          ):(
+            <></>
+          )}
+  </List>
+  </Card>
   );
 }

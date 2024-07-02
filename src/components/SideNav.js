@@ -5,9 +5,9 @@ import Home from '../pages/Home';
 import MeltingBook from '../pages/MeltingBook';
 import KareegarPage from '../pages/KareegarPage';
 import LossAcct from '../pages/LossAcct';
+import Polish from '../pages/Polish';
 
-function SideNav({ currentPage, handlePageChange }) {
-
+function SideNav({ currentPage, handlePageChange, isVisible }) {
     return (
         <>
     <button data-drawer-target="sidebar-multi-level-sidebar" data-drawer-toggle="sidebar-multi-level-sidebar" aria-controls="sidebar-multi-level-sidebar" type="button"
@@ -28,7 +28,7 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
 
 
 <aside id="sidebar-multi-level-sidebar" className="fixed left-0 z-50 w-64 h-screen transition-transform -translate-x-full" aria-label="Sidebar">
-<Sidebar changeVisibility = {handlePageChange}/>
+<Sidebar changeVisibility = {handlePageChange} isVisible={isVisible}/>
 </aside>
 
 
@@ -42,6 +42,8 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
             <KareegarPage />
           ) : currentPage === "lossacct" ?(
             <LossAcct />
+          ) : currentPage === "polish" ?(
+            <Polish />
           ) : (
             <Home />
           )
