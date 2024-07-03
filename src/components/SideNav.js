@@ -6,6 +6,7 @@ import MeltingBook from '../pages/MeltingBook';
 import KareegarPage from '../pages/KareegarPage';
 import LossAcct from '../pages/LossAcct';
 import Polish from '../pages/Polish';
+import GovindMeltingBook from '../pages/GovindMeltingBook';
 
 function SideNav({ currentPage, handlePageChange, isVisible }) {
     return (
@@ -44,9 +45,12 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
             <LossAcct />
           ) : currentPage === "polish" ?(
             <Polish />
+          ) : currentPage === "govindmeltingbook" ?(
+            <GovindMeltingBook />
           ) : (
             <Home />
           )
+          // govindmeltingbook govindtarpatta govindmachine govinddaibhukha govinddai
         }
    </div>
 </div>

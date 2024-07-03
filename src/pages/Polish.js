@@ -30,7 +30,7 @@ const Polish = () => {
   const [totalWeightQuantity, setTotalWeight] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
-  const [totalFineQuantity, setTotalFineQuantity] = useState(0);
+  const [totalFineQuantity, setTotalFineQty] = useState(0);
   const [totalChatkaQuantity, setTotalChatkaQty] = useState(0);
   const [totalLossQuantity, setTotalLossQty] = useState(0);
   const [totalChillQuantity, setTotalChillQty] = useState(0);
@@ -127,12 +127,12 @@ const Polish = () => {
       totalChatkaQty += parseFloat(chatka);
     });
     
-    setTotalIssueQty(totalIssueQty);
-    setTotalRecvQty(totalRecvQty);
-    setTotalLossQty(totalLossQty);
-    setTotalIssueQty(totalFineQty);
-    setTotalChillQty(totalChillQty);
-    setTotalChatkaQty(totalChatkaQty);
+    setTotalIssueQty(totalIssueQty.toFixed(2));
+    setTotalRecvQty(totalRecvQty.toFixed(2));
+    setTotalLossQty(totalLossQty.toFixed(2));
+    setTotalFineQty(totalFineQty.toFixed(2));
+    setTotalChillQty(totalChillQty.toFixed(2));
+    setTotalChatkaQty(totalChatkaQty.toFixed(2));
     
     setIsLoading(false);
   };
@@ -211,12 +211,12 @@ const Polish = () => {
         totalChatkaQty += parseFloat(chatka);
         });
         
-        setTotalIssueQty(totalIssueQty);
-        setTotalRecvQty(totalRecvQty);
-        setTotalLossQty(totalLossQty);
-        setTotalIssueQty(totalFineQty);
-        setTotalChillQty(totalChillQty);
-        setTotalChatkaQty(totalChatkaQty);
+        setTotalIssueQty(totalIssueQty.toFixed(2));
+        setTotalRecvQty(totalRecvQty.toFixed(2));
+        setTotalLossQty(totalLossQty.toFixed(2));
+        setTotalFineQty(totalFineQty.toFixed(2));
+        setTotalChillQty(totalChillQty.toFixed(2));
+        setTotalChatkaQty(totalChatkaQty.toFixed(2));
         
         setIsLoading(false);
 
