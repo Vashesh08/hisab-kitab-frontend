@@ -2,6 +2,7 @@ import React from 'react';
 import Masterstoke from '../pages/Masterstoke';
 import Sidebar from './Sidebar';
 import Home from '../pages/Home';
+import BalanceSheet from '../pages/BalanceSheet';
 import MeltingBook from '../pages/MeltingBook';
 import KareegarPage from '../pages/KareegarPage';
 import LossAcct from '../pages/LossAcct';
@@ -35,7 +36,9 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
 
 <div id="sidebar-right" className="p-4">
    <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
-        {currentPage === "masterstock" ?(
+        {currentPage === "balancesheet" ?(
+          <BalanceSheet />
+          ): currentPage === "masterstock" ?(
           <Masterstoke />
           ) : currentPage === "meltingbook" ?(
             <MeltingBook />
