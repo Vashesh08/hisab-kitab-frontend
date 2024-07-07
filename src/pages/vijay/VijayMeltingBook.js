@@ -11,7 +11,7 @@ import {
 import Highlighter from 'react-highlight-words';
 import { getUtilityData, updateUtility } from "../api/utility.js";
 // import { fetchMeltingBookList, deleteMeltingBookList } from "../api/meltingBook.js";
-import { fetchGovindMeltingBookList, deleteGovindMeltingBookList } from "../api/govindMeltingBook.js";
+import { fetchVijayMeltingBookList, deleteVijayMeltingBookList } from "../api/vijay/vijayMeltingBook.js";
 import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
@@ -20,7 +20,7 @@ import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchO
 import { Tooltip } from 'antd';
 import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
 
-const GovindMeltingBook = () => {
+const VijayMeltingBook = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100000000); // Change this to show all
@@ -70,7 +70,7 @@ const GovindMeltingBook = () => {
     setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
     setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
 
-    const docs = await fetchGovindMeltingBookList(page, itemsPerPage, token);
+    const docs = await fetchVijayMeltingBookList(page, itemsPerPage, token);
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -164,7 +164,7 @@ const GovindMeltingBook = () => {
         setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
         setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
     
-        const docs = await fetchGovindMeltingBookList(page, itemsPerPage, token);
+        const docs = await fetchVijayMeltingBookList(page, itemsPerPage, token);
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
@@ -262,7 +262,7 @@ const GovindMeltingBook = () => {
     let currMeltingBookClosing995Balance = parseFloat(balanceData[0]["meltingBookClosing995Balance"])
     let currMeltingBookClosing100Balance = parseFloat(balanceData[0]["meltingBookClosing100Balance"])
 
-    const docs = await fetchGovindMeltingBookList(page, itemsPerPage, token);
+    const docs = await fetchVijayMeltingBookList(page, itemsPerPage, token);
 
     // console.log(selectedRowKeys, rows);
     selectedRowKeys.map((item, index) => {
@@ -309,7 +309,7 @@ const GovindMeltingBook = () => {
     await updateUtility(utilityData, token);
 
     // console.log(meltingBookId);
-    await deleteGovindMeltingBookList(meltingBookId, token);
+    await deleteVijayMeltingBookList(meltingBookId, token);
 
     await updateRows("valid");
     setSelectedRowKeys([]);
@@ -728,7 +728,7 @@ const GovindMeltingBook = () => {
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Govind Melting Book
+                Vijay Melting Book
               </div>
 
               <div className="flex flex-col">
@@ -799,7 +799,7 @@ const GovindMeltingBook = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Govind Melting Book</div>
+              }} className="text-center text-[#00203FFF]" >Vijay Melting Book</div>
 
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
@@ -855,7 +855,7 @@ const GovindMeltingBook = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Govind Melting Book</div>
+              }} className="text-center text-[#00203FFF]" >Vijay Melting Book</div>
 
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
@@ -996,4 +996,4 @@ const GovindMeltingBook = () => {
   );
 };
 
-export default GovindMeltingBook;
+export default VijayMeltingBook;

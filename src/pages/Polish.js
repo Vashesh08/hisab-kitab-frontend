@@ -19,6 +19,7 @@ import { Tooltip } from 'antd';
 import { fetchPolishList, deletePolishList, postPolishStock } from "../api/polishBook.js";
 import { getUtilityData, updateUtility } from "../api/utility.js";
 import { deleteLossAcctList, fetchLossAcctList, postLossAcct } from "../api/LossAcct.js";
+import PolishClose from "../components/PolishClose.js";
 
 const Polish = () => {
   const screenWidth = window.innerWidth;
@@ -248,59 +249,6 @@ const Polish = () => {
   const showDeletePopup = (text) => {
     setIsDeleteModalOpen(true)
   }
-  
-  const acctCloseModal = async () => {
-    setIsLoading(true);
-    const token = localStorage.getItem("token");
-     
-    const utilityData = await getUtilityData(token);
-    const polishChatkaLoss = utilityData[0]["polishChatkaLoss"]
-    const polishLoss = utilityData[0]["polishLoss"]
-    const date = dayjs()
-
-    const data = {
-      date: dayjs(date, "YYYY-MM-DD"),
-      goods: "Acct Closing For Day " + getFormattedDate(dayjs(date, "YYYY-MM-DD")),
-      chatka: parseFloat(polishChatkaLoss).toFixed(2),
-      chill: parseFloat(polishLoss).toFixed(2)
-    }
-    const updatedData = await postPolishStock(data, token);
-    console.log(updatedData)
-
-    if ((parseFloat(polishChatkaLoss)) > 0){
-      const lossData = {
-        "type": "Polish",
-        "date": date,
-        "lossWt": parseFloat(polishChatkaLoss).toFixed(2),
-        "transactionId": updatedData.polish_id, 
-        "description": " Polish Chatka Loss for " + getFormattedDate(date)
-      }
-      await postLossAcct(lossData, token)
-    }
-
-    if ((parseFloat(polishLoss)) > 0){
-      const lossData = {
-        "type": "Polish",
-        "date": date,
-        "lossWt": parseFloat(polishLoss).toFixed(2),
-        "transactionId": updatedData.polish_id, 
-        "description": " Polish Chill Loss for " + getFormattedDate(date)
-      }
-      await postLossAcct(lossData, token)
-    }
-
-    const utilityBackendData = {
-      _id: utilityData[0]["_id"],
-      polishChatkaLoss: 0,
-      polishLoss: 0
-    }
-    await updateUtility(utilityBackendData, token);
-
-    await updateRows("today");
-    setIsAcctClosingModalOpen(false);
-
-    setIsLoading(false);
-  }
 
   const deleteModal = async () => {
     setIsLoading(true);
@@ -313,7 +261,8 @@ const Polish = () => {
     const balanceData = await getUtilityData(token)
     let curPolishLoss = parseFloat(balanceData[0]["polishLoss"])
     let curPolishChatkaLoss = parseFloat(balanceData[0]["polishChatkaLoss"])
-    
+    let curPolishFineLoss = parseFloat(balanceData[0]["polishFineLoss"])
+
     const docs = await fetchPolishList(page, itemsPerPage, token);
     const lossAcctData = await fetchLossAcctList(page, itemsPerPage, token);
     
@@ -336,15 +285,32 @@ const Polish = () => {
           if (!isNaN(docs[i]["lossWeight"])){
             curPolishLoss -= parseFloat(docs[i]["lossWeight"]);
           }
+          if (!isNaN(docs[i]["fine"])){
+            curPolishFineLoss -= parseFloat(docs[i]["fine"]);
+          }
           if (!isNaN(docs[i]["chill"])){
             curPolishLoss += parseFloat(docs[i]["chill"]);
-            curPolishChatkaLoss += 2 * parseFloat(docs[i]["chatka"]);
           }
         }
       }
-    })
 
-    console.log(lossIds);
+      for (let i = 0; i < lossAcctData.length; i++) {
+        if ((!lossAcctData[i].is_deleted_flag) && (lossAcctData[i].transactionId === item) && (lossAcctData[i].type === "Polish")){
+          if (lossAcctData[i].description.toLowerCase().includes("chatka")){
+            curPolishChatkaLoss += parseFloat(lossAcctData[i].lossWt);
+          }
+          if (lossAcctData[i].description.toLowerCase().includes("fine")){
+            curPolishFineLoss += parseFloat(lossAcctData[i].lossWt);
+          }
+          if (lossAcctData[i].description.toLowerCase().includes("chill")){
+            curPolishLoss += parseFloat(lossAcctData[i].lossWt);
+          }
+        }
+      }
+  
+    })
+    
+    // console.log(lossIds);
     const deleteFromLossAcct = {
       lossId: lossIds
     }
@@ -352,8 +318,9 @@ const Polish = () => {
 
     const utilityData = {
       _id: balanceData[0]["_id"],
-      polishLoss: curPolishLoss,
-      polishChatkaLoss: curPolishChatkaLoss
+      polishLoss: curPolishLoss.toFixed(2),
+      polishChatkaLoss: curPolishChatkaLoss.toFixed(2),
+      polishFineLoss: curPolishFineLoss.toFixed(2)
     }
     await updateUtility(utilityData, token);
 
@@ -364,6 +331,7 @@ const Polish = () => {
     setIsLoading(false);
     setSelectedRowKeys([]);
   }
+
   const handleCancel = () => {
     // updateRows("valid");
     setIsModalOpen(false);
@@ -375,6 +343,7 @@ const Polish = () => {
     updateRows("today");
     setIsModalOpen(false);
     setIsDeleteModalOpen(false);  
+    setIsAcctClosingModalOpen(false);
   }
 
   const [searchText, setSearchText] = useState('');
@@ -770,19 +739,14 @@ const Polish = () => {
       </Modal>
 
       <Modal
-        title="Are you sure you want to close the daily account for Polish Book ?"
+        title="Close Polish Account"
         open={isAcctClosingModalOpen}
         onCancel={handleCancel}
         footer={null}
       >
-        <div className="flex justify-center	">
-          <Button className="bg-[#ABD6DFFF] mr-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={acctCloseModal}>
-              Yes
-          </Button>
-          <Button className="bg-[#ABD6DFFF] ml-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={handleCancel}>
-              No
-          </Button>
-        </div>
+        <PolishClose
+          handleOk={handleUpdateClose}
+        />
       </Modal>
 
       <Table

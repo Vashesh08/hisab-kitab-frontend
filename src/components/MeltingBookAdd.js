@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { postMeltingBook } from "../api/meltingBook.js";
+import { fetchMeltingBookList, postMeltingBook } from "../api/meltingBook.js";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } from "antd";
@@ -16,6 +16,8 @@ function MeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance, setC
   const [formPurityValues, setFormPurityValues] = useState([0, 0, 0, 0, 0]);
   const [formConversionValues, setFormConversionValues] = useState([0, 0, 0, 0, 0]);
   const [issueActualWt, setIssueActualWt] = useState(0);
+  const [lastDate, setLastDate] = useState(dayjs());
+  const [forceUpdate, setForceUpdate] = useState(0);
   const [error, setError] = useState(false);
 
   const handleActualIssueWt = (value) => {
@@ -134,9 +136,20 @@ function MeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance, setC
     // console.log(totalRoundedNumber);
     setMeltingIssueWt(totalRoundedNumber.toFixed(2));
     setIssueActualWt(totalRoundedNumber.toFixed(2));
+    (async () => {
+      const token = localStorage.getItem("token");
+      const docs = await fetchMeltingBookList(1, 100000000, token);
+      // console.log(docs)
+      if (docs.length > 0){
+        const lastEntry = docs[docs.length - 1];
+        setLastDate(dayjs(lastEntry.date));
+        // console.log(lastEntry, lastDate)
+      }
+      setForceUpdate(1);
+      // setForceUpdate(prev => prev + 1);
+    })();
     setIsLoading(false);
   }, [formWeightValues, formPurityValues, formConversionValues, numberOfItems]);
-  
 
   const renderCommonItems = (index) => {
     return (
@@ -443,6 +456,7 @@ function MeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance, setC
   return (
     <Form
       {...layout}
+      key={forceUpdate}
       name="nest-messages"
       onFinish={onFinish}
       style={{
@@ -465,7 +479,7 @@ function MeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance, setC
             type: "Date",
           },
         ]}
-        initialValue={currentDate}
+        initialValue={lastDate}
       >
         <DatePicker format="DD MMM, YYYY" disabledDate={disabledDate} />
       </Form.Item>

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
-import { postKareegarBook } from "../api/kareegarBook.js";
+import { fetchKareegarBookList, postKareegarBook } from "../api/kareegarBook.js";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker } from "antd";
@@ -11,7 +11,9 @@ function KareegarAddItems({ kareegarId, handleOk}) {
   const [isLoading, setIsLoading] = useState(false);
   const [transactionType, setTransactionType] = useState("Issue");
   const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
-
+  const [lastDate, setLastDate] = useState(dayjs());
+  const [forceUpdate, setForceUpdate] = useState(0);
+  
   // const purityOptions = [
   //   {
   //     label: "91.80",
@@ -26,6 +28,21 @@ function KareegarAddItems({ kareegarId, handleOk}) {
   //     value: "100",
   //   },
   // ];
+
+  useEffect(() => {
+    (async () => {
+      const token = localStorage.getItem("token");
+      const docs =  await fetchKareegarBookList(1,100000000, kareegarId, token);
+      // console.log(docs)
+      if (docs.length > 0){
+        const lastEntry = docs[docs.length - 1];
+        setLastDate(dayjs(lastEntry.date));
+        setTransactionType(lastEntry.type);
+        // console.log(lastEntry, lastDate)
+      }
+      setForceUpdate(1);
+    })();
+  }, []);
 
   const validateMessages = {
     // eslint-disable-next-line
@@ -148,6 +165,7 @@ function KareegarAddItems({ kareegarId, handleOk}) {
   return (
     <Form
       {...layout}
+      key={forceUpdate}
       name="nest-messages"
       onFinish={onFinish}
       style={{
@@ -163,7 +181,7 @@ function KareegarAddItems({ kareegarId, handleOk}) {
             type: "Date",
           },
         ]}
-        initialValue={currentDate}
+        initialValue={lastDate}
       >
         <DatePicker format="DD MMM, YYYY" disabledDate={disabledDate} />
       </Form.Item>
@@ -177,13 +195,14 @@ function KareegarAddItems({ kareegarId, handleOk}) {
             required: true,
           },
         ]}
-        initialValue="Issue"
+        initialValue={transactionType}
       >
         <Select
           onChange={handleTransactionType}
           options={[
             { value: "Issue", label: "Issue" },
             { value: "Receive", label: "Receive" },
+            // { value: "IssueReceive", label: "Issue and Receive" },
           ]}
         />
       </Form.Item>

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
-import { postMasterStock } from "../api/masterStock.js";
+import { fetchMasterStockList, postMasterStock } from "../api/masterStock.js";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } from "antd";
@@ -11,7 +11,9 @@ function ModelAdd({handleOk}) {
   const [isLoading, setIsLoading] = useState(false);
   const [transactionType, setTransactionType] = useState("receive");
   const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
-
+  const [lastDate, setLastDate] = useState(dayjs());
+  const [forceUpdate, setForceUpdate] = useState(0);
+  
   const purityOptions = [
     {
       label: "91.80",
@@ -61,7 +63,25 @@ function ModelAdd({handleOk}) {
     },
   };
 
-
+  useEffect(() => {
+    (async () => {
+      const token = localStorage.getItem("token");
+      const docs = await fetchMasterStockList(1, 100000000, token);
+      // console.log(docs)
+      if (docs.length > 0){
+        const lastEntry = docs[docs.length - 1];
+        setLastDate(dayjs(lastEntry.date));
+        // console.log(lastEntry.type, "Vashesh", lastEntry.type === "Receive");
+        if (lastEntry.type === "Receive"){
+          setTransactionType("receive");
+        }
+        else{
+          setTransactionType("issue")
+        }
+      }
+      setForceUpdate(1);
+    })();
+  }, []);
 
   const onFinish = async ({ user }) => {
     const token = localStorage.getItem("token");
@@ -183,6 +203,7 @@ function ModelAdd({handleOk}) {
   return (
     <Form
       {...layout}
+      key={forceUpdate}
       name="nest-messages"
       onFinish={onFinish}
       style={{
@@ -198,7 +219,7 @@ function ModelAdd({handleOk}) {
             type: "Date",
           },
         ]}
-        initialValue={currentDate}
+        initialValue={lastDate}
       >
         <DatePicker format="DD MMM, YYYY" disabledDate={disabledDate} />
       </Form.Item>
@@ -211,7 +232,7 @@ function ModelAdd({handleOk}) {
             required: true,
           },
         ]}
-        initialValue="receive"
+        initialValue={transactionType}
       >
         <Select
           onChange={handleTransactionType}

@@ -1,16 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "./Loading.js";
 import { Button, Form, Input, InputNumber, DatePicker } from "antd";
-import { postPolishStock } from "../api/polishBook.js";
+import { fetchPolishList, postPolishStock } from "../api/polishBook.js";
 import { getUtilityData, updateUtility } from "../api/utility.js";
 
 function PolishAdd({handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
-
+  const [lastDate, setLastDate] = useState(dayjs());
+  const [forceUpdate, setForceUpdate] = useState(0);
+  
   const validateMessages = {
     // eslint-disable-next-line
     required: "${label} is required!",
@@ -41,6 +43,19 @@ function PolishAdd({handleOk}) {
     },
   };
 
+    useEffect(() => {
+      (async () => {
+        const token = localStorage.getItem("token");
+        const docs = await fetchPolishList(1, 100000000, token);
+        // console.log(docs)
+        if (docs.length > 0){
+          const lastEntry = docs[docs.length - 1];
+          setLastDate(dayjs(lastEntry.date));
+          // console.log(lastEntry, lastDate)
+        }
+        setForceUpdate(1);
+      })();
+    }, []);
 
 
   const onFinish = async ({ user }) => {
@@ -86,7 +101,8 @@ function PolishAdd({handleOk}) {
     const utitlityData = await getUtilityData(token);
     const utilityBackendData = {
       _id: utitlityData[0]["_id"],
-      polishChatkaLoss: parseFloat(utitlityData[0]["polishChatkaLoss"]) + parseFloat(chatka),
+      polishChatkaLoss: parseFloat(utitlityData[0]["polishChatkaLoss"]) + parseFloat(chatkaWt),
+      polishFineLoss: parseFloat(utitlityData[0]["polishFineLoss"]) + parseFloat(fineWt),
       polishLoss: parseFloat(utitlityData[0]["polishLoss"]) + parseFloat(lossWt),
     }
     await updateUtility(utilityBackendData, token);
@@ -104,6 +120,7 @@ function PolishAdd({handleOk}) {
   return (
     <Form
       {...layout}
+      key={forceUpdate}
       name="nest-messages"
       onFinish={onFinish}
       style={{
@@ -119,7 +136,7 @@ function PolishAdd({handleOk}) {
             type: "Date",
           },
         ]}
-        initialValue={currentDate}
+        initialValue={lastDate}
       >
         <DatePicker format="DD MMM, YYYY" disabledDate={disabledDate} />
       </Form.Item>
