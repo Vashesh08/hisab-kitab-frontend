@@ -380,7 +380,17 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
                 beads_balance -= parseFloat(docs[i]["beads_issue_wt"]);
               }
           }
+          else if (docs[i]["type"] === "Receive"){
+            balance += parseFloat(docs[i]["recv_wt"]);
+            if (docs[i]["beads_recv_wt"] !== "" && !isNaN(docs[i]["beads_recv_wt"])){
+              beads_balance += parseFloat(docs[i]["beads_recv_wt"]);
+            }
+          }
           else{
+            balance -= parseFloat(docs[i]["issue_wt"]);
+            if (docs[i]["beads_issue_wt"] !== "" && !isNaN(docs[i]["beads_issue_wt"])){
+              beads_balance -= parseFloat(docs[i]["beads_issue_wt"]);
+            }
             balance += parseFloat(docs[i]["recv_wt"]);
             if (docs[i]["beads_recv_wt"] !== "" && !isNaN(docs[i]["beads_recv_wt"])){
               beads_balance += parseFloat(docs[i]["beads_recv_wt"]);
@@ -394,7 +404,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
               lossIds.push(matchedData._id);  
             }
           }
-          console.log("balance", balance, beads_balance);
+          // console.log("balance", balance, beads_balance);
         }
       }
     })

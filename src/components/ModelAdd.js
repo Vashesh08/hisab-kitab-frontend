@@ -98,7 +98,8 @@ function ModelAdd({handleOk}) {
       receiverName,
       purity: originalPurity,
       weight: originalWt,
-      metal
+      metal,
+      issueweight
     } = user;
 
     const weight = originalWt.toFixed(2);
@@ -130,6 +131,67 @@ function ModelAdd({handleOk}) {
       // const updated = await postMasterStock(backendData, token);
       // console.log("Added ",updated);
     }
+    else if (issueReceive === "issuereceive"){
+      const backendData = {
+        type: "Issue & Receive",
+        date: dayjs(date, "YYYY-MM-DD"),
+        // category: goodsType,
+        category: metal,
+        description,
+        weight: weight,
+        issuer: issuerName,
+        receiver: receiverName,
+        purity: purity,
+        issue22k: issueweight,
+        receive22k:(roundedNumber).toFixed(2)
+      };
+      await postMasterStock(backendData, token);
+
+      if (metal === "metal")
+        {
+          // console.log(purity, typeof purity, purity === "99.50");
+          if (parseFloat(purity) === 99.5){
+            const utilityData = {
+              _id: balanceData[0]["_id"],
+              masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2) - (parseFloat(issueweight)).toFixed(2),
+              meltingBookOpening995Balance: (parseFloat(balanceData[0]["meltingBookOpening995Balance"]) + parseFloat(weight)).toFixed(2) ,
+              meltingBookClosing995Balance: (parseFloat(balanceData[0]["meltingBookClosing995Balance"]) + parseFloat(weight)).toFixed(2)
+            }
+            await updateUtility(utilityData, token);
+          }
+          else if (parseFloat(purity) === 100){
+            const utilityData = {
+              _id: balanceData[0]["_id"],
+              masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2) - (parseFloat(issueweight)).toFixed(2),
+              meltingBookOpening100Balance: (parseFloat(balanceData[0]["meltingBookOpening100Balance"]) + parseFloat(weight)).toFixed(2) ,
+              meltingBookClosing100Balance: (parseFloat(balanceData[0]["meltingBookClosing100Balance"]) + parseFloat(weight)).toFixed(2)
+            }
+            await updateUtility(utilityData, token);
+          }
+          else{
+            const utilityData = {
+              _id: balanceData[0]["_id"],
+              masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2) - (parseFloat(issueweight)).toFixed(2),
+              meltingBookOpeningBalance: (parseFloat(balanceData[0]["meltingBookOpeningBalance"]) + parseFloat(weight)).toFixed(2) ,
+              meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) + parseFloat(weight)).toFixed(2)
+            }
+            await updateUtility(utilityData, token);
+          }
+        }
+        else{
+          const utilityData = {
+            _id: balanceData[0]["_id"],
+            masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
+            masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2) - (parseFloat(issueweight)).toFixed(2)
+          }
+        await updateUtility(utilityData, token);
+        }
+  
+
+    }
     else{
       const backendData = {
         type: "Receive",
@@ -144,7 +206,7 @@ function ModelAdd({handleOk}) {
       };
       if (metal === "metal")
       {
-        console.log(purity, typeof purity, purity === "99.50");
+        // console.log(purity, typeof purity, purity === "99.50");
         if (parseFloat(purity) === 99.5){
           const utilityData = {
             _id: balanceData[0]["_id"],
@@ -239,6 +301,7 @@ function ModelAdd({handleOk}) {
           options={[
             { value: "receive", label: "Receive" },
             { value: "issue", label: "Issue" },
+            { value: "issuereceive", label: "Issue & Receive" },
           ]}
         />
       </Form.Item>
@@ -306,7 +369,7 @@ function ModelAdd({handleOk}) {
       
       </>
       
-        ):(
+        ) : transactionType === "issue" ?(
           <>      
           <Form.Item name={["user", "description"]} label="Description">
             <Input />
@@ -347,9 +410,81 @@ function ModelAdd({handleOk}) {
             >
             </AutoComplete>
           </Form.Item>
-          
-
         </>
+        ):(
+      
+          <>
+          <Form.Item
+            name={["user", "metal"]}
+            label="Category"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            initialValue="metal"
+          >
+            <Select
+              options={[
+                { value: "metal", label: "Metal" },
+                { value: "non-metal", label: "Non-Metal" },
+              ]}
+            />
+          </Form.Item>
+    
+          <Form.Item name={["user", "description"]} label="Description">
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name={["user", "weight"]}
+            label="Recv Weight (gm)"
+            rules={[{ type: "number", min: 0, required: true }]}
+          >
+            <InputNumber
+            // precision={4}
+            // step={0.01}
+          />
+          </Form.Item>
+    
+          <Form.Item
+            name={["user", "purity"]}
+            label="Purity of Recv Wt"
+            rules={[
+              {           
+                validator: (_, value) => {
+                  const intValue = parseInt(value, 10);
+                  if (isNaN(intValue)) {
+                    return Promise.reject(new Error("Please enter a valid number."));
+                  } else if (intValue < 0) {
+                    return Promise.reject(new Error("Value must be greater than or equal to 0."));
+                  }
+                  return Promise.resolve();
+                },
+                required: true 
+              }
+            ]}
+            transform={(value) => (value ? parseInt(value, 10) : NaN)} // Convert string to number
+          >
+            <AutoComplete
+              options={purityOptions}
+              // onSelect={onSelect}
+              // onChange={onChange}            
+            >
+            </AutoComplete>
+          </Form.Item>
+
+          <Form.Item
+            name={["user", "issueweight"]}
+            label="Issue Weight (gm)"
+            rules={[{ type: "number", min: 0, required: true }]}
+          >
+            <InputNumber
+            // precision={4}
+            // step={0.01}
+          />
+          </Form.Item>
+
+          </>             
         )
         }
       <Form.Item name={["user", "issuerName"]} label="Issuer Name">

@@ -30,7 +30,7 @@ const MasterStock = () => {
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
   const [openingBalance, setOpeningBalance] = useState(0);
   const [closingBalance, setClosingBalance] = useState(0);
-
+  
   const getFormattedDate = (date) => {
     const dateEntry = date;
     const curDateEntry = new Date(dateEntry);
@@ -235,7 +235,7 @@ const MasterStock = () => {
           if (docs[i]["type"] === "Issue"){
               curMasterStockClosingBalance += parseFloat(docs[i]["weight"])
           }
-          else{
+          else if (docs[i]["type"] === "Receive"){
               if (docs[i]["category"] === "metal"){
                 curMasterStockOpeningBalance -= parseFloat(docs[i]["receive22k"])
                 curMasterStockClosingBalance -= parseFloat(docs[i]["receive22k"])
@@ -257,6 +257,33 @@ const MasterStock = () => {
                 curMasterStockOpeningBalance -= parseFloat(docs[i]["receive22k"])
                 curMasterStockClosingBalance -= parseFloat(docs[i]["receive22k"])
               }
+          }
+          else{
+            if (docs[i]["category"] === "metal"){
+              curMasterStockOpeningBalance -= parseFloat(docs[i]["receive22k"])
+              curMasterStockClosingBalance -= parseFloat(docs[i]["receive22k"])
+              console.log(docs[i]["purity"]);
+              if (docs[i]["purity"] === 99.5){
+                curMeltingBookOpening995Balance -= parseFloat(docs[i]["weight"])
+                curMeltingBookClosing995Balance -= parseFloat(docs[i]["weight"])
+              }
+              else if (docs[i]["purity"] === 100){
+                curMeltingBookOpening100Balance -= parseFloat(docs[i]["weight"])
+                curMeltingBookClosing100Balance -= parseFloat(docs[i]["weight"])
+              }
+              else{
+                curMeltingBookOpeningBalance -= parseFloat(docs[i]["weight"])
+                curMeltingBookClosingBalance -= parseFloat(docs[i]["weight"])
+              }
+            }
+            else{
+              curMasterStockOpeningBalance -= parseFloat(docs[i]["receive22k"])
+              curMasterStockClosingBalance -= parseFloat(docs[i]["receive22k"])
+            }
+
+            // issue22k
+            curMasterStockClosingBalance += parseFloat(docs[i]["issue22k"])
+
           }
         }
         }

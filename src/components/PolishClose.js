@@ -85,12 +85,13 @@ function PolishClose({handleOk}) {
     const polishLoss = utilityData[0]["polishLoss"]
     const polishFineLoss = utilityData[0]["polishFineLoss"]
     
+    console.log("Vashesh",polishChatkaLoss, polishFineLoss, polishLoss);
     const data = {
       date: dayjs(date, "YYYY-MM-DD"),
       goods: "Acct Closing For Day " + getFormattedDate(dayjs(date, "YYYY-MM-DD")),
       // fine: parseFloat(polishFineLoss).toFixed(2),
       // chatka: parseFloat(polishChatkaLoss).toFixed(2),
-      chill: (parseFloat(polishLoss).toFixed(2) - parseFloat(chill).toFixed(2)) 
+      chill: parseFloat(chill).toFixed(2) 
     }
     const updatedData = await postPolishStock(data, token);
     // console.log(updatedData)
@@ -116,12 +117,13 @@ function PolishClose({handleOk}) {
       }
       await postLossAcct(lossData, token)
     }
+    console.log(((parseFloat(polishLoss).toFixed(2) - parseFloat(chill).toFixed(2)).toFixed(2)));
 
-    if ((parseFloat(polishLoss).toFixed(2) - parseFloat(chill).toFixed(2)) > 0){
+    if (((parseFloat(polishLoss).toFixed(2) - parseFloat(chill).toFixed(2)).toFixed(2)) > 0){
       const lossData = {
         "type": "Polish",
         "date": date,
-        "lossWt": (parseFloat(polishLoss).toFixed(2) - parseFloat(chill).toFixed(2)),
+        "lossWt": ((parseFloat(polishLoss).toFixed(2) - parseFloat(chill).toFixed(2)).toFixed(2)),
         "transactionId": updatedData.polish_id, 
         "description": " Polish Chill Loss for " + getFormattedDate(date)
       }

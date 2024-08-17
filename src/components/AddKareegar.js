@@ -53,7 +53,8 @@ function AddKareegar({ handleOk}){
         const backendData = {
             date: date,
             name: name,
-            category: category
+            category: category,
+            kareegarCutoffDate: currentDate
             }
 
         await postKareegarData(backendData,token);

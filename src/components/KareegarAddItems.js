@@ -125,7 +125,7 @@ function KareegarAddItems({ kareegarId, handleOk}) {
       }
       await updateKareegarBalance(kareegarBalanceData, token);
     }
-    else{
+    else if (issueReceive === "Receive"){
       const backendData = {
         kareegar_id: kareegarId,
         type: "Receive",
@@ -148,6 +148,37 @@ function KareegarAddItems({ kareegarId, handleOk}) {
         '_id': kareegarId,
         "balance": balance,
         "beads_balance": beads_recv_wt_balance
+      }
+      await updateKareegarBalance(kareegarBalanceData, token);
+    }
+    else{
+      const backendData = {
+        kareegar_id: kareegarId,
+        type: "Issue & Receive",
+        date: dayjs(date, "YYYY-MM-DD"),
+        category: category,
+        description,
+        issue_wt,
+        beads_issue_wt,
+        recv_wt,
+        beads_recv_wt
+      };
+      await postKareegarBook(backendData, token);
+      // console.log(issue_wt,  typeof issue_wt)
+      let balance = (parseFloat(kareegarData.balance) + parseFloat(issue_wt) - parseFloat(recv_wt)).toFixed(2);
+      let beads_balance_last = (parseFloat(kareegarData.beads_balance))
+      // const updated = await postMasterStock(backendData, token);
+      // console.log("Added ", balance);
+      if (!isNaN(beads_issue_wt)){
+        beads_balance_last += beads_issue_wt; 
+      }
+      if (!isNaN(beads_recv_wt)){
+        beads_balance_last -= beads_recv_wt; 
+      }
+      const kareegarBalanceData = {
+        '_id': kareegarId,
+        "balance": balance,
+        "beads_balance": beads_balance_last
       }
       await updateKareegarBalance(kareegarBalanceData, token);
     }
@@ -202,7 +233,7 @@ function KareegarAddItems({ kareegarId, handleOk}) {
           options={[
             { value: "Issue", label: "Issue" },
             { value: "Receive", label: "Receive" },
-            // { value: "IssueReceive", label: "Issue and Receive" },
+            { value: "IssueReceive", label: "Issue & Receive" },
           ]}
         />
       </Form.Item>
@@ -241,7 +272,7 @@ function KareegarAddItems({ kareegarId, handleOk}) {
 
       </>
       
-        ):(
+        ):transactionType === "Issue" ?(
           <>
           <Form.Item
             name={["user", "issue_wt"]}
@@ -264,7 +295,51 @@ function KareegarAddItems({ kareegarId, handleOk}) {
           />
           </Form.Item>
         </>
-        )
+        ) : (
+          <>
+        <Form.Item
+            name={["user", "issue_wt"]}
+            label="Issue Weight (gm)"
+            rules={[{ type: "number", min: 0, required: true }]}
+          >
+            <InputNumber
+            // precision={4}
+            // step={0.01}
+          />
+          </Form.Item>
+          <Form.Item
+          name={["user", "recv_wt"]}
+          label="Receive Weight (gm)"
+          rules={[{ type: "number", min: 0, required: true }]}
+        >
+          <InputNumber
+          // precision={4}
+          // step={0.01}
+        />
+        </Form.Item>
+  
+          <Form.Item
+            name={["user", "beads_issue_wt"]}
+            label="Beads Issue "
+            rules={[{ type: "integer", min: 0 }]}
+          >
+            <InputNumber
+            // precision={4}
+            // step={0.01}
+          />
+          </Form.Item>
+          <Form.Item
+              name={["user", "beads_recv_wt"]}
+              label="Beads Receive"
+              rules={[{ type: "integer", min: 0 }]}
+            >
+              <InputNumber
+              // precision={4}
+              // step={0.01}
+            />
+          </Form.Item>
+        </>
+      )
         }
       {/* <Form.Item name={["user", "issuerName"]} label="Issuer Name">
         <Input />
