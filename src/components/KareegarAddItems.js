@@ -107,7 +107,8 @@ function KareegarAddItems({ kareegarId, handleOk}) {
         category: category,
         description,
         issue_wt,
-        beads_issue_wt
+        beads_issue_wt,
+        is_receiver_updated: false,
       };
       await postKareegarBook(backendData, token);
       // console.log(issue_wt,  typeof issue_wt)

@@ -20,6 +20,7 @@ import { getKareegarData, updateKareegarBalance } from "../api/kareegarDetail.js
 import KaareegarChangeBoxWt from "../components/KareegarChangeBoxWt.js"
 import KaareegarClose from "../components/KareegarClose.js";
 import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
+import KareegarBookUpdate from "../components/KareegarBookUpdate.js";
 
 const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => {
   const screenWidth = window.innerWidth;
@@ -29,6 +30,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
   // const [todayData, setTodayData] = useState([]);
+  const [updateData, setUpdateData] = useState([]);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalLossQuantity, setTotalLossQty] = useState(0);
@@ -335,12 +337,19 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isBoxWtModalOpen, setIsBoxWtModalOpen] = useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
+  };
+
+  const showAddPopup = (text) => {
+    // console.log(text);
+    setIsEditModalOpen(true);
+    setUpdateData(text)
   };
 
   const showBoxWtModal = () => {
@@ -378,6 +387,14 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
               balance -= parseFloat(docs[i]["issue_wt"]);
               if (docs[i]["beads_issue_wt"] !== "" && !isNaN(docs[i]["beads_issue_wt"])){
                 beads_balance -= parseFloat(docs[i]["beads_issue_wt"]);
+              }
+
+              // Receiving Later
+              if (docs[i]["recv_wt"] !== "" && !isNaN(docs[i]["recv_wt"])){
+                balance += parseFloat(docs[i]["recv_wt"]);
+              }
+              if (docs[i]["beads_recv_wt"] !== "" && !isNaN(docs[i]["beads_recv_wt"])){
+                beads_balance += parseFloat(docs[i]["beads_recv_wt"]);
               }
           }
           else if (docs[i]["type"] === "Receive"){
@@ -438,6 +455,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const handleCancel = () => {
     // updateRows("valid");
     setIsBoxWtModalOpen(false);
+    setIsEditModalOpen(false);
     setIsModalOpen(false);
     setIsCompleteModalOpen(false);
     setIsDeleteModalOpen(false);
@@ -447,6 +465,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     updateRows("today");
     setIsBoxWtModalOpen(false);
     setIsModalOpen(false);
+    setIsEditModalOpen(false);
     setIsCompleteModalOpen(false);
     setIsDeleteModalOpen(false);
   }
@@ -700,6 +719,25 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           align: 'right',  
         }
       ]
+    },
+    {
+      title: "Action",
+      key: "action",
+      width: "8%",
+      
+      render: (text, record, index) => (
+        <>
+          {text.is_receiver_updated || text.is_deleted_flag ? (
+          <div></div>
+        ) : (
+          <div style={{ textAlign:"center"}}>
+          <Space>
+            <EditOutlined style={{ color:"#1f2937", fontSize: '175%'}} onClick={() => showAddPopup(text)}/>
+          </Space>
+          </div>
+        )}
+        </>
+      )
     }
   ];
 
@@ -882,6 +920,19 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       </Modal>
 
       <Modal
+        title="Add Receive Quantity"
+        open={isEditModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+      >
+      <KareegarBookUpdate
+          handleOk={handleUpdateClose}
+          textData={updateData}
+          kareegarId={kareegarId}
+          />
+      </Modal>
+
+      <Modal
         title="Are you sure you want to delete the selected rows ?"
         open={isDeleteModalOpen}
         onCancel={handleCancel}
@@ -929,6 +980,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
                 <Table.Summary.Cell index={12}>
                   {totalBeadsRecvQuantity}
                 </Table.Summary.Cell>
+                <Table.Summary.Cell index={13}></Table.Summary.Cell>
               </Table.Summary.Row>
             </>
           );

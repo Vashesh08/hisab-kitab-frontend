@@ -286,7 +286,7 @@ const Polish = () => {
             curPolishLoss -= parseFloat(docs[i]["lossWeight"]);
           }
           if (!isNaN(docs[i]["fine"])){
-            curPolishFineLoss -= parseFloat(docs[i]["fine"]);
+            curPolishFineLoss += parseFloat(docs[i]["fine"]);
           }
           if (!isNaN(docs[i]["chill"])){
             curPolishLoss += parseFloat(docs[i]["chill"]);
