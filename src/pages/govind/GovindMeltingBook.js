@@ -9,20 +9,19 @@ import {
   Space, 
 } from "antd";
 import Highlighter from 'react-highlight-words';
-import { getUtilityData, updateUtility } from "../../api/utility.js"; 
-// import { fetchGovindMeltingBookList, deleteGovindMeltingBookList } from "../../api/govind/govindMeltingBook.js";
-import VijayMeltingBookAdd from  "../../components/Vijay/VijayMeltingBookAdd.js";
+import { getUtilityData, updateUtility } from "../../api/utility.js";
+import { fetchGovindMeltingBookList, deleteGovindMeltingBookList } from "../../api/govind/govindMeltingBook.js";
+import GovindMeltingBookAdd from "../../components/Govind/GovindMeltingBookAdd.js";
 import '../../style/pages.css';
 import Loading from "../../components/Loading.js";
-import VijayMeltingBookUpdate from "../../components/Vijay/VijayMeltingBookUpdate.js";
+import GovindMeltingBookUpdate from "../../components/Govind/GovindMeltingBookUpdate.js";
 // import MeltingBookUpdate from "../../components/MeltingBookUpdate.js";
 import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
 import { deleteLossAcctList, fetchLossAcctList } from "../../api/LossAcct.js";
 // import { deleteLossAcctList, fetchLossAcctList } from "../../api/LossAcct.js";
-import { fetchVijayStockList, deleteVijayMeltingStockList } from "../../api/vijayBook.js";
 
-const VijayMeltingBook = () => {
+const GovindMeltingBook = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100000000); // Change this to show all
@@ -72,11 +71,11 @@ const VijayMeltingBook = () => {
     setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
     setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
 
-    const docs = await fetchVijayStockList(page, itemsPerPage, token);
+    const docs = await fetchGovindMeltingBookList(page, itemsPerPage, token);
     setFullData(docs);
 
     for (let eachEntry in docs) {
-      if (docs[eachEntry].is_melting_deleted_flag){
+      if (docs[eachEntry].is_deleted_flag){
         deleted_data.push(docs[eachEntry]);
       }
       else{
@@ -101,30 +100,30 @@ const VijayMeltingBook = () => {
     let totalIssueQty = 0.0;
     let totalLossQty = 0.0;
     let totalIssueActualQty = 0.0;
-    data.forEach(({ meltingWeight, meltingReceive, meltingIssue, meltingIssueActual, meltingLoss}) => {
-      // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-      if (isNaN(parseFloat(meltingReceive))) {
-        meltingReceive = 0; // Set it to zero if it's NaN
+    data.forEach(({ weight24k, receive22k, issue22k, issue22kActual, loss22k}) => {
+      // console.log(weight24k, receive22k, issue22k, loss22k);
+      if (isNaN(parseFloat(receive22k))) {
+        receive22k = 0; // Set it to zero if it's NaN
       } 
-      if (isNaN(parseFloat(meltingIssue))) {
-        meltingIssue = 0; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(issue22k))) {
+        issue22k = 0; // Set it to zero if it's NaN
       } 
-      if (isNaN(parseFloat(meltingWeight))){
-        meltingWeight = 0; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(weight24k))){
+        weight24k = 0; // Set it to zero if it's NaN
       }
-      if (isNaN(parseFloat(meltingLoss))){
-        meltingLoss = 0; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(loss22k))){
+        loss22k = 0; // Set it to zero if it's NaN
       }
-      if (isNaN(parseFloat(meltingIssueActual))){
-        meltingIssueActual = 0; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(issue22kActual))){
+        issue22kActual = 0; // Set it to zero if it's NaN
       }
-      const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
+      const sumOfWeights = weight24k.map(Number).reduce((acc, curr) => acc + curr, 0);
       // console.log(sumOfWeights);
       totalWeight += parseFloat(sumOfWeights);
-      totalRecvQty += parseFloat(meltingReceive);
-      totalIssueQty += parseFloat(meltingIssue);
-      totalIssueActualQty += parseFloat(meltingIssueActual);
-      totalLossQty += parseFloat(meltingLoss);
+      totalRecvQty += parseFloat(receive22k);
+      totalIssueQty += parseFloat(issue22k);
+      totalIssueActualQty += parseFloat(issue22kActual);
+      totalLossQty += parseFloat(loss22k);
     });
     // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
     setTotalWeight(totalWeight.toFixed(2));
@@ -166,11 +165,11 @@ const VijayMeltingBook = () => {
         setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
         setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
     
-        const docs = await fetchVijayStockList(page, itemsPerPage, token);
+        const docs = await fetchGovindMeltingBookList(page, itemsPerPage, token);
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
-          if (docs[eachEntry].is_melting_deleted_flag){
+          if (docs[eachEntry].is_deleted_flag){
             deleted_data.push(docs[eachEntry]);
           }
           else{
@@ -185,30 +184,30 @@ const VijayMeltingBook = () => {
         let totalIssueQty = 0.0;
         let totalLossQty = 0.0;
         let totalIssueActualQty = 0.0;
-        data.forEach(({ meltingWeight, meltingReceive, meltingIssue, meltingIssueActual, meltingLoss}) => {
-          // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-          if (isNaN(parseFloat(meltingReceive))) {
-            meltingReceive = 0; // Set it to zero if it's NaN
+        data.forEach(({ weight24k, receive22k, issue22k, issue22kActual, loss22k}) => {
+          // console.log(weight24k, receive22k, issue22k, loss22k);
+          if (isNaN(parseFloat(receive22k))) {
+            receive22k = 0; // Set it to zero if it's NaN
           } 
-          if (isNaN(parseFloat(meltingIssue))) {
-            meltingIssue = 0; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(issue22k))) {
+            issue22k = 0; // Set it to zero if it's NaN
           } 
-          if (isNaN(parseFloat(meltingWeight))){
-            meltingWeight = 0 // Set it to zero if it's NaN
+          if (isNaN(parseFloat(weight24k))){
+            weight24k = 0 // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(meltingLoss))){
-            meltingLoss = 0  // Set it to zero if it's NaN
+          if (isNaN(parseFloat(loss22k))){
+            loss22k = 0  // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(meltingIssueActual))){
-            meltingIssueActual = 0; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(issue22kActual))){
+            issue22kActual = 0; // Set it to zero if it's NaN
           }
-          const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
+          const sumOfWeights = weight24k.map(Number).reduce((acc, curr) => acc + curr, 0);
           // console.log(sumOfWeights);
           totalWeight += parseFloat(sumOfWeights);
-          totalRecvQty += parseFloat(meltingReceive);
-          totalIssueQty += parseFloat(meltingIssue);
-          totalIssueActualQty += parseFloat(meltingIssueActual);
-          totalLossQty += parseFloat(meltingLoss);
+          totalRecvQty += parseFloat(receive22k);
+          totalIssueQty += parseFloat(issue22k);
+          totalIssueActualQty += parseFloat(issue22kActual);
+          totalLossQty += parseFloat(loss22k);
         });
         // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
         setTotalWeight(totalWeight.toFixed(2));
@@ -264,7 +263,7 @@ const VijayMeltingBook = () => {
     let currMeltingBookClosing995Balance = parseFloat(balanceData[0]["meltingBookClosing995Balance"])
     let currMeltingBookClosing100Balance = parseFloat(balanceData[0]["meltingBookClosing100Balance"])
 
-    const docs = await fetchVijayStockList(page, itemsPerPage, token);
+    const docs = await fetchGovindMeltingBookList(page, itemsPerPage, token);
 
     // console.log(selectedRowKeys, rows);
     selectedRowKeys.map((item, index) => {
@@ -275,16 +274,16 @@ const VijayMeltingBook = () => {
       }
 
       for (let i = 0; i < docs.length; i++) {
-        if (docs[i]["_id"] === item && !docs[i]["is_melting_deleted_flag"]) {
+        if (docs[i]["_id"] === item && !docs[i]["is_deleted_flag"]) {
           // console.log(rows[i]);
 
-            docs[i]["meltingWeight"].forEach((element, index) => {
+            docs[i]["weight24k"].forEach((element, index) => {
               console.log(element)
-              if (docs[i]["meltingCategory"][index] === "Gold"){
-                if (parseFloat(docs[i]["meltingPurity"][index]) === 99.5){
+              if (docs[i]["category"][index] === "Gold"){
+                if (parseFloat(docs[i]["purity"][index]) === 99.5){
                   currMeltingBookClosing995Balance += parseFloat(element);
                 }
-                else if (parseFloat(docs[i]["meltingPurity"][index]) === 100){
+                else if (parseFloat(docs[i]["purity"][index]) === 100){
                   currMeltingBookClosing100Balance += parseFloat(element);
                 }
                 else{
@@ -311,7 +310,7 @@ const VijayMeltingBook = () => {
     await updateUtility(utilityData, token);
 
     // console.log(meltingBookId);
-    await deleteVijayMeltingStockList(meltingBookId, token);
+    await deleteGovindMeltingBookList(meltingBookId, token);
 
     await updateRows("valid");
     setSelectedRowKeys([]);
@@ -345,7 +344,7 @@ const VijayMeltingBook = () => {
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
-        if (dataIndex === "meltingDate"){
+        if (dataIndex === "date"){
           if (getFormattedDate(user[dataIndex]).toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
             array.push(user);
           }
@@ -436,7 +435,7 @@ const VijayMeltingBook = () => {
       }
     },
     render: (text) =>
-      dataIndex === "meltingDate" ? (
+      dataIndex === "date" ? (
         searchedColumn === dataIndex ? (<Highlighter
           highlightStyle={{
             backgroundColor: '#ffc069',
@@ -449,7 +448,7 @@ const VijayMeltingBook = () => {
         ) : (
           getFormattedDate(text)
         )
-      ) : dataIndex === "meltingWeight" ?(
+      ) : dataIndex === "weight24k" ?(
         // searchedColumn === dataIndex ? (<Highlighter
         //   highlightStyle={{
         //     backgroundColor: '#ffc069',
@@ -467,17 +466,17 @@ const VijayMeltingBook = () => {
           )
           )
         // )
-      ) : dataIndex === "meltingPurity" ?(
+      ) : dataIndex === "purity" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ) : dataIndex === "meltingConversion" ?(
+      ) : dataIndex === "conversion" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ) : dataIndex === "meltingCategory" ?(
+      ) : dataIndex === "category" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"left"}}>{eachText}</div>
         )
@@ -502,7 +501,7 @@ const VijayMeltingBook = () => {
   const columns = [
     {
       title: "Date",
-      dataIndex: "meltingDate",
+      dataIndex: "date",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
           {getFormattedDate(text)}
@@ -511,11 +510,11 @@ const VijayMeltingBook = () => {
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
       width: '9%',
       sortDirections: ['ascend', "descend", 'ascend'],
-      ...getColumnSearchProps('meltingDate'),
+      ...getColumnSearchProps('date'),
     },
     {
       title: "Category",
-      dataIndex: "meltingCategory",
+      dataIndex: "category",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text.map((eachText) => (
@@ -525,7 +524,7 @@ const VijayMeltingBook = () => {
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('meltingCategory'),
+      ...getColumnSearchProps('category'),
     },
     {
       title: "Description",
@@ -540,7 +539,7 @@ const VijayMeltingBook = () => {
     },
     {
       title: "Weight",
-      dataIndex: "meltingWeight",
+      dataIndex: "weight24k",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -550,14 +549,14 @@ const VijayMeltingBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('meltingWeight'),
+      ...getColumnSearchProps('weight24k'),
       align: 'right',
     },
     {
       title: "Purity",
-      dataIndex: "meltingPurity",
+      dataIndex: "purity",
       render: text => (
-        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
+        <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
             <div style={{textAlign:"right"}}>{eachText}</div>
           )
@@ -565,12 +564,12 @@ const VijayMeltingBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('meltingPurity'),
+      ...getColumnSearchProps('purity'),
       align: 'right',
     },
     {
       title: "Conversion",
-      dataIndex: "meltingConversion",
+      dataIndex: "conversion",
       render: text => (
         <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -580,54 +579,54 @@ const VijayMeltingBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('meltingConversion'),
+      ...getColumnSearchProps('conversion'),
       align: 'right',
     },
     // {
     //   title: "Issue Wt (F)",
-    //   dataIndex: "meltingIssue",
+    //   dataIndex: "issue22k",
     //   render: text => (
     //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
     //       {text}
     //     </div>
     //   ),
     //   width: '10%',
-    //   ...getColumnSearchProps('meltingIssue'),
+    //   ...getColumnSearchProps('issue22k'),
     // },
     {
       title: "Issue Wt",
-      dataIndex: "meltingIssueActual",
+      dataIndex: "issue22kActual",
       render: text => (
         <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('meltingIssueActual'),
+      ...getColumnSearchProps('issue22kActual'),
       align: 'right',
     },
     {
       title: "Receive Wt",
-      dataIndex: "meltingReceive",
+      dataIndex: "receive22k",
       render: text => (
         <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
           {text}
         </div>
       ),
       width: '15%',
-      ...getColumnSearchProps('meltingReceive'),
+      ...getColumnSearchProps('receive22k'),
       align: 'right',
     },
     {
       title: "Loss Qty",
-      dataIndex: "meltingLoss",
+      dataIndex: "loss22k",
       render: text => (
         <div style={{minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
       width: '12%',
-      ...getColumnSearchProps('meltingLoss'),
+      ...getColumnSearchProps('loss22k'),
       align: 'right',
     },
     {
@@ -637,7 +636,7 @@ const VijayMeltingBook = () => {
       
       render: (text, record, index) => (
         <>
-          {text.is_melting_receiver_updated || text.is_melting_deleted_flag ? (
+          {text.is_receiver_updated || text.is_deleted_flag ? (
           <div></div>
         ) : (
           <div style={{ textAlign:"center"}}>
@@ -659,7 +658,7 @@ const VijayMeltingBook = () => {
     const array = [];
 
     rows.forEach( function(number){
-      if (number.is_melting_deleted_flag === false){
+      if (number.is_deleted_flag === false){
         array.push(number._id);
       }
     }
@@ -676,7 +675,7 @@ const VijayMeltingBook = () => {
     selectedRowKeys,
     onChange: onSelectChange,
     getCheckboxProps: (record) => ({
-      disabled: record.is_melting_deleted_flag === true,
+      disabled: record.is_deleted_flag === true,
     }),
     selections: [
       {
@@ -712,7 +711,7 @@ const VijayMeltingBook = () => {
 
   const getRowClassName = (record, i) => {
     // console.log(i, record, record._id)
-    return record.is_melting_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
+    return record.is_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
   };
 
   if (isLoading){
@@ -730,7 +729,7 @@ const VijayMeltingBook = () => {
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Vijay Melting Book
+                Govind Melting Book
               </div>
 
               <div className="flex flex-col">
@@ -801,7 +800,7 @@ const VijayMeltingBook = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Vijay Melting Book</div>
+              }} className="text-center text-[#00203FFF]" >Govind Melting Book</div>
 
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
@@ -857,7 +856,7 @@ const VijayMeltingBook = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Vijay Melting Book</div>
+              }} className="text-center text-[#00203FFF]" >Govind Melting Book</div>
 
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
@@ -909,12 +908,12 @@ const VijayMeltingBook = () => {
         )}
 
       <Modal
-        title="Add Item To Vijay Melting Book"
+        title="Add Item To Govind Melting Book"
         open={isModalOpen}
         onCancel={handleCancel}
         footer={null}
       >
-      <VijayMeltingBookAdd
+      <GovindMeltingBookAdd
           handleOk={handleUpdateClose}
           closingBalance={parseFloat(closingBalance)}
           setClosingBalance={setClosingBalance}
@@ -945,7 +944,7 @@ const VijayMeltingBook = () => {
         onCancel={handleCancel}
         footer={null}
       >
-      <VijayMeltingBookUpdate
+      <GovindMeltingBookUpdate
           handleOk={handleUpdateClose}
           textData={updateData}
           />
@@ -998,4 +997,4 @@ const VijayMeltingBook = () => {
   );
 };
 
-export default VijayMeltingBook;
+export default GovindMeltingBook;

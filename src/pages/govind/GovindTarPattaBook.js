@@ -9,18 +9,19 @@ import {
   Space, 
 } from "antd";
 import Highlighter from 'react-highlight-words';
-import { getUtilityData, updateUtility } from "../api/utility.js";
-// import { fetchMeltingBookList, deleteMeltingBookList } from "../api/meltingBook.js";
-import { fetchGovindMeltingBookList, deleteGovindMeltingBookList } from "../api/govindMeltingBook.js";
-import  MeltingBookAdd from "../components/MeltingBookAdd.js"
-import '../style/pages.css';
-import Loading from "../components/Loading.js";
-import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
+import { getUtilityData, updateUtility } from "../../api/utility.js";
+import { fetchGovindTarPattaBookList, deleteGovindTarPattaBookList } from "../../api/govind/govindTarPatta.js";
+import GovindMeltingBookAdd from "../../components/Govind/GovindMeltingBookAdd.js";
+import '../../style/pages.css';
+import Loading from "../../components/Loading.js";
+import GovindMeltingBookUpdate from "../../components/Govind/GovindMeltingBookUpdate.js";
+// import MeltingBookUpdate from "../../components/MeltingBookUpdate.js";
 import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
-import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
+import { deleteLossAcctList, fetchLossAcctList } from "../../api/LossAcct.js";
+// import { deleteLossAcctList, fetchLossAcctList } from "../../api/LossAcct.js";
 
-const GovindMeltingBook = () => {
+const GovindTarPattaBook = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100000000); // Change this to show all
@@ -70,7 +71,7 @@ const GovindMeltingBook = () => {
     setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
     setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
 
-    const docs = await fetchGovindMeltingBookList(page, itemsPerPage, token);
+    const docs = await fetchGovindTarPattaBookList(page, itemsPerPage, token);
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -99,39 +100,39 @@ const GovindMeltingBook = () => {
     let totalIssueQty = 0.0;
     let totalLossQty = 0.0;
     let totalIssueActualQty = 0.0;
-    data.forEach(({ weight24k, receive22k, issue22k, issue22kActual, loss22k}) => {
-      // console.log(weight24k, receive22k, issue22k, loss22k);
-      if (isNaN(parseFloat(receive22k))) {
-        receive22k = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(issue22k))) {
-        issue22k = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(weight24k))){
-        weight24k = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(loss22k))){
-        loss22k = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(issue22kActual))){
-        issue22kActual = 0; // Set it to zero if it's NaN
-      }
-      const sumOfWeights = weight24k.map(Number).reduce((acc, curr) => acc + curr, 0);
-      // console.log(sumOfWeights);
-      totalWeight += parseFloat(sumOfWeights);
-      totalRecvQty += parseFloat(receive22k);
-      totalIssueQty += parseFloat(issue22k);
-      totalIssueActualQty += parseFloat(issue22kActual);
-      totalLossQty += parseFloat(loss22k);
-    });
-    // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-    setTotalWeight(totalWeight.toFixed(2));
-    setTotalRecvQty(totalRecvQty.toFixed(2));
-    setTotalIssueQty(totalIssueQty.toFixed(2));
-    setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
-    setTotalLossQty(totalLossQty.toFixed(2));
+  //   data.forEach(({ weight24k, receive22k, issue22k, issue22kActual, loss22k}) => {
+  //     // console.log(weight24k, receive22k, issue22k, loss22k);
+  //     if (isNaN(parseFloat(receive22k))) {
+  //       receive22k = 0; // Set it to zero if it's NaN
+  //     } 
+  //     if (isNaN(parseFloat(issue22k))) {
+  //       issue22k = 0; // Set it to zero if it's NaN
+  //     } 
+  //     if (isNaN(parseFloat(weight24k))){
+  //       weight24k = 0; // Set it to zero if it's NaN
+  //     }
+  //     if (isNaN(parseFloat(loss22k))){
+  //       loss22k = 0; // Set it to zero if it's NaN
+  //     }
+  //     if (isNaN(parseFloat(issue22kActual))){
+  //       issue22kActual = 0; // Set it to zero if it's NaN
+  //     }
+  //     const sumOfWeights = weight24k.map(Number).reduce((acc, curr) => acc + curr, 0);
+  //     // console.log(sumOfWeights);
+  //     totalWeight += parseFloat(sumOfWeights);
+  //     totalRecvQty += parseFloat(receive22k);
+  //     totalIssueQty += parseFloat(issue22k);
+  //     totalIssueActualQty += parseFloat(issue22kActual);
+  //     totalLossQty += parseFloat(loss22k);
+  //   });
+  //   // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
+  //   setTotalWeight(totalWeight.toFixed(2));
+  //   setTotalRecvQty(totalRecvQty.toFixed(2));
+  //   setTotalIssueQty(totalIssueQty.toFixed(2));
+  //   setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
+  //   setTotalLossQty(totalLossQty.toFixed(2));
     
-    // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+  //   // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 
@@ -164,7 +165,7 @@ const GovindMeltingBook = () => {
         setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
         setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
     
-        const docs = await fetchGovindMeltingBookList(page, itemsPerPage, token);
+        const docs = await fetchGovindTarPattaBookList(page, itemsPerPage, token);
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
@@ -262,7 +263,7 @@ const GovindMeltingBook = () => {
     let currMeltingBookClosing995Balance = parseFloat(balanceData[0]["meltingBookClosing995Balance"])
     let currMeltingBookClosing100Balance = parseFloat(balanceData[0]["meltingBookClosing100Balance"])
 
-    const docs = await fetchGovindMeltingBookList(page, itemsPerPage, token);
+    const docs = await fetchGovindTarPattaBookList(page, itemsPerPage, token);
 
     // console.log(selectedRowKeys, rows);
     selectedRowKeys.map((item, index) => {
@@ -309,7 +310,7 @@ const GovindMeltingBook = () => {
     await updateUtility(utilityData, token);
 
     // console.log(meltingBookId);
-    await deleteGovindMeltingBookList(meltingBookId, token);
+    await deleteGovindTarPattaBookList(meltingBookId, token);
 
     await updateRows("valid");
     setSelectedRowKeys([]);
@@ -512,8 +513,8 @@ const GovindMeltingBook = () => {
       ...getColumnSearchProps('date'),
     },
     {
-      title: "Category",
-      dataIndex: "category",
+      title: "Goods",
+      dataIndex: "goods",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text.map((eachText) => (
@@ -523,22 +524,22 @@ const GovindMeltingBook = () => {
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('category'),
+      ...getColumnSearchProps('goods'),
     },
     {
-      title: "Description",
-      dataIndex: "description",
+      title: "Melting Wt",
+      dataIndex: "meltingWt",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('description'),
+      ...getColumnSearchProps('meltingWt'),
     },
     {
-      title: "Weight",
-      dataIndex: "weight24k",
+      title: "Issue",
+      dataIndex: "issue",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -548,12 +549,12 @@ const GovindMeltingBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('weight24k'),
+      ...getColumnSearchProps('issue'),
       align: 'right',
     },
     {
-      title: "Purity",
-      dataIndex: "purity",
+      title: "Receive Wt",
+      dataIndex: "receive",
       render: text => (
         <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -567,8 +568,8 @@ const GovindMeltingBook = () => {
       align: 'right',
     },
     {
-      title: "Conversion",
-      dataIndex: "conversion",
+      title: "Loss Qty",
+      dataIndex: "loss",
       render: text => (
         <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -578,7 +579,7 @@ const GovindMeltingBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('conversion'),
+      ...getColumnSearchProps('loss'),
       align: 'right',
     },
     // {
@@ -592,42 +593,42 @@ const GovindMeltingBook = () => {
     //   width: '10%',
     //   ...getColumnSearchProps('issue22k'),
     // },
-    {
-      title: "Issue Wt",
-      dataIndex: "issue22kActual",
-      render: text => (
-        <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('issue22kActual'),
-      align: 'right',
-    },
-    {
-      title: "Receive Wt",
-      dataIndex: "receive22k",
-      render: text => (
-        <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
-          {text}
-        </div>
-      ),
-      width: '15%',
-      ...getColumnSearchProps('receive22k'),
-      align: 'right',
-    },
-    {
-      title: "Loss Qty",
-      dataIndex: "loss22k",
-      render: text => (
-        <div style={{minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-          {text}
-        </div>
-      ),
-      width: '12%',
-      ...getColumnSearchProps('loss22k'),
-      align: 'right',
-    },
+    // {
+    //   title: "Issue Wt",
+    //   dataIndex: "issue22kActual",
+    //   render: text => (
+    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+    //       {text}
+    //     </div>
+    //   ),
+    //   width: '10%',
+    //   ...getColumnSearchProps('issue22kActual'),
+    //   align: 'right',
+    // },
+    // {
+    //   title: "Receive Wt",
+    //   dataIndex: "receive22k",
+    //   render: text => (
+    //     <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
+    //       {text}
+    //     </div>
+    //   ),
+    //   width: '15%',
+    //   ...getColumnSearchProps('receive22k'),
+    //   align: 'right',
+    // },
+    // {
+    //   title: "Loss Qty",
+    //   dataIndex: "loss22k",
+    //   render: text => (
+    //     <div style={{minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+    //       {text}
+    //     </div>
+    //   ),
+    //   width: '12%',
+    //   ...getColumnSearchProps('loss22k'),
+    //   align: 'right',
+    // },
     {
       title: "Action",
       key: "action",
@@ -728,7 +729,7 @@ const GovindMeltingBook = () => {
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Govind Melting Book
+                Govind Tar Patta Book
               </div>
 
               <div className="flex flex-col">
@@ -799,7 +800,7 @@ const GovindMeltingBook = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Govind Melting Book</div>
+              }} className="text-center text-[#00203FFF]" >Govind Tar Patta Book</div>
 
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
@@ -855,7 +856,7 @@ const GovindMeltingBook = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Govind Melting Book</div>
+              }} className="text-center text-[#00203FFF]" >Govind Tar Patta Book</div>
 
           <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
@@ -907,12 +908,12 @@ const GovindMeltingBook = () => {
         )}
 
       <Modal
-        title="Add Item"
+        title="Add Item To Govind Melting Book"
         open={isModalOpen}
         onCancel={handleCancel}
         footer={null}
       >
-      <MeltingBookAdd
+      <GovindMeltingBookAdd
           handleOk={handleUpdateClose}
           closingBalance={parseFloat(closingBalance)}
           setClosingBalance={setClosingBalance}
@@ -943,7 +944,7 @@ const GovindMeltingBook = () => {
         onCancel={handleCancel}
         footer={null}
       >
-      <MeltingBookUpdate
+      <GovindMeltingBookUpdate
           handleOk={handleUpdateClose}
           textData={updateData}
           />
@@ -996,4 +997,4 @@ const GovindMeltingBook = () => {
   );
 };
 
-export default GovindMeltingBook;
+export default GovindTarPattaBook;

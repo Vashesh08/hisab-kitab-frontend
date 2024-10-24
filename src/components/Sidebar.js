@@ -166,6 +166,40 @@ export default function Sidebar({ changeVisibility, isVisible }) {
               </List>
             </AccordionBody>
             </Accordion> */}
+            <Accordion
+            open={open === 4}
+            icon={
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`mx-auto h-4 w-4 transition-transform ${open === 4 ? "rotate-180" : ""}`}
+              />
+            }
+          >
+            <ListItem className="p-0" selected={open === 4}>
+            <AccordionHeader onClick={() => handleOpen(4)} className="border-b-0 p-3 text-white hover:text-black active:text-black">
+              <ListItemPrefix>
+                <BookOpenIcon className="h-5 w-5" />
+              </ListItemPrefix>
+              <Typography className="mr-auto font-normal">
+                Vijay Book
+              </Typography>
+            </AccordionHeader>
+          </ListItem>
+          
+            <AccordionBody className="py-1">
+              <List className="p-0 items-center">
+                <ListItem onClick={() => changePage("vijaymeltingbook")}
+                  className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                    Melting Book
+                </ListItem>
+                <ListItem onClick={() => changePage("vijaytarpatta")}
+                  className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                    Tar Patta
+                </ListItem>
+              </List>
+            </AccordionBody>
+            </Accordion>
+ 
             </>
           ):(
             <></>

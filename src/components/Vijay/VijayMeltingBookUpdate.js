@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { updateMeltingBook } from "../api/meltingBook.js";
-import Loading from "./Loading.js";
+import { updateVijayBook } from "../../api/vijayBook.js";
+import Loading from "../Loading.js";
 import { Button, Form, InputNumber } from "antd";
-import { postLossAcct } from "../api/LossAcct.js";
-import dayjs from 'dayjs';
+import { postLossAcct } from "../../api/LossAcct.js";
 
-function MeltingBookUpdate({handleOk, textData}) {
+
+function VijayMeltingBookUpdate({handleOk, textData}) {
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
     
@@ -47,26 +47,29 @@ function MeltingBookUpdate({handleOk, textData}) {
         const backendData = {
         _id: textData._id,
         // issue22kActual: issue22kActual,
-        receive22k: String(recv_weight),
-        loss22k: (textData.issue22kActual - recv_weight).toFixed(2)
+        meltingReceive: String(recv_weight.toFixed(2)),
+        meltingLoss: (textData.meltingIssueActual - recv_weight).toFixed(2),
+        is_melting_receiver_updated: true
         };
         // console.log("Vashesh", backendData);
-        await updateMeltingBook(backendData, token);
+        await updateVijayBook(backendData, token);
+
+        // const tarpattaData = {
+        //     meltingWt: recv_weight,
+        //     meltingId: textData._id,
+        // }
+        // await postGovindTarPattaBook(tarpattaData, token);
         
-        if ((textData.issue22kActual - recv_weight) >= 0){
+        if ((textData.meltingIssueActual - recv_weight) >= 0){
           const lossData = {
-            "type": "Melting",
-            "date": textData.date,
-            "lossWt": (textData.issue22kActual - recv_weight).toFixed(2),
+            "type": "Vijay Melting",
+            "date": textData.meltingDate,
+            "lossWt": (textData.meltingIssueActual - recv_weight).toFixed(2),
             "transactionId": textData._id,
-            "description": "Melting Loss"
+            "description": "Vijay Melting Loss"
           }
           await postLossAcct(lossData, token)
         }
-
-        // const updated = await updateMeltingBook(backendData, token);
-        // console.log("Added ",updated);
-        
 
         form.resetFields();
         setIsLoading(false);
@@ -120,4 +123,4 @@ function MeltingBookUpdate({handleOk, textData}) {
     
 }
 
-export default MeltingBookUpdate;
+export default VijayMeltingBookUpdate;

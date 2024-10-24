@@ -55,3 +55,23 @@ export async function postLossAcct(lossBook, token) {
     const body = await res.json();
     return body;
 }
+
+export async function updateLossBook(lossBook, token){
+    // send request to check authenticated
+    const formData = await convertObjectToFormData(lossBook);
+
+    const res = await fetch(`${config.API_URL}/admin/lossAcct`, {
+    method: 'PATCH',
+    headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json, text/plain, */*'
+    },
+    body:formData
+    });
+    // console.log(res);
+    if ( res.status !== 200) {
+        throw Error('Failed to update');
+    }
+    const body = await res.json();
+    return body;
+}

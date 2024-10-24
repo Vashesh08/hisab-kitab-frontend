@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { updateMeltingBook } from "../api/meltingBook.js";
-import Loading from "./Loading.js";
+import { updateGovindMeltingBook } from "../../api/govind/govindMeltingBook.js";
+import Loading from "../Loading.js";
 import { Button, Form, InputNumber } from "antd";
-import { postLossAcct } from "../api/LossAcct.js";
-import dayjs from 'dayjs';
+import { postLossAcct } from "../../api/LossAcct.js";
+import { postGovindTarPattaBook } from "../../api/govind/govindTarPatta.js";
 
-function MeltingBookUpdate({handleOk, textData}) {
+function GovindMeltingBookUpdate({handleOk, textData}) {
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
     
@@ -51,7 +51,13 @@ function MeltingBookUpdate({handleOk, textData}) {
         loss22k: (textData.issue22kActual - recv_weight).toFixed(2)
         };
         // console.log("Vashesh", backendData);
-        await updateMeltingBook(backendData, token);
+        await updateGovindMeltingBook(backendData, token);
+
+        const tarpattaData = {
+            meltingWt: recv_weight,
+            meltingId: textData._id,
+        }
+        await postGovindTarPattaBook(tarpattaData, token);
         
         if ((textData.issue22kActual - recv_weight) >= 0){
           const lossData = {
@@ -63,10 +69,6 @@ function MeltingBookUpdate({handleOk, textData}) {
           }
           await postLossAcct(lossData, token)
         }
-
-        // const updated = await updateMeltingBook(backendData, token);
-        // console.log("Added ",updated);
-        
 
         form.resetFields();
         setIsLoading(false);
@@ -120,4 +122,4 @@ function MeltingBookUpdate({handleOk, textData}) {
     
 }
 
-export default MeltingBookUpdate;
+export default GovindMeltingBookUpdate;

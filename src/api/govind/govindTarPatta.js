@@ -1,10 +1,9 @@
+import convertObjectToFormData from "../../utils/convertObjectToFormData";
+import config from '../../config';
 
-import convertObjectToFormData from "../utils/convertObjectToFormData";
-import config from '../config';
-
-export async function getGovindMeltingBook(token) {
+export async function getGovindTarPatta(token) {
     // send request to check authenticated
-    const res = await fetch(`${config.API_URL}/govindMeltingBook`, {
+    const res = await fetch(`${config.API_URL}/govindTarPattaBook`, {
       method: 'get',
       headers: {
           'Authorization': `Bearer ${token}`,
@@ -19,8 +18,8 @@ export async function getGovindMeltingBook(token) {
     return body;
 }
 
-export async function fetchGovindMeltingBookList(page, itemsPerPage, token) {
-    const response = await fetch(`${config.API_URL}/admin/govindMeltingStock-list?page=${page}&itemsPerPage=${itemsPerPage}`, {
+export async function fetchGovindTarPattaBookList(page, itemsPerPage, token) {
+    const response = await fetch(`${config.API_URL}/admin/govindTarPattaStock-list?page=${page}&itemsPerPage=${itemsPerPage}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -33,13 +32,13 @@ export async function fetchGovindMeltingBookList(page, itemsPerPage, token) {
     return data;
 }
 
-export async function deleteGovindMeltingBookList(govindMeltingBookId, token) {
+export async function deleteGovindTarPattaBookList(govindTarPattaBookId, token) {
     // console.log(meltingBookId);
-    const formData = await convertObjectToFormData(govindMeltingBookId);  
+    const formData = await convertObjectToFormData(govindTarPattaBookId);  
     // Var name to be changed later
     // console.log("vas",formData);
 
-    const response = await fetch(`${config.API_URL}/admin/govindMeltingBookDelete`, {
+    const response = await fetch(`${config.API_URL}/admin/govindTarPattaBookDelete`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -55,11 +54,11 @@ export async function deleteGovindMeltingBookList(govindMeltingBookId, token) {
     return data;
 }
 
-export async function postGovindMeltingBook(govindMeltingBook, token) {
+export async function postGovindTarPattaBook(govindTarPattaBook, token) {
     // send request to check authenticated
-    const formData = await convertObjectToFormData(govindMeltingBook);
+    const formData = await convertObjectToFormData(govindTarPattaBook);
 
-    const res = await fetch(`${config.API_URL}/admin/govindMeltingBook`, {
+    const res = await fetch(`${config.API_URL}/admin/govindTarPattaBook`, {
       method: 'post',
       headers: {
           'Authorization': `Bearer ${token}`,
@@ -75,11 +74,11 @@ export async function postGovindMeltingBook(govindMeltingBook, token) {
     return body;
 }
 
-export async function updateGovindMeltingBook(govindMeltingBook, token){
+export async function updateGovindTarPattaBook(govindTarPattaBook, token){
     // send request to check authenticated
-    const formData = await convertObjectToFormData(govindMeltingBook);
+    const formData = await convertObjectToFormData(govindTarPattaBook);
 
-    const res = await fetch(`${config.API_URL}/admin/update/govindMeltingBook`, {
+    const res = await fetch(`${config.API_URL}/admin/update/govindTarPattaBook`, {
     method: 'PATCH',
     headers: {
         'Authorization': `Bearer ${token}`,
