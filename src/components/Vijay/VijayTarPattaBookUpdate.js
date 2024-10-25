@@ -355,7 +355,7 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
             required: true,
           },
         ]}
-        initialValue="Vijay"
+        initialValue={textData.issue_to_kareegar || "Vijay"}
       >
         <Select
           options={[
