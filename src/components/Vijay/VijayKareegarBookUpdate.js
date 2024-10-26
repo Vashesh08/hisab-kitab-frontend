@@ -2,19 +2,19 @@ import React, { useState, useEffect } from "react";
 import { updateVijayBook } from "../../api/vijayBook.js";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "../Loading.js";
-import { Button, Form, InputNumber, Input, DatePicker, Select } from "antd";
+import { Button, Form, InputNumber, Input, DatePicker } from "antd";
 import { postLossAcct, updateLossBook } from "../../api/LossAcct.js";
 
 
-function VijayTarPattaBookUpdate({handleOk, textData}) {
+function VijayKareegarBookUpdate({handleOk, textData}) {
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
-    const [numberOfIssueItems, setNumberOfIssueItems] = useState(textData.tarpattaIssue.length || 1);
-    const [numberOfReceiveItems, setNumberOfReceiveItems] = useState(textData.tarpattaReceive.length || 1);
-    const [numberOfBhukaItems, setNumberOfBhukaItems] = useState(textData.tarpattaBhuka.length || 1);
-    const [issueItems, setIssueItems] = useState(textData.tarpattaIssue || [0, 0, 0, 0, 0]);
-    const [receiveItems, setReceiveItems] = useState(textData.tarpattaReceive || [0, 0, 0, 0, 0]);
-    const [bhukaItems, setBhukaItems] = useState(textData.tarpattaBhuka || [0, 0, 0, 0, 0]);
+    const [numberOfIssueItems, setNumberOfIssueItems] = useState(textData.vijayIssue.length || 1);
+    const [numberOfReceiveItems, setNumberOfReceiveItems] = useState(textData.vijayReceive.length || 1);
+    const [numberOfBhukaItems, setNumberOfBhukaItems] = useState(textData.vijayBhuka.length || 1);
+    const [issueItems, setIssueItems] = useState(textData.vijayIssue || [0, 0, 0, 0, 0]);
+    const [receiveItems, setReceiveItems] = useState(textData.vijayReceive || [0, 0, 0, 0, 0]);
+    const [bhukaItems, setBhukaItems] = useState(textData.vijayBhuka || [0, 0, 0, 0, 0]);
     const [lastDate, setDate] = useState(dayjs());
   
     const disabledDate = (current) => {
@@ -69,19 +69,19 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
     
     useEffect(() => {
         setIsLoading(true);
-        if (textData.tarpattaIssue.length > 0){
-            setNumberOfIssueItems(textData.tarpattaIssue.length);
-            setIssueItems(textData.tarpattaIssue);            
+        if (textData.vijayIssue.length > 0){
+            setNumberOfIssueItems(textData.vijayIssue.length);
+            setIssueItems(textData.vijayIssue);            
           }
-        if (textData.tarpattaReceive.length > 0){
-            setNumberOfReceiveItems(textData.tarpattaReceive.length);
-            setReceiveItems(textData.tarpattaReceive);
+        if (textData.vijayReceive.length > 0){
+            setNumberOfReceiveItems(textData.vijayReceive.length);
+            setReceiveItems(textData.vijayReceive);
         }
-        if (textData.tarpattaBhuka.length > 0){
-            setNumberOfBhukaItems(textData.tarpattaBhuka.length);
-            setBhukaItems(textData.tarpattaBhuka);
+        if (textData.vijayBhuka.length > 0){
+            setNumberOfBhukaItems(textData.vijayBhuka.length);
+            setBhukaItems(textData.vijayBhuka);
         }
-        
+        console.log("loaded");
         setIsLoading(false);
     }, [textData]);
 
@@ -138,10 +138,10 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
         // console.log(user);
         
         const {
-          tarpattaDate,
-          tarpattaDescription,
+            vijayDate,
+            vijayDescription,
           // issue22kActual
-          issue_to_kareegar
+        //   issue_to_kareegar
         } = user;
 
         
@@ -154,17 +154,17 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
         const bhukaWeightKeys = [...Array(numberOfBhukaItems)].map((_, index) => `bhukaWeight${index}`);
         const bhukaWeightValues = bhukaWeightKeys.map((key) => user[key]);
 
-        // console.log("Vashesh", issueWeightValues, receiveWeightValues, bhukaWeightValues);
-        if (textData.tarpattaIssue.length === 0){
+        console.log("Vashesh", issueWeightValues, receiveWeightValues, bhukaWeightValues, textData);
+        if (textData.vijayIssue.length === 0){
           const backendData = {
             _id: textData._id,
-            tarpattaDate: tarpattaDate,
-            tarpattaIssue: issueWeightValues,
-            tarpattaDescription: tarpattaDescription
+            vijayDate: vijayDate,
+            vijayIssue: issueWeightValues,
+            vijayDescription: vijayDescription
           }
           await updateVijayBook(backendData, token);
         }
-        else if (textData.tarpattaLoss === undefined){
+        else if (textData.vijayLoss === undefined){
           let totalIssueQty = 0;
           for (let index = 0; index < numberOfIssueItems; index++) {
             totalIssueQty += issueWeightValues[index];
@@ -183,21 +183,20 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
           if (totalLossQty >= 0){
             const backendData = {
               _id: textData._id,
-              tarpattaReceive: receiveWeightValues,
-              tarpattaBhuka: bhukaWeightValues,
-              tarpattaLoss: totalLossQty.toFixed(2),
-              tarpattaDescription: tarpattaDescription,
-              "issue_to_kareegar": issue_to_kareegar
+              vijayDescription: vijayDescription,
+              vijayReceive: receiveWeightValues,
+              vijayBhuka: bhukaWeightValues,
+              vijayLoss: totalLossQty.toFixed(2),
             }
 
             await updateVijayBook(backendData, token);
             
             const lossData = {
-              "type": "Vijay Tarpatta",
+              "type": "Vijay Kareegar",
               date: lastDate,
               "transactionId": textData._id,
               "lossWt": totalLossQty.toFixed(2),
-              "description": "Vijay Tarpatta Loss"
+              "description": "Vijay Kareegar Loss"
             }
 
             await postLossAcct(lossData, token);
@@ -223,21 +222,20 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
           if (totalLossQty >= 0){
             const backendData = {
               _id: textData._id,
-              tarpattaDescription: tarpattaDescription,
-              tarpattaReceive: receiveWeightValues,
-              tarpattaBhuka: bhukaWeightValues,
-              tarpattaLoss: totalLossQty.toFixed(2),
-              "issue_to_kareegar": issue_to_kareegar
+              vijayDescription: vijayDescription,
+              vijayReceive: receiveWeightValues,
+              vijayBhuka: bhukaWeightValues,
+              vijayLoss: totalLossQty.toFixed(2),
             }
 
             await updateVijayBook(backendData, token);
             
             const lossData = {
-              "type": "Vijay Tarpatta",
+              "type": "Vijay Kareegar",
               date: lastDate,
               "transactionId": textData._id,
               "lossWt": totalLossQty.toFixed(2),
-              "description": "Vijay Tarpatta Loss"
+              "description": "Vijay Kareegar Loss"
             }
 
             await updateLossBook(lossData, token);
@@ -268,10 +266,10 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
     >
 
 
-      {(textData.tarpattaIssue.length === 0) ?(
+      {(textData.vijayIssue.length === 0) ?(
         <>
           <Form.Item
-            name={["user", "tarpattaDate"]}
+            name={["user", "vijayDate"]}
             label="Date"
             rules={[
               {
@@ -283,7 +281,7 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
             <DatePicker format="DD MMM, YYYY" disabledDate={disabledDate} />
           </Form.Item>
           
-          <Form.Item name={["user", "tarpattaDescription"]} label="Description">
+          <Form.Item name={["user", "vijayDescription"]} label="Description">
             <Input />
           </Form.Item>
 
@@ -303,8 +301,9 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
           </>
         ): (
         <>
-          <Form.Item name={["user", "tarpattaDescription"]} label="Description" initialValue={textData.tarpattaDescription || ""}>
-            <Input/>
+
+        <Form.Item name={["user", "vijayDescription"]} label="Description" initialValue={textData.vijayDescription || ""}>
+            <Input />
           </Form.Item>
 
         <Form.Item
@@ -352,24 +351,6 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
         </Form.Item>
 
           {renderBhukaItems()}
-
-      <Form.Item
-        name={["user", `issue_to_kareegar`]}
-        label={`Issue To`}
-        rules={[
-          {
-            required: false,
-          },
-        ]}
-        initialValue={textData.issue_to_kareegar || ""}
-      >
-        <Select
-          options={[
-            { value: "Vijay", label: "Vijay" },
-            { value: "Manish", label: "Manish" },
-          ]}
-        />
-      </Form.Item>
           
           </>
         )}
@@ -389,4 +370,4 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
     
 }
 
-export default VijayTarPattaBookUpdate;
+export default VijayKareegarBookUpdate;

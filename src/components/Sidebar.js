@@ -186,20 +186,43 @@ export default function Sidebar({ changeVisibility, isVisible }) {
             </AccordionHeader>
           </ListItem>
           
-            <AccordionBody className="py-1">
-              <List className="p-0 items-center">
-                <ListItem onClick={() => changePage("vijaymeltingbook")}
-                  className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
-                    Melting Book
-                </ListItem>
-                <ListItem onClick={() => changePage("vijaytarpatta")}
-                  className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
-                    Tar Patta
-                </ListItem>
-              </List>
-            </AccordionBody>
+              <AccordionBody className="py-1">
+                <List className="p-0 items-center">
+                  <ListItem onClick={() => changePage("vijaymeltingbook")}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Melting Book
+                  </ListItem>
+                  <ListItem onClick={() => changePage("vijaytarpatta")}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Tar Patta
+                  </ListItem>
+                  <ListItem onClick={() => changePage("vijaykareegar")}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Vijay Kareegar
+                  </ListItem>
+                  <ListItem onClick={() => changePage("manishkareegar")}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Manish Kareegar
+                  </ListItem>
+                  {/* <ListItem onClick={() => changePage("solder")}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Solder
+                  </ListItem>
+                  <ListItem onClick={() => changePage("joint")}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Joint
+                  </ListItem>
+                  <ListItem onClick={() => changePage("shankar")}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Shankar
+                  </ListItem>
+                  <ListItem onClick={() => changePage("touch")}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Touch
+                  </ListItem> */}
+                </List>
+              </AccordionBody>
             </Accordion>
- 
             </>
           ):(
             <></>

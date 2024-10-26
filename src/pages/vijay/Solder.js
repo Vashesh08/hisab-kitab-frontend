@@ -15,7 +15,7 @@ import { EditOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { fetchVijayStockList } from "../../api/vijayBook.js";
 import VijayTarPattaBookUpdate from "../../components/Vijay/VijayTarPattaBookUpdate.js";
 
-const VijayTarPattaBook = () => {
+const Solder = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100000000); // Change this to show all
@@ -401,20 +401,20 @@ const VijayTarPattaBook = () => {
 
   const columns = [
     {
-      title: "Melting Wt",
-      dataIndex: "meltingReceive",
+      title: "Date",
+      dataIndex: "solderDate",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('meltingReceive'),
+      ...getColumnSearchProps('solderDate'),
       align: 'right',
     },
     {
-      title: "Date",
-      dataIndex: "tarpattaDate",
+      title: "Lot No",
+      dataIndex: "solderLotNo",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
           {getFormattedDate(text)}
@@ -423,23 +423,23 @@ const VijayTarPattaBook = () => {
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
       width: '9%',
       sortDirections: ['ascend', "descend", 'ascend'],
-      ...getColumnSearchProps('tarpattaDate'),
+      ...getColumnSearchProps('solderLotNo'),
       align: 'right',
     },
     {
-      title: "Description",
-      dataIndex: "tarpattaDescription",
+      title: "Item",
+      dataIndex: "solderItem",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('tarpattaDescription'),
+      ...getColumnSearchProps('solderItem'),
     },
     {
-      title: "Issue",
-      dataIndex: "tarpattaIssue",
+      title: "Melting",
+      dataIndex: "solderMelting",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -449,12 +449,12 @@ const VijayTarPattaBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('tarpattaIssue'),
+      ...getColumnSearchProps('solderMelting'),
       align: 'right',
     },
     {
-      title: "Receive",
-      dataIndex: "tarpattaReceive",
+      title: "Chain(I)",
+      dataIndex: "solderChainIssue",
       render: text => (
         <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -464,12 +464,12 @@ const VijayTarPattaBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('tarpattaReceive'),
+      ...getColumnSearchProps('solderChainIssue'),
       align: 'right',
     },
     {
-      title: "Bhuka",
-      dataIndex: "tarpattaBhuka",
+      title: "Chain(R)",
+      dataIndex: "solderChainReceive",
       render: text => (
         <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -479,35 +479,24 @@ const VijayTarPattaBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('tarpattaBhuka'),
+      ...getColumnSearchProps('solderChainReceive'),
       align: 'right',
     },
-    // {
-    //   title: "Issue Wt (F)",
-    //   dataIndex: "meltingIssue",
-    //   render: text => (
-    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   ...getColumnSearchProps('meltingIssue'),
-    // },
     {
-      title: "Loss",
-      dataIndex: "tarpattaLoss",
+      title: "Bhuka",
+      dataIndex: "solderBhuka",
       render: text => (
         <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('tarpattaLoss'),
+      ...getColumnSearchProps('solderBhuka'),
       align: 'right',
     },
     {
-      title: "Assigned To",
-      dataIndex: "issue_to_kareegar",
+      title: "Total",
+      dataIndex: "solderTotal",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
@@ -515,7 +504,43 @@ const VijayTarPattaBook = () => {
       ),
       width: '10%',
       align: 'center',
-      ...getColumnSearchProps('issue_to_kareegar'),
+      ...getColumnSearchProps('solderTotal'),
+    },
+    {
+      title: "Powder",
+      dataIndex: "solderPowder",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      align: 'center',
+      ...getColumnSearchProps('solderPowder'),
+    },
+    {
+      title: "R1",
+      dataIndex: "solderR1",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      align: 'center',
+      ...getColumnSearchProps('solderR1'),
+    },
+    {
+      title: "R2",
+      dataIndex: "solderR2",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      align: 'center',
+      ...getColumnSearchProps('solderR2'),
     },
     {
       title: "Action",
@@ -612,7 +637,7 @@ const VijayTarPattaBook = () => {
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Vijay TarPatta Book
+                Vijay Solder Book
               </div>
           </div>
           ) : screenWidth > 500 ? (
@@ -620,14 +645,14 @@ const VijayTarPattaBook = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Vijay TarPatta Book</div>
+              }} className="text-center text-[#00203FFF]" >Vijay Solder Book</div>
 
             ): (
               <div style={{
                 fontSize: '250%',
                 fontWeight: 'bolder',
                 lineHeight: "2em",
-                }} className="text-center text-[#00203FFF]" >Vijay TarPatta Book</div>
+                }} className="text-center text-[#00203FFF]" >Vijay Solder Book</div>
         )}
 
       <Modal
@@ -665,23 +690,27 @@ const VijayTarPattaBook = () => {
                 <Table.Summary.Cell index={3}>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={4}>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={5}>
                   {/* {totalWeightQuantity} */}
                   {issueBalance}
                   </Table.Summary.Cell>
                 {/* <Table.Summary.Cell index={5}>
                   {totalIssueQuantity}
                 </Table.Summary.Cell> */}
-                  <Table.Summary.Cell index={5}>
+                  <Table.Summary.Cell index={6}>
                   {receiveBalance}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={6}>
+                <Table.Summary.Cell index={7}>
                 {bhukaBalance}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={7}>
+                <Table.Summary.Cell index={8}>
                   {lossBalance}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={8}></Table.Summary.Cell>
                 <Table.Summary.Cell index={9}></Table.Summary.Cell>
+                <Table.Summary.Cell index={10}></Table.Summary.Cell>
+                <Table.Summary.Cell index={11}></Table.Summary.Cell>
+                <Table.Summary.Cell index={12}></Table.Summary.Cell>
                 
               </Table.Summary.Row>
             </>
@@ -693,4 +722,4 @@ const VijayTarPattaBook = () => {
   );
 };
 
-export default VijayTarPattaBook;
+export default Solder;

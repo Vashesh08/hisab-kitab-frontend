@@ -13,9 +13,9 @@ import '../../style/pages.css';
 import Loading from "../../components/Loading.js";
 import { EditOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { fetchVijayStockList } from "../../api/vijayBook.js";
-import VijayTarPattaBookUpdate from "../../components/Vijay/VijayTarPattaBookUpdate.js";
+import ManishKareegarBookUpdate from "../../components/Vijay/ManishKareegarBookUpdate.js";
 
-const VijayTarPattaBook = () => {
+const ManishKareegarBook = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100000000); // Change this to show all
@@ -27,7 +27,7 @@ const VijayTarPattaBook = () => {
   const [receiveBalance, setReceiveBalance] = useState(0);
   const [bhukaBalance, setBhukaBalance] = useState(0);
   const [lossBalance, setLossBalance] = useState(0);
-  const [meltingWtBalance, setMeltingWtBalance] = useState(0);
+  const [tarpattaRecvBalance, setTarpattaRecvBalance] = useState(0);
 
   const getFormattedDate = (date) => {
     if (date === undefined){
@@ -54,7 +54,8 @@ const VijayTarPattaBook = () => {
     const deleted_data = [];
     // console.log("data", data)
     
-    const docs = await fetchVijayStockList(page, itemsPerPage, token);
+    const allData = await fetchVijayStockList(page, itemsPerPage, token);
+    const docs = allData.filter(item => item.issue_to_kareegar === "Manish");
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -78,42 +79,43 @@ const VijayTarPattaBook = () => {
       setRows(deleted_data);
     }
 
-    let totalMeltingWeight = 0.000;
+    let totalTarpattaRecv = 0.000;
     let totalRecvQty = 0.0;
     let totalIssueQty = 0.0;
     let totalLossQty = 0.0;
     let totalBhukaQty = 0.0;
-    data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
+    data.forEach(({ tarpattaReceive, manishReceive, manishIssue, manishBhuka, manishLoss}) => {
       // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
       if (isNaN(parseFloat(tarpattaReceive))) {
         tarpattaReceive = [0]; // Set it to zero if it's NaN
       } 
-      if (isNaN(parseFloat(tarpattaIssue))) {
-        tarpattaIssue = [0]; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(manishIssue))) {
+        manishIssue = [0]; // Set it to zero if it's NaN
       } 
-      if (isNaN(parseFloat(meltingReceive))){
-        meltingReceive = 0; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(manishReceive))){
+        manishReceive = [0]; // Set it to zero if it's NaN
       }
-      if (isNaN(parseFloat(tarpattaLoss))){
-        tarpattaLoss = 0; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(manishLoss))){
+        manishLoss = 0; // Set it to zero if it's NaN
       }
-      if (isNaN(parseFloat(tarpattaBhuka))){
-        tarpattaBhuka = [0]; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(manishBhuka))){
+        manishBhuka = [0]; // Set it to zero if it's NaN
       }
       // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
       // console.log(sumOfWeights);
-      const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
       const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
+      const sumOfManishIssue = manishIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
+      const sumOfManishReceive = manishReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
+      const sumOfManishBhuka = manishBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
       
-      totalMeltingWeight += parseFloat(meltingReceive);
-      totalRecvQty += parseFloat(sumOfTarpattaReceive);
-      totalIssueQty += parseFloat(sumOfTarpattaIssue);
-      totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
-      totalLossQty += parseFloat(tarpattaLoss);
+      totalTarpattaRecv += parseFloat(sumOfTarpattaReceive);
+      totalRecvQty += parseFloat(sumOfManishReceive);
+      totalIssueQty += parseFloat(sumOfManishIssue);
+      totalBhukaQty += parseFloat(sumOfManishBhuka);
+      totalLossQty += parseFloat(manishLoss);
     });
     // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-    setMeltingWtBalance(totalMeltingWeight.toFixed(2));
+    setTarpattaRecvBalance(totalTarpattaRecv.toFixed(2));
     setReceiveBalance(totalRecvQty.toFixed(2));
     setIssueBalance(totalIssueQty.toFixed(2));
     setBhukaBalance(totalBhukaQty.toFixed(2));
@@ -133,7 +135,8 @@ const VijayTarPattaBook = () => {
         const deleted_data = [];
         // console.log("data", data)
         
-        const docs = await fetchVijayStockList(page, itemsPerPage, token);
+        const allData = await fetchVijayStockList(page, itemsPerPage, token);
+        const docs = allData.filter(item => item.issue_to_kareegar === "Manish");
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
@@ -147,44 +150,43 @@ const VijayTarPattaBook = () => {
         data.reverse();
         setRows(data);
 
-        let totalMeltingWeight = 0.000;
+        let totalTarpattaRecv = 0.000;
         let totalRecvQty = 0.0;
         let totalIssueQty = 0.0;
         let totalLossQty = 0.0;
         let totalBhukaQty = 0.0;
-        data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
+        data.forEach(({ tarpattaReceive, manishReceive, manishIssue, manishBhuka, manishLoss}) => {
           // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-          // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
-          if (isNaN(parseFloat(tarpattaReceive))) {
-            tarpattaReceive = [0]; // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(tarpattaIssue))) {
-            tarpattaIssue = [0]; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(manishReceive))) {
+            manishReceive = [0]; // Set it to zero if it's NaN
           } 
-          if (isNaN(parseFloat(meltingReceive))){
-            meltingReceive = 0 // Set it to zero if it's NaN
+          if (isNaN(parseFloat(manishIssue))) {
+            manishIssue = [0]; // Set it to zero if it's NaN
+          } 
+          if (isNaN(parseFloat(manishReceive))){
+            manishReceive = [0]; // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(tarpattaLoss))){
-            tarpattaLoss = 0  // Set it to zero if it's NaN
+          if (isNaN(parseFloat(manishLoss))){
+            manishLoss = 0; // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(tarpattaBhuka))){
-            tarpattaBhuka = [0]; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(manishBhuka))){
+            manishBhuka = [0]; // Set it to zero if it's NaN
           }
           // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
           // console.log(sumOfWeights);
-          const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
           const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
+          const sumOfManishIssue = manishIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
+          const sumOfManishReceive = manishReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
+          const sumOfManishBhuka = manishBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
           
-          totalMeltingWeight += parseFloat(meltingReceive);
-          totalRecvQty += parseFloat(sumOfTarpattaReceive);
-          totalIssueQty += parseFloat(sumOfTarpattaIssue);
-          totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
-          totalLossQty += parseFloat(tarpattaLoss);
-              
+          totalTarpattaRecv += parseFloat(sumOfTarpattaReceive);
+          totalRecvQty += parseFloat(sumOfManishReceive);
+          totalIssueQty += parseFloat(sumOfManishIssue);
+          totalBhukaQty += parseFloat(sumOfManishBhuka);
+          totalLossQty += parseFloat(manishLoss);
         });
         // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-        setMeltingWtBalance(totalMeltingWeight.toFixed(2));
+        setTarpattaRecvBalance(totalTarpattaRecv.toFixed(2));
         setReceiveBalance(totalRecvQty.toFixed(2));
         setIssueBalance(totalIssueQty.toFixed(2));
         setBhukaBalance(totalBhukaQty.toFixed(2));
@@ -321,7 +323,7 @@ const VijayTarPattaBook = () => {
       }
     },
     render: (text) =>
-      dataIndex === "tarpattaDate" ? (
+      dataIndex === "manishDate" ? (
         searchedColumn === dataIndex ? (<Highlighter
           highlightStyle={{
             backgroundColor: '#ffc069',
@@ -334,7 +336,7 @@ const VijayTarPattaBook = () => {
         ) : (
           getFormattedDate(text)
         )
-      ) : dataIndex === "tarpattaWeight" ?(
+      ) : dataIndex === "manishWeight" ?(
         // searchedColumn === dataIndex ? (<Highlighter
         //   highlightStyle={{
         //     backgroundColor: '#ffc069',
@@ -352,32 +354,32 @@ const VijayTarPattaBook = () => {
           )
           )
         // )
-      ) : dataIndex === "tarpattaPurity" ?(
+      ) : dataIndex === "manishPurity" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ) : dataIndex === "tarpattaConversion" ?(
+      ) : dataIndex === "manishConversion" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ) : dataIndex === "tarpattaCategory" ?(
+      ) : dataIndex === "manishCategory" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"left"}}>{eachText}</div>
         )
         )
-      ): dataIndex === "tarpattaIssue" ?(
+      ): dataIndex === "manishIssue" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ): dataIndex === "tarpattaReceive" ?(
+      ): dataIndex === "manishReceive" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ): dataIndex === "tarpattaBhuka" ?(
+      ): dataIndex === "manishBhuka" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
@@ -401,62 +403,10 @@ const VijayTarPattaBook = () => {
 
   const columns = [
     {
-      title: "Melting Wt",
-      dataIndex: "meltingReceive",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('meltingReceive'),
-      align: 'right',
-    },
-    {
-      title: "Date",
-      dataIndex: "tarpattaDate",
-      render: text => (
-        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
-          {getFormattedDate(text)}
-        </div>
-      ),
-      sorter: (a, b) => new Date(a.date) - new Date(b.date),
-      width: '9%',
-      sortDirections: ['ascend', "descend", 'ascend'],
-      ...getColumnSearchProps('tarpattaDate'),
-      align: 'right',
-    },
-    {
-      title: "Description",
-      dataIndex: "tarpattaDescription",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('tarpattaDescription'),
-    },
-    {
-      title: "Issue",
-      dataIndex: "tarpattaIssue",
-      render: text => (
-        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
-          {text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
-          )
-          )}
-        </div>
-      ),
-      width: '9%',
-      ...getColumnSearchProps('tarpattaIssue'),
-      align: 'right',
-    },
-    {
-      title: "Receive",
+      title: "Tarpatta Recv",
       dataIndex: "tarpattaReceive",
       render: text => (
-        <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
+        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
             <div style={{textAlign:"right"}}>{eachText}</div>
           )
@@ -468,8 +418,62 @@ const VijayTarPattaBook = () => {
       align: 'right',
     },
     {
+      title: "Date",
+      dataIndex: "manishDate",
+      render: text => (
+        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
+          {getFormattedDate(text)}
+        </div>
+      ),
+      sorter: (a, b) => new Date(a.date) - new Date(b.date),
+      width: '9%',
+      sortDirections: ['ascend', "descend", 'ascend'],
+      ...getColumnSearchProps('manishDate'),
+    },
+    {
+      title: "Description",
+      dataIndex: "manishDescription",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      ...getColumnSearchProps('manishDescription'),
+    },
+    {
+      title: "Issue",
+      dataIndex: "manishIssue",
+      render: text => (
+        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
+          {text.map((eachText) => (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )}
+        </div>
+      ),
+      width: '9%',
+      ...getColumnSearchProps('manishIssue'),
+      align: 'right',
+    },
+    {
+      title: "Receive",
+      dataIndex: "manishReceive",
+      render: text => (
+        <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
+          {text.map((eachText) => (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )}
+        </div>
+      ),
+      width: '9%',
+      ...getColumnSearchProps('manishReceive'),
+      align: 'right',
+    },
+    {
       title: "Bhuka",
-      dataIndex: "tarpattaBhuka",
+      dataIndex: "manishBhuka",
       render: text => (
         <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -479,7 +483,7 @@ const VijayTarPattaBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('tarpattaBhuka'),
+      ...getColumnSearchProps('manishBhuka'),
       align: 'right',
     },
     // {
@@ -495,28 +499,28 @@ const VijayTarPattaBook = () => {
     // },
     {
       title: "Loss",
-      dataIndex: "tarpattaLoss",
+      dataIndex: "manishLoss",
       render: text => (
         <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('tarpattaLoss'),
+      ...getColumnSearchProps('manishLoss'),
       align: 'right',
     },
-    {
-      title: "Assigned To",
-      dataIndex: "issue_to_kareegar",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      align: 'center',
-      ...getColumnSearchProps('issue_to_kareegar'),
-    },
+    // {
+    //   title: "Assigned To",
+    //   dataIndex: "issue_to_kareegar",
+    //   render: text => (
+    //     <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+    //       {text}
+    //     </div>
+    //   ),
+    //   width: '10%',
+    //   align: 'center',
+    //   ...getColumnSearchProps('issue_to_kareegar'),
+    // },
     {
       title: "Action",
       key: "action",
@@ -612,7 +616,7 @@ const VijayTarPattaBook = () => {
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Vijay TarPatta Book
+                Manish Kareegar Book
               </div>
           </div>
           ) : screenWidth > 500 ? (
@@ -620,14 +624,14 @@ const VijayTarPattaBook = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Vijay TarPatta Book</div>
+              }} className="text-center text-[#00203FFF]" >Manish Kareegar Book</div>
 
             ): (
               <div style={{
                 fontSize: '250%',
                 fontWeight: 'bolder',
                 lineHeight: "2em",
-                }} className="text-center text-[#00203FFF]" >Vijay TarPatta Book</div>
+                }} className="text-center text-[#00203FFF]" >Manish Kareegar Book</div>
         )}
 
       <Modal
@@ -636,7 +640,7 @@ const VijayTarPattaBook = () => {
         onCancel={handleCancel}
         footer={null}
       >
-      <VijayTarPattaBookUpdate
+      <ManishKareegarBookUpdate
           handleOk={handleUpdateClose}
           textData={editModalData}
           />
@@ -658,7 +662,7 @@ const VijayTarPattaBook = () => {
                 {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
                 {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={1}>
-                  {meltingWtBalance}
+                  {tarpattaRecvBalance}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={2}>
                 </Table.Summary.Cell>
@@ -681,7 +685,7 @@ const VijayTarPattaBook = () => {
                   {lossBalance}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={8}></Table.Summary.Cell>
-                <Table.Summary.Cell index={9}></Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={9}></Table.Summary.Cell> */}
                 
               </Table.Summary.Row>
             </>
@@ -693,4 +697,4 @@ const VijayTarPattaBook = () => {
   );
 };
 
-export default VijayTarPattaBook;
+export default ManishKareegarBook;
