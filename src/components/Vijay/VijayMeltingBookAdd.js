@@ -391,7 +391,7 @@ function VijayMeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance,
           
           const backendData = {
             meltingDate: dayjs(date, "YYYY-MM-DD"),
-            description,
+            meltingDescription: description,
             meltingWeight: weightValues,
             meltingPurity: purityValues,
             meltingCategory: categoryValues,

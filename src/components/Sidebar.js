@@ -204,7 +204,7 @@ export default function Sidebar({ changeVisibility, isVisible }) {
                     className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                       Manish Kareegar
                   </ListItem>
-                  {/* <ListItem onClick={() => changePage("solder")}
+                  <ListItem onClick={() => changePage("solder")}
                     className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                       Solder
                   </ListItem>
@@ -212,7 +212,7 @@ export default function Sidebar({ changeVisibility, isVisible }) {
                     className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                       Joint
                   </ListItem>
-                  <ListItem onClick={() => changePage("shankar")}
+                  {/* <ListItem onClick={() => changePage("shankar")}
                     className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                       Shankar
                   </ListItem>

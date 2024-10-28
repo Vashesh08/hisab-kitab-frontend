@@ -54,7 +54,8 @@ function AddKareegar({ handleOk}){
             date: date,
             name: name,
             category: category,
-            kareegarCutoffDate: currentDate
+            kareegarCutoffDate: currentDate,
+            is_hidden_flag: false
             }
 
         await postKareegarData(backendData,token);

@@ -21,7 +21,10 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         setIsLoading(true);
 
         const token = localStorage.getItem("token");
-        setAllKareegarDetails(await getKareegarData(1, 100000000,token));
+        const data = await getKareegarData(1, 100000000, token);
+        const filteredData = data.filter(item => item.is_deleted_flag === false && item.is_hidden_flag === false);
+
+        setAllKareegarDetails(filteredData);
 
         setIsLoading(false);
     }
@@ -118,8 +121,10 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
       
       
         // console.log(kareegarId, "Delete ICon clicked");
-        
-        setAllKareegarDetails(await getKareegarData(1, 100000000, token));
+        const kareegar_data = await getKareegarData(1, 100000000, token);
+        const filteredData = kareegar_data.filter(item => item.is_deleted_flag === false && item.is_hidden_flag === false);
+
+        setAllKareegarDetails(filteredData);
         
         setIsDeleteModalOpen(false);
         setIsLoading(false);
@@ -136,7 +141,9 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         (async () => {
             setIsLoading(true);
             const token = localStorage.getItem("token");
-            setAllKareegarDetails(await getKareegarData(1, 100000000, token));
+            const data = await getKareegarData(1, 100000000, token);
+            const filteredData = data.filter(item => item.is_deleted_flag === false && item.is_hidden_flag === false);
+            setAllKareegarDetails(filteredData);
             // console.log(allKareegarDetails);
             setIsLoading(false);
         })();

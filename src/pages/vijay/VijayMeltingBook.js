@@ -529,14 +529,14 @@ const VijayMeltingBook = () => {
     },
     {
       title: "Description",
-      dataIndex: "description",
+      dataIndex: "meltingDescription",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('description'),
+      ...getColumnSearchProps('meltingDescription'),
     },
     {
       title: "Weight",

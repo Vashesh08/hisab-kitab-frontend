@@ -14,6 +14,7 @@ import VijayTarPattaBook from '../pages/vijay/VijayTarPattaBook';
 import VijayKareegarBook from '../pages/vijay/VijayKareegarBook';
 import ManishKareegarBook from '../pages/vijay/ManishKareegarBook';
 import Solder from '../pages/vijay/Solder';
+import Joint from '../pages/vijay/Joint';
 
 function SideNav({ currentPage, handlePageChange, isVisible }) {
     return (
@@ -68,6 +69,8 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
             <ManishKareegarBook />
           ) : currentPage === "solder" ?(
             <Solder />
+          ) : currentPage === "joint" ?(
+            <Joint />
           ) : (
             <Home />
           )

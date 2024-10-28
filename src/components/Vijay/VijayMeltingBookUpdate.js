@@ -60,7 +60,7 @@ function VijayMeltingBookUpdate({handleOk, textData}) {
         // }
         // await postGovindTarPattaBook(tarpattaData, token);
         
-        if ((textData.meltingIssueActual - recv_weight) >= 0){
+        if ((textData.meltingIssueActual - recv_weight) > 0){
           const lossData = {
             "type": "Vijay Melting",
             "date": textData.meltingDate,

@@ -13,7 +13,7 @@ import '../../style/pages.css';
 import Loading from "../../components/Loading.js";
 import { EditOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { fetchVijayStockList } from "../../api/vijayBook.js";
-import VijayTarPattaBookUpdate from "../../components/Vijay/VijayTarPattaBookUpdate.js";
+import VijaySolderUpdate from "../../components/Vijay/VijaySolderUpdate.js";
 
 const Solder = () => {
   const screenWidth = window.innerWidth;
@@ -54,7 +54,21 @@ const Solder = () => {
     const deleted_data = [];
     // console.log("data", data)
     
-    const docs = await fetchVijayStockList(page, itemsPerPage, token);
+    const originaldata = await fetchVijayStockList(page, itemsPerPage, token);
+    const docs = originaldata.flatMap(item => {
+      // If item has tags1 array
+      if (item.solderChainIssue.length > 0) {
+        console.log("Issue", item.solderChainIssue);
+        return item.solderChainIssue.map((tag, index) => ({
+          ...item,
+          solderChainIssue: tag,
+          index: index
+        }));
+      }
+      // If neither exists, return the item as is
+      return [];
+    });
+    console.log("Vashesh", docs);
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -127,15 +141,29 @@ const Solder = () => {
         (async () => {
 
         setIsLoading(true);
-            const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
         // send request to check authenticated
         const data = [];
         const deleted_data = [];
         // console.log("data", data)
-        
-        const docs = await fetchVijayStockList(page, itemsPerPage, token);
+
+        const originaldata = await fetchVijayStockList(page, itemsPerPage, token);
+        const docs = originaldata.flatMap(item => {
+          // If item has tags1 array
+          if (item.solderChainIssue.length > 0) {
+            // console.log("Issue", item.solderChainIssue);
+            return item.solderChainIssue.map((tag, index) => ({
+              ...item,
+              solderChainIssue: tag,
+              index: index
+            }));
+          }
+          // If neither exists, return the item as is
+          return [];
+        });
+        console.log("Vashesh", docs);
         setFullData(docs);
-        // console.log("data", docs);
+        
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_melting_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
               deleted_data.push(docs[eachEntry]);
@@ -320,8 +348,8 @@ const Solder = () => {
         setTimeout(() => searchInput.current?.select(), 100);
       }
     },
-    render: (text) =>
-      dataIndex === "tarpattaDate" ? (
+    render: (text, record) =>
+      dataIndex === "solderDate" ? (
         searchedColumn === dataIndex ? (<Highlighter
           highlightStyle={{
             backgroundColor: '#ffc069',
@@ -329,58 +357,70 @@ const Solder = () => {
           }}
           searchWords={[searchText]}
           autoEscape
-          textToHighlight={getFormattedDate(text) ? getFormattedDate(text).toString() : ''}
+          textToHighlight={getFormattedDate(text[record.index]) ? getFormattedDate(text[record.index]).toString() : ''}
         />
         ) : (
-          getFormattedDate(text)
-        )
-      ) : dataIndex === "tarpattaWeight" ?(
-        // searchedColumn === dataIndex ? (<Highlighter
-        //   highlightStyle={{
-        //     backgroundColor: '#ffc069',
-        //     padding: 0,
-        //   }}
-        //   searchWords={[searchText]}
-        //   autoEscape
-        //   textToHighlight={text ? (
-        //     text.join("\n")
-        //   ) : ''}
-        //   />
-        // ) : (
-          text && text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
+
+          text[record.index] === "2000-12-31T18:30:00.000Z" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+            <div style={{textAlign:"right"}}>{getFormattedDate(text[record.index])}</div>
           )
-          )
-        // )
-      ) : dataIndex === "tarpattaPurity" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+      )) : dataIndex === "solderChainIssue" ?(
+            <div style={{textAlign:"right"}}>{text}</div>
+      ) : dataIndex === "solderLotNo" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
+      ) : dataIndex === "solderItem" ?(
+        text[record.index] === "-1" ?(
+          <div style={{textAlign:"right"}}></div>
+        ):(
+        <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ) : dataIndex === "tarpattaConversion" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+      ) : dataIndex === "solderMelting" ?(
+        text[record.index] === "-1" ?(
+          <div style={{textAlign:"right"}}></div>
+        ):(
+        <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
+      ): dataIndex === "solderChainReceive" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ) : dataIndex === "tarpattaCategory" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"left"}}>{eachText}</div>
+      ): dataIndex === "solderBhuka" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
+      ): dataIndex === "solderTotal" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ): dataIndex === "tarpattaIssue" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+      ): dataIndex === "solderPowder" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
+      ): dataIndex === "solderR1" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ): dataIndex === "tarpattaReceive" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ): dataIndex === "tarpattaBhuka" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
+      ): dataIndex === "solderR2" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
       ):(
       searchedColumn === dataIndex ? (
@@ -401,11 +441,23 @@ const Solder = () => {
 
   const columns = [
     {
+      title: "Kareegar",
+      dataIndex: "issue_to_kareegar",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      ...getColumnSearchProps('issue_to_kareegar'),
+      align: 'center',
+    },
+    {
       title: "Date",
       dataIndex: "solderDate",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
+          {getFormattedDate(text)}
         </div>
       ),
       width: '10%',
@@ -417,7 +469,7 @@ const Solder = () => {
       dataIndex: "solderLotNo",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
-          {getFormattedDate(text)}
+          {text}
         </div>
       ),
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
@@ -661,7 +713,7 @@ const Solder = () => {
         onCancel={handleCancel}
         footer={null}
       >
-      <VijayTarPattaBookUpdate
+      <VijaySolderUpdate
           handleOk={handleUpdateClose}
           textData={editModalData}
           />
@@ -675,47 +727,48 @@ const Solder = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100']}}
-        summary={() => {
-          return (
-            <>
-              <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-                <Table.Summary.Cell index={0} className="" colSpan={1}>Total</Table.Summary.Cell> 
-                {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
-                {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
-                <Table.Summary.Cell index={1}>
-                  {meltingWtBalance}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={2}>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={3}>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={4}>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={5}>
-                  {/* {totalWeightQuantity} */}
-                  {issueBalance}
-                  </Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={5}>
-                  {totalIssueQuantity}
-                </Table.Summary.Cell> */}
-                  <Table.Summary.Cell index={6}>
-                  {receiveBalance}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={7}>
-                {bhukaBalance}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={8}>
-                  {lossBalance}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={9}></Table.Summary.Cell>
-                <Table.Summary.Cell index={10}></Table.Summary.Cell>
-                <Table.Summary.Cell index={11}></Table.Summary.Cell>
-                <Table.Summary.Cell index={12}></Table.Summary.Cell>
+        // summary={() => {
+        //   return (
+        //     <>
+        //       <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
+        //         <Table.Summary.Cell index={0} className="" colSpan={1}>Total</Table.Summary.Cell> 
+        //         {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
+        //         {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
+        //         <Table.Summary.Cell index={1}>
+        //           {meltingWtBalance}
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={2}>
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={3}>
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={4}>
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={5}>
+        //           {/* {totalWeightQuantity} */}
+        //           {issueBalance}
+        //           </Table.Summary.Cell>
+        //         {/* <Table.Summary.Cell index={5}>
+        //           {totalIssueQuantity}
+        //         </Table.Summary.Cell> */}
+        //           <Table.Summary.Cell index={6}>
+        //           {receiveBalance}
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={7}>
+        //         {bhukaBalance}
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={8}>
+        //           {lossBalance}
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={9}></Table.Summary.Cell>
+        //         <Table.Summary.Cell index={10}></Table.Summary.Cell>
+        //         <Table.Summary.Cell index={11}></Table.Summary.Cell>
+        //         <Table.Summary.Cell index={12}></Table.Summary.Cell>
+        //         <Table.Summary.Cell index={13}></Table.Summary.Cell>
                 
-              </Table.Summary.Row>
-            </>
-          );
-        }}
+        //       </Table.Summary.Row>
+        //     </>
+        //   );
+        // }}
       />
       <Divider />
     </div>

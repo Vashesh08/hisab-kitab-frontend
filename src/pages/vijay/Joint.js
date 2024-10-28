@@ -13,9 +13,9 @@ import '../../style/pages.css';
 import Loading from "../../components/Loading.js";
 import { EditOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { fetchVijayStockList } from "../../api/vijayBook.js";
-import VijayKareegarBookUpdate from "../../components/Vijay/VijayKareegarBookUpdate.js";
+import VijayJointUpdate from "../../components/Vijay/VijayJointUpdate.js";
 
-const VijayKareegarBook = () => {
+const Joint = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100000000); // Change this to show all
@@ -27,7 +27,7 @@ const VijayKareegarBook = () => {
   const [receiveBalance, setReceiveBalance] = useState(0);
   const [bhukaBalance, setBhukaBalance] = useState(0);
   const [lossBalance, setLossBalance] = useState(0);
-  const [tarpattaRecvBalance, setTarpattaRecvBalance] = useState(0);
+  const [meltingWtBalance, setMeltingWtBalance] = useState(0);
 
   const getFormattedDate = (date) => {
     if (date === undefined){
@@ -54,8 +54,22 @@ const VijayKareegarBook = () => {
     const deleted_data = [];
     // console.log("data", data)
     
-    const allData = await fetchVijayStockList(page, itemsPerPage, token);
-    const docs = allData.filter(item => item.issue_to_kareegar === "Vijay");
+    const originaldata = await fetchVijayStockList(page, itemsPerPage, token);
+    const filteredData = originaldata.flatMap(item => {
+      // If item has tags1 array
+      if (item.solderChainReceive && item.solderChainReceive.length > 0) {
+        console.log("Issue", item.solderChainReceive);
+        return item.solderChainReceive.map((tag, index) => ({
+          ...item,
+          solderChainReceive: tag,
+          index: index
+        }));
+      }
+      // If neither exists, return the item as is
+      return [];
+    });
+    const docs = filteredData.filter((item) => item.solderChainReceive !== "-1");
+    console.log("Vashesh", docs);
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -79,43 +93,42 @@ const VijayKareegarBook = () => {
       setRows(deleted_data);
     }
 
-    let totalTarpattaRecv = 0.000;
+    let totalMeltingWeight = 0.000;
     let totalRecvQty = 0.0;
     let totalIssueQty = 0.0;
     let totalLossQty = 0.0;
     let totalBhukaQty = 0.0;
-    data.forEach(({ tarpattaReceive, vijayReceive, vijayIssue, vijayBhuka, vijayLoss}) => {
+    data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
       // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
       if (isNaN(parseFloat(tarpattaReceive))) {
         tarpattaReceive = [0]; // Set it to zero if it's NaN
       } 
-      if (isNaN(parseFloat(vijayIssue))) {
-        vijayIssue = [0]; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(tarpattaIssue))) {
+        tarpattaIssue = [0]; // Set it to zero if it's NaN
       } 
-      if (isNaN(parseFloat(vijayReceive))){
-        vijayReceive = [0]; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(meltingReceive))){
+        meltingReceive = 0; // Set it to zero if it's NaN
       }
-      if (isNaN(parseFloat(vijayLoss))){
-        vijayLoss = 0; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(tarpattaLoss))){
+        tarpattaLoss = 0; // Set it to zero if it's NaN
       }
-      if (isNaN(parseFloat(vijayBhuka))){
-        vijayBhuka = [0]; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(tarpattaBhuka))){
+        tarpattaBhuka = [0]; // Set it to zero if it's NaN
       }
       // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
       // console.log(sumOfWeights);
+      const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
       const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfVijayIssue = vijayIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfVijayReceive = vijayReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfVijayBhuka = vijayBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
+      const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
       
-      totalTarpattaRecv += parseFloat(sumOfTarpattaReceive);
-      totalRecvQty += parseFloat(sumOfVijayReceive);
-      totalIssueQty += parseFloat(sumOfVijayIssue);
-      totalBhukaQty += parseFloat(sumOfVijayBhuka);
-      totalLossQty += parseFloat(vijayLoss);
+      totalMeltingWeight += parseFloat(meltingReceive);
+      totalRecvQty += parseFloat(sumOfTarpattaReceive);
+      totalIssueQty += parseFloat(sumOfTarpattaIssue);
+      totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
+      totalLossQty += parseFloat(tarpattaLoss);
     });
     // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-    setTarpattaRecvBalance(totalTarpattaRecv.toFixed(2));
+    setMeltingWtBalance(totalMeltingWeight.toFixed(2));
     setReceiveBalance(totalRecvQty.toFixed(2));
     setIssueBalance(totalIssueQty.toFixed(2));
     setBhukaBalance(totalBhukaQty.toFixed(2));
@@ -129,16 +142,30 @@ const VijayKareegarBook = () => {
         (async () => {
 
         setIsLoading(true);
-            const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
         // send request to check authenticated
         const data = [];
         const deleted_data = [];
         // console.log("data", data)
-        
-        const allData = await fetchVijayStockList(page, itemsPerPage, token);
-        const docs = allData.filter(item => item.issue_to_kareegar === "Vijay");
+
+        const originaldata = await fetchVijayStockList(page, itemsPerPage, token);
+        const filteredData = originaldata.flatMap(item => {
+          // If item has tags1 array
+          if (item.solderChainReceive && item.solderChainReceive.length > 0) {
+            // console.log("Issue", item.jointChainIssue);
+            return item.solderChainReceive.map((tag, index) => ({
+              ...item,
+              solderChainReceive: tag,
+              index: index
+            }));
+          }
+          // If neither exists, return the item as is
+          return [];
+        });
+        const docs = filteredData.filter((item) => item.solderChainReceive !== "-1");
+        console.log("Vashesh", docs);
         setFullData(docs);
-        // console.log("data", docs);
+        
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_melting_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
               deleted_data.push(docs[eachEntry]);
@@ -150,44 +177,44 @@ const VijayKareegarBook = () => {
         data.reverse();
         setRows(data);
 
-        let totalTarpattaRecv = 0.000;
+        let totalMeltingWeight = 0.000;
         let totalRecvQty = 0.0;
         let totalIssueQty = 0.0;
         let totalLossQty = 0.0;
         let totalBhukaQty = 0.0;
-        data.forEach(({ tarpattaReceive, vijayReceive, vijayIssue, vijayBhuka, vijayLoss}) => {
+        data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
           // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
+          // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
           if (isNaN(parseFloat(tarpattaReceive))) {
             tarpattaReceive = [0]; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(vijayIssue))) {
-            vijayIssue = [0]; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(vijayReceive))){
-            vijayReceive = [0]; // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(vijayLoss))){
-            vijayLoss = 0; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(tarpattaIssue))) {
+            tarpattaIssue = [0]; // Set it to zero if it's NaN
+          } 
+          if (isNaN(parseFloat(meltingReceive))){
+            meltingReceive = 0 // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(vijayBhuka))){
-            vijayBhuka = [0]; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(tarpattaLoss))){
+            tarpattaLoss = 0  // Set it to zero if it's NaN
+          }
+          if (isNaN(parseFloat(tarpattaBhuka))){
+            tarpattaBhuka = [0]; // Set it to zero if it's NaN
           }
           // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
           // console.log(sumOfWeights);
-          console.log(vijayReceive);
+          const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
           const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfVijayIssue = vijayIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfVijayReceive = vijayReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfVijayBhuka = vijayBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
+          const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
           
-          totalTarpattaRecv += parseFloat(sumOfTarpattaReceive);
-          totalRecvQty += parseFloat(sumOfVijayReceive);
-          totalIssueQty += parseFloat(sumOfVijayIssue);
-          totalBhukaQty += parseFloat(sumOfVijayBhuka);
-          totalLossQty += parseFloat(vijayLoss);
+          totalMeltingWeight += parseFloat(meltingReceive);
+          totalRecvQty += parseFloat(sumOfTarpattaReceive);
+          totalIssueQty += parseFloat(sumOfTarpattaIssue);
+          totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
+          totalLossQty += parseFloat(tarpattaLoss);
+              
         });
         // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-        setTarpattaRecvBalance(totalTarpattaRecv.toFixed(2));
+        setMeltingWtBalance(totalMeltingWeight.toFixed(2));
         setReceiveBalance(totalRecvQty.toFixed(2));
         setIssueBalance(totalIssueQty.toFixed(2));
         setBhukaBalance(totalBhukaQty.toFixed(2));
@@ -323,8 +350,8 @@ const VijayKareegarBook = () => {
         setTimeout(() => searchInput.current?.select(), 100);
       }
     },
-    render: (text) =>
-      dataIndex === "vijayDate" ? (
+    render: (text, record) =>
+      dataIndex === "jointDate" ? (
         searchedColumn === dataIndex ? (<Highlighter
           highlightStyle={{
             backgroundColor: '#ffc069',
@@ -332,58 +359,76 @@ const VijayKareegarBook = () => {
           }}
           searchWords={[searchText]}
           autoEscape
-          textToHighlight={getFormattedDate(text) ? getFormattedDate(text).toString() : ''}
+          textToHighlight={getFormattedDate(text[record.index]) ? getFormattedDate(text[record.index]).toString() : ''}
         />
         ) : (
-          getFormattedDate(text)
-        )
-      ) : dataIndex === "vijayWeight" ?(
-        // searchedColumn === dataIndex ? (<Highlighter
-        //   highlightStyle={{
-        //     backgroundColor: '#ffc069',
-        //     padding: 0,
-        //   }}
-        //   searchWords={[searchText]}
-        //   autoEscape
-        //   textToHighlight={text ? (
-        //     text.join("\n")
-        //   ) : ''}
-        //   />
-        // ) : (
-          text && text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
+
+          text[record.index] === "2000-12-31T18:30:00.000Z" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+            <div style={{textAlign:"right"}}>{getFormattedDate(text[record.index])}</div>
           )
-          )
-        // )
-      ) : dataIndex === "vijayPurity" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+      )) : dataIndex === "solderChainReceive" ?(
+            <div style={{textAlign:"right"}}>{text}</div>
+      ) : dataIndex === "jointLotNo" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
+      ) : dataIndex === "jointChainIssue" ?(
+        text[record.index] === "-1" ?(
+          <div style={{textAlign:"right"}}></div>
+        ):(
+        <div style={{textAlign:"right"}}>{text[record.index]}</div>
+      )
+    ) : dataIndex === "jointItem" ?(
+        text[record.index] === "-1" ?(
+          <div style={{textAlign:"right"}}></div>
+        ):(
+        <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ) : dataIndex === "vijayConversion" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+      ) : dataIndex === "jointMelting" ?(
+        text[record.index] === "-1" ?(
+          <div style={{textAlign:"right"}}></div>
+        ):(
+        <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
+      ): dataIndex === "jointChainReceive" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ) : dataIndex === "vijayCategory" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"left"}}>{eachText}</div>
+      ): dataIndex === "jointBhuka" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
+      ): dataIndex === "jointTotal" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ): dataIndex === "vijayIssue" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+      ): dataIndex === "jointPowder" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
+      ): dataIndex === "jointR1" ?(
+        text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ): dataIndex === "vijayReceive" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ): dataIndex === "vijayBhuka" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
+      ): dataIndex === "jointR2" ?(
+          text[record.index] === "-1" ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
       ):(
       searchedColumn === dataIndex ? (
@@ -404,47 +449,69 @@ const VijayKareegarBook = () => {
 
   const columns = [
     {
-      title: "Tarpatta Recv",
-      dataIndex: "tarpattaReceive",
-      render: text => (
-        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
-          {text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
-          )
-          )}
-        </div>
-      ),
-      width: '9%',
-      ...getColumnSearchProps('tarpattaReceive'),
-      align: 'right',
-    },
-    {
-      title: "Date",
-      dataIndex: "vijayDate",
-      render: text => (
-        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
-          {getFormattedDate(text)}
-        </div>
-      ),
-      sorter: (a, b) => new Date(a.date) - new Date(b.date),
-      width: '9%',
-      sortDirections: ['ascend', "descend", 'ascend'],
-      ...getColumnSearchProps('vijayDate'),
-    },
-    {
-      title: "Description",
-      dataIndex: "vijayDescription",
+      title: "Kareegar",
+      dataIndex: "issue_to_kareegar",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('vijayDescription'),
+      ...getColumnSearchProps('issue_to_kareegar'),
+      align: 'center',
     },
     {
-      title: "Issue",
-      dataIndex: "vijayIssue",
+      title: "Solder Chain(R)",
+      dataIndex: "solderChainReceive",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      ...getColumnSearchProps('solderChainReceive'),
+      align: 'center',
+    },
+    {
+      title: "Date",
+      dataIndex: "jointDate",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {getFormattedDate(text)}
+        </div>
+      ),
+      width: '10%',
+      ...getColumnSearchProps('jointDate'),
+      align: 'right',
+    },
+    {
+      title: "Lot No",
+      dataIndex: "jointLotNo",
+      render: text => (
+        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      sorter: (a, b) => new Date(a.date) - new Date(b.date),
+      width: '9%',
+      sortDirections: ['ascend', "descend", 'ascend'],
+      ...getColumnSearchProps('jointLotNo'),
+      align: 'right',
+    },
+    {
+      title: "Item",
+      dataIndex: "jointItem",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      ...getColumnSearchProps('jointItem'),
+    },
+    {
+      title: "Melting",
+      dataIndex: "jointMelting",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -454,12 +521,12 @@ const VijayKareegarBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('vijayIssue'),
+      ...getColumnSearchProps('jointMelting'),
       align: 'right',
     },
     {
-      title: "Receive",
-      dataIndex: "vijayReceive",
+      title: "Chain(I)",
+      dataIndex: "jointChainIssue",
       render: text => (
         <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -469,12 +536,12 @@ const VijayKareegarBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('vijayReceive'),
+      ...getColumnSearchProps('jointChainIssue'),
       align: 'right',
     },
     {
-      title: "Bhuka",
-      dataIndex: "vijayBhuka",
+      title: "Chain(R)",
+      dataIndex: "jointChainReceive",
       render: text => (
         <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -484,44 +551,69 @@ const VijayKareegarBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('vijayBhuka'),
+      ...getColumnSearchProps('jointChainReceive'),
       align: 'right',
     },
-    // {
-    //   title: "Issue Wt (F)",
-    //   dataIndex: "meltingIssue",
-    //   render: text => (
-    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   ...getColumnSearchProps('meltingIssue'),
-    // },
     {
-      title: "Loss",
-      dataIndex: "vijayLoss",
+      title: "Bhuka",
+      dataIndex: "jointBhuka",
       render: text => (
         <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('vijayLoss'),
+      ...getColumnSearchProps('jointBhuka'),
       align: 'right',
     },
-    // {
-    //   title: "Assigned To",
-    //   dataIndex: "issue_to_kareegar",
-    //   render: text => (
-    //     <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   align: 'center',
-    //   ...getColumnSearchProps('issue_to_kareegar'),
-    // },
+    {
+      title: "Total",
+      dataIndex: "jointTotal",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      align: 'center',
+      ...getColumnSearchProps('jointTotal'),
+    },
+    {
+      title: "Powder",
+      dataIndex: "jointPowder",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      align: 'center',
+      ...getColumnSearchProps('jointPowder'),
+    },
+    {
+      title: "R1",
+      dataIndex: "jointR1",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      align: 'center',
+      ...getColumnSearchProps('jointR1'),
+    },
+    {
+      title: "R2",
+      dataIndex: "jointR2",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      align: 'center',
+      ...getColumnSearchProps('jointR2'),
+    },
     {
       title: "Action",
       key: "action",
@@ -617,7 +709,7 @@ const VijayKareegarBook = () => {
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Vijay Kareegar Book
+                Vijay Joint Book
               </div>
           </div>
           ) : screenWidth > 500 ? (
@@ -625,14 +717,14 @@ const VijayKareegarBook = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Vijay Kareegar Book</div>
+              }} className="text-center text-[#00203FFF]" >Vijay Joint Book</div>
 
             ): (
               <div style={{
                 fontSize: '250%',
                 fontWeight: 'bolder',
                 lineHeight: "2em",
-                }} className="text-center text-[#00203FFF]" >Vijay Kareegar Book</div>
+                }} className="text-center text-[#00203FFF]" >Vijay Joint Book</div>
         )}
 
       <Modal
@@ -641,7 +733,7 @@ const VijayKareegarBook = () => {
         onCancel={handleCancel}
         footer={null}
       >
-      <VijayKareegarBookUpdate
+      <VijayJointUpdate
           handleOk={handleUpdateClose}
           textData={editModalData}
           />
@@ -655,47 +747,52 @@ const VijayKareegarBook = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100']}}
-        summary={() => {
-          return (
-            <>
-              <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-                <Table.Summary.Cell index={0} className="" colSpan={1}>Total</Table.Summary.Cell> 
-                {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
-                {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
-                <Table.Summary.Cell index={1}>
-                  {tarpattaRecvBalance}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={2}>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={3}>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={4}>
-                  {/* {totalWeightQuantity} */}
-                  {issueBalance}
-                  </Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={5}>
-                  {totalIssueQuantity}
-                </Table.Summary.Cell> */}
-                  <Table.Summary.Cell index={5}>
-                  {receiveBalance}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={6}>
-                {bhukaBalance}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={7}>
-                  {lossBalance}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={8}></Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={9}></Table.Summary.Cell> */}
+        // summary={() => {
+        //   return (
+        //     <>
+        //       <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
+        //         <Table.Summary.Cell index={0} className="" colSpan={1}>Total</Table.Summary.Cell> 
+        //         {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
+        //         {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
+        //         <Table.Summary.Cell index={1}>
+        //           {meltingWtBalance}
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={2}>
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={3}>
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={4}>
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={5}>
+        //           {/* {totalWeightQuantity} */}
+        //           {issueBalance}
+        //           </Table.Summary.Cell>
+        //         {/* <Table.Summary.Cell index={5}>
+        //           {totalIssueQuantity}
+        //         </Table.Summary.Cell> */}
+        //           <Table.Summary.Cell index={6}>
+        //           {receiveBalance}
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={7}>
+        //         {bhukaBalance}
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={8}>
+        //           {lossBalance}
+        //         </Table.Summary.Cell>
+        //         <Table.Summary.Cell index={9}></Table.Summary.Cell>
+        //         <Table.Summary.Cell index={10}></Table.Summary.Cell>
+        //         <Table.Summary.Cell index={11}></Table.Summary.Cell>
+        //         <Table.Summary.Cell index={12}></Table.Summary.Cell>
+        //         <Table.Summary.Cell index={13}></Table.Summary.Cell>
                 
-              </Table.Summary.Row>
-            </>
-          );
-        }}
+        //       </Table.Summary.Row>
+        //     </>
+        //   );
+        // }}
       />
       <Divider />
     </div>
   );
 };
 
-export default VijayKareegarBook;
+export default Joint;
