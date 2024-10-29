@@ -375,6 +375,11 @@ const VijayKareegarBook = () => {
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
+      ): dataIndex === "tarpattaReceive" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+        )
       ): dataIndex === "vijayReceive" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>

@@ -180,7 +180,7 @@ function ManishKareegarBookUpdate({handleOk, textData}) {
           }
           totalLossQty += totalIssueQty - totalReceiveQty - totalBhukaQty;
           
-          const temp = Array(numberOfReceiveItems).fill("-1");
+          // const temp = Array(numberOfReceiveItems).fill("-1");
 
           if (totalLossQty > 0){
             const backendData = {
@@ -190,29 +190,29 @@ function ManishKareegarBookUpdate({handleOk, textData}) {
               solderChainIssue: receiveWeightValues,
               manishBhuka: bhukaWeightValues,
               manishLoss: totalLossQty.toFixed(2),
-              solderDate: temp,
-              solderLotNo: temp,
-              solderItem: temp,
-              solderMelting: temp,
-              solderChainReceive: temp,
-              solderPowder: temp,
-              solderBhuka: temp,
-              solderTotal: temp,
-              solderR1: temp,
-              solderR2: temp,
-              is_solder_updated: temp,
-              jointDate: temp,
-              jointLotNo: temp,
-              jointItem: temp,
-              jointMelting: temp,
-              jointChainIssue: temp,
-              jointChainReceive: temp,
-              jointPowder: temp,
-              jointBhuka: temp,
-              jointTotal: temp,
-              jointR1: temp,
-              jointR2: temp,
-              is_joint_updated: temp,
+              // solderDate: temp,
+              // solderLotNo: temp,
+              // solderItem: temp,
+              // solderMelting: temp,
+              // solderChainReceive: temp,
+              // solderPowder: temp,
+              // solderBhuka: temp,
+              // solderTotal: temp,
+              // solderR1: temp,
+              // solderR2: temp,
+              // is_solder_updated: temp,
+              // jointDate: temp,
+              // jointLotNo: temp,
+              // jointItem: temp,
+              // jointMelting: temp,
+              // jointChainIssue: temp,
+              // jointChainReceive: temp,
+              // jointPowder: temp,
+              // jointBhuka: temp,
+              // jointTotal: temp,
+              // jointR1: temp,
+              // jointR2: temp,
+              // is_joint_updated: temp,
             }
 
             await updateVijayBook(backendData, token);
@@ -245,7 +245,7 @@ function ManishKareegarBookUpdate({handleOk, textData}) {
           }
           totalLossQty += totalIssueQty - totalReceiveQty - totalBhukaQty;
           
-          const temp = Array(numberOfReceiveItems).fill("-1");
+          // const temp = Array(numberOfReceiveItems).fill("-1");
 
           if (totalLossQty > 0){
             const backendData = {
@@ -255,29 +255,29 @@ function ManishKareegarBookUpdate({handleOk, textData}) {
               solderChainIssue: receiveWeightValues,
               manishBhuka: bhukaWeightValues,
               manishLoss: totalLossQty.toFixed(2),
-              solderDate: temp,
-              solderLotNo: temp,
-              solderItem: temp,
-              solderMelting: temp,
-              solderChainReceive: temp,
-              solderPowder: temp,
-              solderBhuka: temp,
-              solderTotal: temp,
-              solderR1: temp,
-              solderR2: temp,
-              is_solder_updated: temp,
-              jointDate: temp,
-              jointLotNo: temp,
-              jointItem: temp,
-              jointMelting: temp,
-              jointChainIssue: temp,
-              jointChainReceive: temp,
-              jointPowder: temp,
-              jointBhuka: temp,
-              jointTotal: temp,
-              jointR1: temp,
-              jointR2: temp,
-              is_joint_updated: temp,
+              // solderDate: temp,
+              // solderLotNo: temp,
+              // solderItem: temp,
+              // solderMelting: temp,
+              // solderChainReceive: temp,
+              // solderPowder: temp,
+              // solderBhuka: temp,
+              // solderTotal: temp,
+              // solderR1: temp,
+              // solderR2: temp,
+              // is_solder_updated: temp,
+              // jointDate: temp,
+              // jointLotNo: temp,
+              // jointItem: temp,
+              // jointMelting: temp,
+              // jointChainIssue: temp,
+              // jointChainReceive: temp,
+              // jointPowder: temp,
+              // jointBhuka: temp,
+              // jointTotal: temp,
+              // jointR1: temp,
+              // jointR2: temp,
+              // is_joint_updated: temp,
             }
 
             await updateVijayBook(backendData, token);

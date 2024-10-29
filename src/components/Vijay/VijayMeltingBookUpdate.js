@@ -43,13 +43,39 @@ function VijayMeltingBookUpdate({handleOk, textData}) {
           recv_weight,
           // issue22kActual
         } = user;
+        
+        const temp = Array(5).fill("-1");
+
         // console.log(recv_weight);
         const backendData = {
         _id: textData._id,
         // issue22kActual: issue22kActual,
         meltingReceive: String(recv_weight.toFixed(2)),
         meltingLoss: (textData.meltingIssueActual - recv_weight).toFixed(2),
-        is_melting_receiver_updated: true
+        is_melting_receiver_updated: true,
+        solderDate: temp,
+        solderLotNo: temp,
+        solderItem: temp,
+        solderMelting: temp,
+        solderChainReceive: temp,
+        solderPowder: temp,
+        solderBhuka: temp,
+        solderTotal: temp,
+        solderR1: temp,
+        solderR2: temp,
+        is_solder_updated: temp,
+        jointDate: temp,
+        jointLotNo: temp,
+        jointItem: temp,
+        jointMelting: temp,
+        jointChainIssue: temp,
+        jointChainReceive: temp,
+        jointPowder: temp,
+        jointBhuka: temp,
+        jointTotal: temp,
+        jointR1: temp,
+        jointR2: temp,
+        is_joint_updated: temp,
         };
         // console.log("Vashesh", backendData);
         await updateVijayBook(backendData, token);

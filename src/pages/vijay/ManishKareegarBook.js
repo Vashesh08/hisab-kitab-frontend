@@ -369,7 +369,13 @@ const ManishKareegarBook = () => {
           <div style={{textAlign:"left"}}>{eachText}</div>
         )
         )
+        
       ): dataIndex === "manishIssue" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+        )
+      ): dataIndex === "tarpattaReceive" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
