@@ -58,7 +58,7 @@ const VijayTarPattaBook = () => {
     setFullData(docs);
 
     for (let eachEntry in docs) {
-      if (docs[eachEntry].is_melting_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
+      if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
         deleted_data.push(docs[eachEntry]);
       }
       else{
@@ -137,7 +137,7 @@ const VijayTarPattaBook = () => {
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
-          if (docs[eachEntry].is_melting_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
+          if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
               deleted_data.push(docs[eachEntry]);
           }
           else{
@@ -230,7 +230,7 @@ const VijayTarPattaBook = () => {
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
-        if (dataIndex === "meltingDate"){
+        if (dataIndex === "tarpattaDate"){
           if (getFormattedDate(user[dataIndex]).toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
             array.push(user);
           }
@@ -542,7 +542,7 @@ const VijayTarPattaBook = () => {
     const array = [];
 
     rows.forEach( function(number){
-      if (number.is_melting_deleted_flag === false){
+      if (number.is_deleted_flag === false){
         array.push(number._id);
       }
     }
@@ -559,7 +559,7 @@ const VijayTarPattaBook = () => {
     selectedRowKeys,
     onChange: onSelectChange,
     getCheckboxProps: (record) => ({
-      disabled: record.is_melting_deleted_flag === true,
+      disabled: record.is_deleted_flag === true,
     }),
     selections: [
       {
@@ -595,7 +595,7 @@ const VijayTarPattaBook = () => {
 
   const getRowClassName = (record, i) => {
     // console.log(i, record, record._id)
-    return record.is_melting_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
+    return record.is_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
   };
 
   if (isLoading){
@@ -631,7 +631,7 @@ const VijayTarPattaBook = () => {
         )}
 
       <Modal
-        title="Add Receive Quantity"
+        title="Add Items"
         open={isEditModalOpen}
         onCancel={handleCancel}
         footer={null}

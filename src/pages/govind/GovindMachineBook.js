@@ -12,10 +12,10 @@ import Highlighter from 'react-highlight-words';
 import '../../style/pages.css';
 import Loading from "../../components/Loading.js";
 import { EditOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
-import { fetchVijayStockList } from "../../api/vijayBook.js";
-import VijayJointUpdate from "../../components/Vijay/VijayJointUpdate.js";
+import { fetchGovindStockList } from "../../api/govindBook.js";
+import GovindMachineBookUpdate from "../../components/Govind/GovindMachineBookUpdate.js";
 
-const Joint = () => {
+const GovindMachineBook = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100000000); // Change this to show all
@@ -27,7 +27,7 @@ const Joint = () => {
   const [receiveBalance, setReceiveBalance] = useState(0);
   const [bhukaBalance, setBhukaBalance] = useState(0);
   const [lossBalance, setLossBalance] = useState(0);
-  const [meltingWtBalance, setMeltingWtBalance] = useState(0);
+  const [tarpattaRecvBalance, setTarpattaRecvBalance] = useState(0);
 
   const getFormattedDate = (date) => {
     if (date === undefined){
@@ -54,22 +54,8 @@ const Joint = () => {
     const deleted_data = [];
     // console.log("data", data)
     
-    const originaldata = await fetchVijayStockList(page, itemsPerPage, token);
-    const filteredData = originaldata.flatMap(item => {
-      // If item has tags1 array
-      if (item.solderChainReceive && item.solderChainReceive.length > 0) {
-        console.log("Issue", item.solderChainReceive);
-        return item.solderChainReceive.map((tag, index) => ({
-          ...item,
-          solderChainReceive: tag,
-          index: index
-        }));
-      }
-      // If neither exists, return the item as is
-      return [];
-    });
-    const docs = filteredData.filter((item) => item.solderChainReceive !== "-1");
-    console.log("Vashesh", docs);
+    const allData = await fetchGovindStockList(page, itemsPerPage, token);
+    const docs = allData.filter(item => item.tarpattaReceive.length > 0);
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -93,47 +79,43 @@ const Joint = () => {
       setRows(deleted_data);
     }
 
-    let totalMeltingWeight = 0.000;
+    let totalTarpattaWt = 0.000;
     let totalRecvQty = 0.0;
     let totalIssueQty = 0.0;
     let totalLossQty = 0.0;
-    let totalBhukaQty = 0.0;
-    data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
+    data.forEach(({ tarpattaReceive, machineIssue, machineReceive, machineLoss}) => {
       // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
+      // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
       if (isNaN(parseFloat(tarpattaReceive))) {
         tarpattaReceive = [0]; // Set it to zero if it's NaN
+      }
+      if (isNaN(parseFloat(machineIssue))) {
+        machineIssue = [0]; // Set it to zero if it's NaN
       } 
-      if (isNaN(parseFloat(tarpattaIssue))) {
-        tarpattaIssue = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(meltingReceive))){
-        meltingReceive = 0; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(machineReceive))){
+        machineReceive = 0 // Set it to zero if it's NaN
       }
-      if (isNaN(parseFloat(tarpattaLoss))){
-        tarpattaLoss = 0; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(machineLoss))){
+        machineLoss = 0  // Set it to zero if it's NaN
       }
-      if (isNaN(parseFloat(tarpattaBhuka))){
-        tarpattaBhuka = [0]; // Set it to zero if it's NaN
-      }
-      // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-      // console.log(sumOfWeights);
-      const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
       
-      totalMeltingWeight += parseFloat(meltingReceive);
-      totalRecvQty += parseFloat(sumOfTarpattaReceive);
-      totalIssueQty += parseFloat(sumOfTarpattaIssue);
-      totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
-      totalLossQty += parseFloat(tarpattaLoss);
+      const sumOfTarpattaRecv = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
+      // console.log(sumOfWeights);
+      const sumOfMachineIssue = machineIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
+      // const sumOfMachineReceive = machineReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
+      
+      totalTarpattaWt += parseFloat(sumOfTarpattaRecv);
+      totalRecvQty += parseFloat(machineReceive);
+      totalIssueQty += parseFloat(sumOfMachineIssue);
+      totalLossQty += parseFloat(machineLoss);
+       
     });
     // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-    setMeltingWtBalance(totalMeltingWeight.toFixed(2));
+    setTarpattaRecvBalance(totalTarpattaWt.toFixed(2));
     setReceiveBalance(totalRecvQty.toFixed(2));
     setIssueBalance(totalIssueQty.toFixed(2));
-    setBhukaBalance(totalBhukaQty.toFixed(2));
     setLossBalance(totalLossQty.toFixed(2));
-    
+
     // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
@@ -142,30 +124,17 @@ const Joint = () => {
         (async () => {
 
         setIsLoading(true);
-        const token = localStorage.getItem("token");
+            const token = localStorage.getItem("token");
         // send request to check authenticated
         const data = [];
         const deleted_data = [];
         // console.log("data", data)
-
-        const originaldata = await fetchVijayStockList(page, itemsPerPage, token);
-        const filteredData = originaldata.flatMap(item => {
-          // If item has tags1 array
-          if (item.solderChainReceive && item.solderChainReceive.length > 0) {
-            // console.log("Issue", item.jointChainIssue);
-            return item.solderChainReceive.map((tag, index) => ({
-              ...item,
-              solderChainReceive: tag,
-              index: index
-            }));
-          }
-          // If neither exists, return the item as is
-          return [];
-        });
-        const docs = filteredData.filter((item) => item.solderChainReceive !== "-1");
-        console.log("Vashesh", docs);
-        setFullData(docs);
         
+        const allData = await fetchGovindStockList(page, itemsPerPage, token);
+        const docs = allData.filter(item => item.tarpattaReceive.length > 0);
+        setFullData(docs);
+    
+        // console.log("data", docs);
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
               deleted_data.push(docs[eachEntry]);
@@ -177,47 +146,45 @@ const Joint = () => {
         data.reverse();
         setRows(data);
 
-        let totalMeltingWeight = 0.000;
+        let totalTarpattaWt = 0.000;
         let totalRecvQty = 0.0;
         let totalIssueQty = 0.0;
         let totalLossQty = 0.0;
-        let totalBhukaQty = 0.0;
-        data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
+        data.forEach(({ tarpattaReceive, machineIssue, machineReceive, machineLoss}) => {
           // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
           // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
           if (isNaN(parseFloat(tarpattaReceive))) {
             tarpattaReceive = [0]; // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(tarpattaIssue))) {
-            tarpattaIssue = [0]; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(machineIssue))) {
+            machineIssue = [0]; // Set it to zero if it's NaN
           } 
-          if (isNaN(parseFloat(meltingReceive))){
-            meltingReceive = 0 // Set it to zero if it's NaN
+          if (isNaN(parseFloat(machineReceive))){
+            machineReceive = 0 // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(tarpattaLoss))){
-            tarpattaLoss = 0  // Set it to zero if it's NaN
+          if (isNaN(parseFloat(machineLoss))){
+            machineLoss = 0  // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(tarpattaBhuka))){
-            tarpattaBhuka = [0]; // Set it to zero if it's NaN
-          }
+          // if (isNaN(parseFloat(tarpattaBhuka))){
+          //   tarpattaBhuka = [0]; // Set it to zero if it's NaN
+          // }
           // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
           // console.log(sumOfWeights);
-          const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
+          const sumOfTarpattaRecv = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
+          const sumOfMachineIssue = machineIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
+          // const sumOfMachineReceive = machineReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
+          // const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
           
-          totalMeltingWeight += parseFloat(meltingReceive);
-          totalRecvQty += parseFloat(sumOfTarpattaReceive);
-          totalIssueQty += parseFloat(sumOfTarpattaIssue);
-          totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
-          totalLossQty += parseFloat(tarpattaLoss);
+          totalTarpattaWt += parseFloat(sumOfTarpattaRecv);
+          totalRecvQty += parseFloat(machineReceive);
+          totalIssueQty += parseFloat(sumOfMachineIssue);
+          totalLossQty += parseFloat(machineLoss);
               
         });
         // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-        setMeltingWtBalance(totalMeltingWeight.toFixed(2));
+        setTarpattaRecvBalance(totalTarpattaWt.toFixed(2));
         setReceiveBalance(totalRecvQty.toFixed(2));
         setIssueBalance(totalIssueQty.toFixed(2));
-        setBhukaBalance(totalBhukaQty.toFixed(2));
         setLossBalance(totalLossQty.toFixed(2));
         // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
 
@@ -260,7 +227,7 @@ const Joint = () => {
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
-        if (dataIndex === "jointDate"){
+        if (dataIndex === "machineDate"){
           if (getFormattedDate(user[dataIndex]).toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
             array.push(user);
           }
@@ -350,8 +317,8 @@ const Joint = () => {
         setTimeout(() => searchInput.current?.select(), 100);
       }
     },
-    render: (text, record) =>
-      dataIndex === "jointDate" ? (
+    render: (text) =>
+      dataIndex === "machineDate" ? (
         searchedColumn === dataIndex ? (<Highlighter
           highlightStyle={{
             backgroundColor: '#ffc069',
@@ -359,76 +326,58 @@ const Joint = () => {
           }}
           searchWords={[searchText]}
           autoEscape
-          textToHighlight={getFormattedDate(text[record.index]) ? getFormattedDate(text[record.index]).toString() : ''}
+          textToHighlight={getFormattedDate(text) ? getFormattedDate(text).toString() : ''}
         />
         ) : (
-
-          text[record.index] === "2000-12-31T18:30:00.000Z" ?(
-            <div style={{textAlign:"right"}}></div>
-          ):(
-            <div style={{textAlign:"right"}}>{getFormattedDate(text[record.index])}</div>
+          getFormattedDate(text)
+        )
+      ) : dataIndex === "tarpattaReceive" ?(
+        // searchedColumn === dataIndex ? (<Highlighter
+        //   highlightStyle={{
+        //     backgroundColor: '#ffc069',
+        //     padding: 0,
+        //   }}
+        //   searchWords={[searchText]}
+        //   autoEscape
+        //   textToHighlight={text ? (
+        //     text.join("\n")
+        //   ) : ''}
+        //   />
+        // ) : (
+          text && text.map((eachText) => (
+            <div style={{textAlign:"right"}}>{eachText}</div>
           )
-      )) : dataIndex === "solderChainReceive" ?(
-            <div style={{textAlign:"right"}}>{text}</div>
-      ) : dataIndex === "jointLotNo" ?(
-          text[record.index] === "-1" ?(
-            <div style={{textAlign:"right"}}></div>
-          ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
+          )
+        // )
+      ) : dataIndex === "tarpattaPurity" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
         )
-      ) : dataIndex === "jointChainIssue" ?(
-        text[record.index] === "-1" ?(
-          <div style={{textAlign:"right"}}></div>
-        ):(
-        <div style={{textAlign:"right"}}>{text[record.index]}</div>
-      )
-    ) : dataIndex === "jointItem" ?(
-        text[record.index] === "-1" ?(
-          <div style={{textAlign:"right"}}></div>
-        ):(
-        <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ) : dataIndex === "jointMelting" ?(
-        text[record.index] === "-1" ?(
-          <div style={{textAlign:"right"}}></div>
-        ):(
-        <div style={{textAlign:"right"}}>{text[record.index]}</div>
+      ) : dataIndex === "tarpattaConversion" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
         )
-      ): dataIndex === "jointChainReceive" ?(
-          text[record.index] === "-1" ?(
-            <div style={{textAlign:"right"}}></div>
-          ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ): dataIndex === "jointBhuka" ?(
-          text[record.index] === "-1" ?(
-            <div style={{textAlign:"right"}}></div>
-          ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
+      ) : dataIndex === "tarpattaCategory" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"left"}}>{eachText}</div>
         )
-      ): dataIndex === "jointTotal" ?(
-          text[record.index] === "-1" ?(
-            <div style={{textAlign:"right"}}></div>
-          ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ): dataIndex === "jointPowder" ?(
-          text[record.index] === "-1" ?(
-            <div style={{textAlign:"right"}}></div>
-          ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
+      ): dataIndex === "machineIssue" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
         )
-      ): dataIndex === "jointR1" ?(
-        text[record.index] === "-1" ?(
-            <div style={{textAlign:"right"}}></div>
-          ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
         )
-      ): dataIndex === "jointR2" ?(
-          text[record.index] === "-1" ?(
-            <div style={{textAlign:"right"}}></div>
-          ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
+      ): dataIndex === "tarpattaBhuka" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+        )
+      ): dataIndex === "tarpattaBhuka" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
         )
       ):(
       searchedColumn === dataIndex ? (
@@ -449,69 +398,45 @@ const Joint = () => {
 
   const columns = [
     {
-      title: "Kareegar",
-      dataIndex: "issue_to_kareegar",
+      title: "Tarpatta Recv",
+      dataIndex: "tarpattaReceive",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('issue_to_kareegar'),
-      align: 'center',
-    },
-    {
-      title: "Solder Chain(R)",
-      dataIndex: "solderChainReceive",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('solderChainReceive'),
-      align: 'center',
-    },
-    {
-      title: "Date",
-      dataIndex: "jointDate",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {getFormattedDate(text)}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('jointDate'),
+      ...getColumnSearchProps('tarpattaReceive'),
       align: 'right',
     },
     {
-      title: "Lot No",
-      dataIndex: "jointLotNo",
+      title: "Date",
+      dataIndex: "machineDate",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
-          {text}
+          {getFormattedDate(text)}
         </div>
       ),
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
       width: '9%',
       sortDirections: ['ascend', "descend", 'ascend'],
-      ...getColumnSearchProps('jointLotNo'),
+      ...getColumnSearchProps('machineDate'),
       align: 'right',
     },
     {
-      title: "Item",
-      dataIndex: "jointItem",
+      title: "Description",
+      dataIndex: "machineDescription",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('jointItem'),
+      ...getColumnSearchProps('machineDescription'),
     },
     {
-      title: "Melting",
-      dataIndex: "jointMelting",
+      title: "Issue",
+      dataIndex: "machineIssue",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -521,99 +446,71 @@ const Joint = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('jointMelting'),
+      ...getColumnSearchProps('machineIssue'),
       align: 'right',
     },
     {
-      title: "Chain(I)",
-      dataIndex: "jointChainIssue",
+      title: "Receive",
+      dataIndex: "machineReceive",
       render: text => (
         <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
-          {text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
-          )
-          )}
+          {text}          
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('jointChainIssue'),
+      ...getColumnSearchProps('machineReceive'),
       align: 'right',
     },
+    // {
+    //   title: "Bhuka",
+    //   dataIndex: "tarpattaBhuka",
+    //   render: text => (
+    //     <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
+    //       {text.map((eachText) => (
+    //         <div style={{textAlign:"right"}}>{eachText}</div>
+    //       )
+    //       )}
+    //     </div>
+    //   ),
+    //   width: '9%',
+    //   ...getColumnSearchProps('tarpattaBhuka'),
+    //   align: 'right',
+    // },
+    // {
+    //   title: "Issue Wt (F)",
+    //   dataIndex: "meltingIssue",
+    //   render: text => (
+    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+    //       {text}
+    //     </div>
+    //   ),
+    //   width: '10%',
+    //   ...getColumnSearchProps('meltingIssue'),
+    // },
     {
-      title: "Chain(R)",
-      dataIndex: "jointChainReceive",
-      render: text => (
-        <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
-          {text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
-          )
-          )}
-        </div>
-      ),
-      width: '9%',
-      ...getColumnSearchProps('jointChainReceive'),
-      align: 'right',
-    },
-    {
-      title: "Bhuka",
-      dataIndex: "jointBhuka",
+      title: "Loss",
+      dataIndex: "machineLoss",
       render: text => (
         <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('jointBhuka'),
+      ...getColumnSearchProps('machineLoss'),
       align: 'right',
     },
-    {
-      title: "Total",
-      dataIndex: "jointTotal",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      align: 'center',
-      ...getColumnSearchProps('jointTotal'),
-    },
-    {
-      title: "Powder",
-      dataIndex: "jointPowder",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      align: 'center',
-      ...getColumnSearchProps('jointPowder'),
-    },
-    {
-      title: "R1",
-      dataIndex: "jointR1",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      align: 'center',
-      ...getColumnSearchProps('jointR1'),
-    },
-    {
-      title: "R2",
-      dataIndex: "jointR2",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      align: 'center',
-      ...getColumnSearchProps('jointR2'),
-    },
+    // {
+    //   title: "Assigned To",
+    //   dataIndex: "issue_to_kareegar",
+    //   render: text => (
+    //     <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+    //       {text}
+    //     </div>
+    //   ),
+    //   width: '10%',
+    //   align: 'center',
+    //   ...getColumnSearchProps('issue_to_kareegar'),
+    // },
     {
       title: "Action",
       key: "action",
@@ -709,7 +606,7 @@ const Joint = () => {
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Vijay Joint Book
+                Govind Machine Book
               </div>
           </div>
           ) : screenWidth > 500 ? (
@@ -717,23 +614,23 @@ const Joint = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Vijay Joint Book</div>
+              }} className="text-center text-[#00203FFF]" >Govind Machine Book</div>
 
             ): (
               <div style={{
                 fontSize: '250%',
                 fontWeight: 'bolder',
                 lineHeight: "2em",
-                }} className="text-center text-[#00203FFF]" >Vijay Joint Book</div>
+                }} className="text-center text-[#00203FFF]" >Govind Machine Book</div>
         )}
 
       <Modal
-        title="Add Receive Quantity"
+        title="Add Items"
         open={isEditModalOpen}
         onCancel={handleCancel}
         footer={null}
       >
-      <VijayJointUpdate
+      <GovindMachineBookUpdate
           handleOk={handleUpdateClose}
           textData={editModalData}
           />
@@ -747,52 +644,47 @@ const Joint = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100']}}
-        // summary={() => {
-        //   return (
-        //     <>
-        //       <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-        //         <Table.Summary.Cell index={0} className="" colSpan={1}>Total</Table.Summary.Cell> 
-        //         {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
-        //         {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
-        //         <Table.Summary.Cell index={1}>
-        //           {meltingWtBalance}
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={2}>
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={3}>
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={4}>
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={5}>
-        //           {/* {totalWeightQuantity} */}
-        //           {issueBalance}
-        //           </Table.Summary.Cell>
-        //         {/* <Table.Summary.Cell index={5}>
-        //           {totalIssueQuantity}
-        //         </Table.Summary.Cell> */}
-        //           <Table.Summary.Cell index={6}>
-        //           {receiveBalance}
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={7}>
-        //         {bhukaBalance}
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={8}>
-        //           {lossBalance}
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={9}></Table.Summary.Cell>
-        //         <Table.Summary.Cell index={10}></Table.Summary.Cell>
-        //         <Table.Summary.Cell index={11}></Table.Summary.Cell>
-        //         <Table.Summary.Cell index={12}></Table.Summary.Cell>
-        //         <Table.Summary.Cell index={13}></Table.Summary.Cell>
+        summary={() => {
+          return (
+            <>
+              <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
+                <Table.Summary.Cell index={0} className="" colSpan={1}>Total</Table.Summary.Cell> 
+                {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
+                {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
+                <Table.Summary.Cell index={1}>
+                  {tarpattaRecvBalance}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={3}>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={4}>
+                  {/* {totalWeightQuantity} */}
+                  {issueBalance}
+                  </Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={5}>
+                  {totalIssueQuantity}
+                </Table.Summary.Cell> */}
+                  <Table.Summary.Cell index={5}>
+                  {receiveBalance}
+                </Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={6}>
+                {bhukaBalance}
+                </Table.Summary.Cell> */}
+                <Table.Summary.Cell index={7}>
+                  {lossBalance}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={8}></Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={9}></Table.Summary.Cell> */}
                 
-        //       </Table.Summary.Row>
-        //     </>
-        //   );
-        // }}
+              </Table.Summary.Row>
+            </>
+          );
+        }}
       />
       <Divider />
     </div>
   );
 };
 
-export default Joint;
+export default GovindMachineBook;

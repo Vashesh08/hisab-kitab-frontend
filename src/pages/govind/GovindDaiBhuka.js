@@ -12,10 +12,10 @@ import Highlighter from 'react-highlight-words';
 import '../../style/pages.css';
 import Loading from "../../components/Loading.js";
 import { EditOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
-import { fetchVijayStockList } from "../../api/vijayBook.js";
-import VijayKareegarBookUpdate from "../../components/Vijay/VijayKareegarBookUpdate.js";
+import { fetchGovindStockList } from "../../api/govindBook.js";
+import GovindDaiBhukaUpdate from "../../components/Govind/GovindDaiBhukaUpdate.js";
 
-const VijayKareegarBook = () => {
+const GovindDaiBhuka = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100000000); // Change this to show all
@@ -23,12 +23,10 @@ const VijayKareegarBook = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [editModalData, setEditModalData] = useState([]);
   const [fullData, setFullData] = useState([]);
-  const [issueBalance, setIssueBalance] = useState(0);
-  const [receiveBalance, setReceiveBalance] = useState(0);
-  const [bhukaBalance, setBhukaBalance] = useState(0);
-  const [lossBalance, setLossBalance] = useState(0);
-  const [tarpattaRecvBalance, setTarpattaRecvBalance] = useState(0);
-
+  const [machineIssueBalance, setMachineIssueBalance] = useState(0);
+  const [daiBhukaDaiBalance, setDaiBhukaDaiBalance] = useState(0);
+  const [daiBhukaBhukaBalance, setDaiBhukaBhukaBalance] = useState(0);
+  
   const getFormattedDate = (date) => {
     if (date === undefined){
       return ""
@@ -54,8 +52,8 @@ const VijayKareegarBook = () => {
     const deleted_data = [];
     // console.log("data", data)
     
-    const allData = await fetchVijayStockList(page, itemsPerPage, token);
-    const docs = allData.filter(item => item.issue_to_kareegar === "Vijay");
+    const allData = await fetchGovindStockList(page, itemsPerPage, token);
+    const docs = allData.filter(item => item.machineIssue.length > 0);
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -79,48 +77,35 @@ const VijayKareegarBook = () => {
       setRows(deleted_data);
     }
 
-    let totalTarpattaRecv = 0.000;
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    let totalLossQty = 0.0;
-    let totalBhukaQty = 0.0;
-    data.forEach(({ tarpattaReceive, vijayReceive, vijayIssue, vijayBhuka, vijayLoss}) => {
+    let totalDaiBhukaDaiQty = 0.000;
+    let totalmachineIssueQty = 0.0;
+    let totalDaiBhukaBhukaQty = 0.000;
+    data.forEach(({ machineIssue, daiBhukaDai, daiBhukaBhuka}) => {
       // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-      if (isNaN(parseFloat(tarpattaReceive))) {
-        tarpattaReceive = [0]; // Set it to zero if it's NaN
+      // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
+      if (isNaN(parseFloat(daiBhukaDai))) {
+        daiBhukaDai = [0]; // Set it to zero if it's NaN
+      }
+      if (isNaN(parseFloat(machineIssue))) {
+        machineIssue = [0]; // Set it to zero if it's NaN
       } 
-      if (isNaN(parseFloat(vijayIssue))) {
-        vijayIssue = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(vijayReceive))){
-        vijayReceive = [0]; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(daiBhukaBhuka))){
+        daiBhukaBhuka = [0] // Set it to zero if it's NaN
       }
-      if (isNaN(parseFloat(vijayLoss))){
-        vijayLoss = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(vijayBhuka))){
-        vijayBhuka = [0]; // Set it to zero if it's NaN
-      }
-      // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-      // console.log(sumOfWeights);
-      const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfVijayIssue = vijayIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfVijayReceive = vijayReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfVijayBhuka = vijayBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
       
-      totalTarpattaRecv += parseFloat(sumOfTarpattaReceive);
-      totalRecvQty += parseFloat(sumOfVijayReceive);
-      totalIssueQty += parseFloat(sumOfVijayIssue);
-      totalBhukaQty += parseFloat(sumOfVijayBhuka);
-      totalLossQty += parseFloat(vijayLoss);
+      const sumOfDaiBhukaDai = daiBhukaDai.map(Number).reduce((acc, curr) => acc + curr, 0)
+      const sumOfDaiBhukaBhuka = daiBhukaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0)
+      const sumOfMachineIssue = machineIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
+      
+      totalDaiBhukaDaiQty += parseFloat(sumOfDaiBhukaDai);
+      totalDaiBhukaBhukaQty += parseFloat(sumOfDaiBhukaBhuka);
+      totalmachineIssueQty += parseFloat(sumOfMachineIssue);
+       
     });
-    // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-    setTarpattaRecvBalance(totalTarpattaRecv.toFixed(2));
-    setReceiveBalance(totalRecvQty.toFixed(2));
-    setIssueBalance(totalIssueQty.toFixed(2));
-    setBhukaBalance(totalBhukaQty.toFixed(2));
-    setLossBalance(totalLossQty.toFixed(2));
-    
+    setMachineIssueBalance(totalmachineIssueQty);
+    setDaiBhukaDaiBalance(totalDaiBhukaDaiQty);
+    setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty);
+
     // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
@@ -135,8 +120,8 @@ const VijayKareegarBook = () => {
         const deleted_data = [];
         // console.log("data", data)
         
-        const allData = await fetchVijayStockList(page, itemsPerPage, token);
-        const docs = allData.filter(item => item.issue_to_kareegar === "Vijay");
+        const allData = await fetchGovindStockList(page, itemsPerPage, token);
+        const docs = allData.filter(item => item.machineIssue.length > 0);
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
@@ -150,50 +135,35 @@ const VijayKareegarBook = () => {
         data.reverse();
         setRows(data);
 
-        let totalTarpattaRecv = 0.000;
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        let totalLossQty = 0.0;
-        let totalBhukaQty = 0.0;
-        data.forEach(({ tarpattaReceive, vijayReceive, vijayIssue, vijayBhuka, vijayLoss}) => {
+        let totalDaiBhukaDaiQty = 0.000;
+        let totalmachineIssueQty = 0.0;
+        let totalDaiBhukaBhukaQty = 0.000;
+        data.forEach(({ machineIssue, daiBhukaDai, daiBhukaBhuka}) => {
           // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-          if (isNaN(parseFloat(tarpattaReceive))) {
-            tarpattaReceive = [0]; // Set it to zero if it's NaN
+          // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
+          if (isNaN(parseFloat(daiBhukaDai))) {
+            daiBhukaDai = [0]; // Set it to zero if it's NaN
+          }
+          if (isNaN(parseFloat(machineIssue))) {
+            machineIssue = [0]; // Set it to zero if it's NaN
           } 
-          if (isNaN(parseFloat(vijayIssue))) {
-            vijayIssue = [0]; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(vijayReceive))){
-            vijayReceive = [0]; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(daiBhukaBhuka))){
+            daiBhukaBhuka = [0] // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(vijayLoss))){
-            vijayLoss = 0; // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(vijayBhuka))){
-            vijayBhuka = [0]; // Set it to zero if it's NaN
-          }
-          // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-          // console.log(sumOfWeights);
-          // console.log(vijayReceive);
-          const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfVijayIssue = vijayIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfVijayReceive = vijayReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfVijayBhuka = vijayBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
           
-          totalTarpattaRecv += parseFloat(sumOfTarpattaReceive);
-          totalRecvQty += parseFloat(sumOfVijayReceive);
-          totalIssueQty += parseFloat(sumOfVijayIssue);
-          totalBhukaQty += parseFloat(sumOfVijayBhuka);
-          totalLossQty += parseFloat(vijayLoss);
+          const sumOfDaiBhukaDai = daiBhukaDai.map(Number).reduce((acc, curr) => acc + curr, 0)
+          const sumOfDaiBhukaBhuka = daiBhukaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0)
+          const sumOfMachineIssue = machineIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
+          
+          totalDaiBhukaDaiQty += parseFloat(sumOfDaiBhukaDai);
+          totalDaiBhukaBhukaQty += parseFloat(sumOfDaiBhukaBhuka);
+          totalmachineIssueQty += parseFloat(sumOfMachineIssue);
+           
         });
-        // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-        setTarpattaRecvBalance(totalTarpattaRecv.toFixed(2));
-        setReceiveBalance(totalRecvQty.toFixed(2));
-        setIssueBalance(totalIssueQty.toFixed(2));
-        setBhukaBalance(totalBhukaQty.toFixed(2));
-        setLossBalance(totalLossQty.toFixed(2));
-        // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
-
+        setMachineIssueBalance(totalmachineIssueQty);
+        setDaiBhukaDaiBalance(totalDaiBhukaDaiQty);
+        setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty);
+    
         setIsLoading(false);
     })();
   
@@ -233,7 +203,7 @@ const VijayKareegarBook = () => {
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
-        if (dataIndex === "vijayDate"){
+        if (dataIndex === "daiBhukaDate"){
           if (getFormattedDate(user[dataIndex]).toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
             array.push(user);
           }
@@ -324,7 +294,7 @@ const VijayKareegarBook = () => {
       }
     },
     render: (text) =>
-      dataIndex === "vijayDate" ? (
+      dataIndex === "daiBhukaDate" ? (
         searchedColumn === dataIndex ? (<Highlighter
           highlightStyle={{
             backgroundColor: '#ffc069',
@@ -337,7 +307,7 @@ const VijayKareegarBook = () => {
         ) : (
           getFormattedDate(text)
         )
-      ) : dataIndex === "vijayWeight" ?(
+      ) : dataIndex === "machineIssue" ?(
         // searchedColumn === dataIndex ? (<Highlighter
         //   highlightStyle={{
         //     backgroundColor: '#ffc069',
@@ -355,37 +325,32 @@ const VijayKareegarBook = () => {
           )
           )
         // )
-      ) : dataIndex === "vijayPurity" ?(
+      ) : dataIndex === "tarpattaPurity" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ) : dataIndex === "vijayConversion" ?(
+      ) : dataIndex === "tarpattaConversion" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ) : dataIndex === "vijayCategory" ?(
+      ) : dataIndex === "tarpattaCategory" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"left"}}>{eachText}</div>
         )
         )
-      ): dataIndex === "vijayIssue" ?(
+      ): dataIndex === "daiBhukaDai" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ): dataIndex === "tarpattaReceive" ?(
+      ): dataIndex === "daiBhukaBhuka" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ): dataIndex === "vijayReceive" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ): dataIndex === "vijayBhuka" ?(
+      ): dataIndex === "tarpattaBhuka" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
@@ -409,23 +374,20 @@ const VijayKareegarBook = () => {
 
   const columns = [
     {
-      title: "Tarpatta Recv",
-      dataIndex: "tarpattaReceive",
+      title: "Machine Issue",
+      dataIndex: "machineIssue",
       render: text => (
-        <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
-          {text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
-          )
-          )}
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
         </div>
       ),
-      width: '9%',
-      ...getColumnSearchProps('tarpattaReceive'),
+      width: '10%',
+      ...getColumnSearchProps('machineIssue'),
       align: 'right',
     },
     {
       title: "Date",
-      dataIndex: "vijayDate",
+      dataIndex: "daiBhukaDate",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
           {getFormattedDate(text)}
@@ -434,22 +396,23 @@ const VijayKareegarBook = () => {
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
       width: '9%',
       sortDirections: ['ascend', "descend", 'ascend'],
-      ...getColumnSearchProps('vijayDate'),
+      ...getColumnSearchProps('daiBhukaDate'),
+      align: 'right',
     },
     {
       title: "Description",
-      dataIndex: "vijayDescription",
+      dataIndex: "daiBhukaDescription",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('vijayDescription'),
+      ...getColumnSearchProps('daiBhukaDescription'),
     },
     {
-      title: "Issue",
-      dataIndex: "vijayIssue",
+      title: "Dai",
+      dataIndex: "daiBhukaDai",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -459,12 +422,12 @@ const VijayKareegarBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('vijayIssue'),
+      ...getColumnSearchProps('daiBhukaDai'),
       align: 'right',
     },
     {
-      title: "Receive",
-      dataIndex: "vijayReceive",
+      title: "Bhuka",
+      dataIndex: "daiBhukaBhuka",
       render: text => (
         <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -474,24 +437,24 @@ const VijayKareegarBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('vijayReceive'),
+      ...getColumnSearchProps('daiBhukaBhuka'),
       align: 'right',
     },
-    {
-      title: "Bhuka",
-      dataIndex: "vijayBhuka",
-      render: text => (
-        <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
-          {text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
-          )
-          )}
-        </div>
-      ),
-      width: '9%',
-      ...getColumnSearchProps('vijayBhuka'),
-      align: 'right',
-    },
+    // {
+    //   title: "Bhuka",
+    //   dataIndex: "tarpattaBhuka",
+    //   render: text => (
+    //     <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
+    //       {text.map((eachText) => (
+    //         <div style={{textAlign:"right"}}>{eachText}</div>
+    //       )
+    //       )}
+    //     </div>
+    //   ),
+    //   width: '9%',
+    //   ...getColumnSearchProps('tarpattaBhuka'),
+    //   align: 'right',
+    // },
     // {
     //   title: "Issue Wt (F)",
     //   dataIndex: "meltingIssue",
@@ -503,18 +466,18 @@ const VijayKareegarBook = () => {
     //   width: '10%',
     //   ...getColumnSearchProps('meltingIssue'),
     // },
-    {
-      title: "Loss",
-      dataIndex: "vijayLoss",
-      render: text => (
-        <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('vijayLoss'),
-      align: 'right',
-    },
+    // {
+    //   title: "Loss",
+    //   dataIndex: "machineLoss",
+    //   render: text => (
+    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+    //       {text}
+    //     </div>
+    //   ),
+    //   width: '10%',
+    //   ...getColumnSearchProps('machineLoss'),
+    //   align: 'right',
+    // },
     // {
     //   title: "Assigned To",
     //   dataIndex: "issue_to_kareegar",
@@ -622,7 +585,7 @@ const VijayKareegarBook = () => {
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Vijay Kareegar Book
+                Govind Dai + Bhuka Book
               </div>
           </div>
           ) : screenWidth > 500 ? (
@@ -630,23 +593,23 @@ const VijayKareegarBook = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Vijay Kareegar Book</div>
+              }} className="text-center text-[#00203FFF]" >Govind Dai + Bhuka Book</div>
 
             ): (
               <div style={{
                 fontSize: '250%',
                 fontWeight: 'bolder',
                 lineHeight: "2em",
-                }} className="text-center text-[#00203FFF]" >Vijay Kareegar Book</div>
+                }} className="text-center text-[#00203FFF]" >Govind Dai + Bhuka Book</div>
         )}
 
       <Modal
-        title="Add Receive Quantity"
+        title="Add Items"
         open={isEditModalOpen}
         onCancel={handleCancel}
         footer={null}
       >
-      <VijayKareegarBookUpdate
+      <GovindDaiBhukaUpdate
           handleOk={handleUpdateClose}
           textData={editModalData}
           />
@@ -668,7 +631,7 @@ const VijayKareegarBook = () => {
                 {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
                 {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={1}>
-                  {tarpattaRecvBalance}
+                  {machineIssueBalance}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={2}>
                 </Table.Summary.Cell>
@@ -676,20 +639,20 @@ const VijayKareegarBook = () => {
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={4}>
                   {/* {totalWeightQuantity} */}
-                  {issueBalance}
+                  {daiBhukaDaiBalance}
                   </Table.Summary.Cell>
                 {/* <Table.Summary.Cell index={5}>
                   {totalIssueQuantity}
                 </Table.Summary.Cell> */}
                   <Table.Summary.Cell index={5}>
-                  {receiveBalance}
+                  {daiBhukaBhukaBalance}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={6}>
+                {/* <Table.Summary.Cell index={6}>
                 {bhukaBalance}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={7}>
+                </Table.Summary.Cell> */}
+                {/* <Table.Summary.Cell index={7}>
                   {lossBalance}
-                </Table.Summary.Cell>
+                </Table.Summary.Cell> */}
                 <Table.Summary.Cell index={8}></Table.Summary.Cell>
                 {/* <Table.Summary.Cell index={9}></Table.Summary.Cell> */}
                 
@@ -703,4 +666,4 @@ const VijayKareegarBook = () => {
   );
 };
 
-export default VijayKareegarBook;
+export default GovindDaiBhuka;

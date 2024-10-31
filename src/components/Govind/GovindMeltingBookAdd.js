@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { fetchGovindMeltingBookList, postGovindMeltingBook } from "../../api/govind/govindMeltingBook.js";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "../Loading.js";
 import { Button, Form, Input, InputNumber, Select, DatePicker, AutoComplete } from "antd";
 import { getUtilityData, updateUtility } from "../../api/utility.js";
+import { fetchGovindStockList, postGovindStock } from "../../api/govindBook.js";
 
 function GovindMeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance, setClosing100Balance}) {
   const [form] = Form.useForm();
@@ -138,7 +138,7 @@ function GovindMeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance
     setIssueActualWt(totalRoundedNumber.toFixed(2));
     (async () => {
       const token = localStorage.getItem("token");
-      const docs = await fetchGovindMeltingBookList(1, 100000000, token);
+      const docs = await fetchGovindStockList(1, 100000000, token);
       // console.log(docs)
       if (docs.length > 0){
         const lastEntry = docs[docs.length - 1];
@@ -363,10 +363,10 @@ function GovindMeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance
       description,
       // issue22kActual
     } = user;
-  
+    
     let totalWeight = 0;
-    let totalWeight995 = 0
-    let totalWeight100 = 0
+    let totalWeight995 = 0;
+    let totalWeight100 = 0;
     let totalRoundedNumber = 0;
     for (let index = 0; index < numberOfItems; index++) {
       if (categoryType[index] === "Gold"){
@@ -386,33 +386,20 @@ function GovindMeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance
     
     form.resetFields();
 
-    // if (categoryType === "Bhuka"){
-    //   const backendData = {
-    //     date: moment(date).format("YYYY-MM-DD"),
-    //     description,
-    //     weight24k: weightValues,
-    //     purity: purityValues,
-    //     category: categoryType,
-    //     conversion: conversionValues,
-    //     issue22k: (totalRoundedNumber).toFixed(2),
-    //     };
-    //     await postGovindMeltingBook(backendData, token);
-    // }
-    // else{
         if ((parseFloat(totalWeight) <= parseFloat(balanceData[0]["meltingBookClosingBalance"])) && (parseFloat(totalWeight995) <= parseFloat(balanceData[0]["meltingBookClosing995Balance"])) && (parseFloat(totalWeight100) <= parseFloat(balanceData[0]["meltingBookClosing100Balance"]))){
 
           
           const backendData = {
-            date: dayjs(date, "YYYY-MM-DD"),
-            description,
-            weight24k: weightValues,
-            purity: purityValues,
-            category: categoryValues,
-            conversion: conversionValues,
-            issue22k: (totalRoundedNumber).toFixed(2),
-            issue22kActual: parseFloat(issueActualWt).toFixed(2),
+            meltingDate: dayjs(date, "YYYY-MM-DD"),
+            meltingDescription: description,
+            meltingWeight: weightValues,
+            meltingPurity: purityValues,
+            meltingCategory: categoryValues,
+            meltingConversion: conversionValues,
+            meltingIssue: (totalRoundedNumber).toFixed(2),
+            meltingIssueActual: parseFloat(issueActualWt).toFixed(2),
             };
-            await postGovindMeltingBook(backendData, token);
+            await postGovindStock(backendData, token);
             
             
         //   if (category === "Gold")
@@ -444,8 +431,6 @@ function GovindMeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance
       // }
 
       handleOk();
-    // const updated = await postGovindMeltingBook(backendData, token);
-    // console.log("Added ",updated);
     setIsLoading(false);
 
   };

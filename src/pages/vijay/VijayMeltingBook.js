@@ -76,7 +76,7 @@ const VijayMeltingBook = () => {
     setFullData(docs);
 
     for (let eachEntry in docs) {
-      if (docs[eachEntry].is_melting_deleted_flag){
+      if (docs[eachEntry].is_deleted_flag){
         deleted_data.push(docs[eachEntry]);
       }
       else{
@@ -170,7 +170,7 @@ const VijayMeltingBook = () => {
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
-          if (docs[eachEntry].is_melting_deleted_flag){
+          if (docs[eachEntry].is_deleted_flag){
             deleted_data.push(docs[eachEntry]);
           }
           else{
@@ -275,7 +275,7 @@ const VijayMeltingBook = () => {
       }
 
       for (let i = 0; i < docs.length; i++) {
-        if (docs[i]["_id"] === item && !docs[i]["is_melting_deleted_flag"]) {
+        if (docs[i]["_id"] === item && !docs[i]["is_deleted_flag"]) {
           // console.log(rows[i]);
 
             docs[i]["meltingWeight"].forEach((element, index) => {
@@ -637,7 +637,7 @@ const VijayMeltingBook = () => {
       
       render: (text, record, index) => (
         <>
-          {text.is_melting_receiver_updated || text.is_melting_deleted_flag ? (
+          {text.is_melting_receiver_updated || text.is_deleted_flag ? (
           <div></div>
         ) : (
           <div style={{ textAlign:"center"}}>
@@ -659,7 +659,7 @@ const VijayMeltingBook = () => {
     const array = [];
 
     rows.forEach( function(number){
-      if (number.is_melting_deleted_flag === false){
+      if (number.is_deleted_flag === false){
         array.push(number._id);
       }
     }
@@ -676,7 +676,7 @@ const VijayMeltingBook = () => {
     selectedRowKeys,
     onChange: onSelectChange,
     getCheckboxProps: (record) => ({
-      disabled: record.is_melting_deleted_flag === true,
+      disabled: record.is_deleted_flag === true,
     }),
     selections: [
       {
@@ -712,7 +712,7 @@ const VijayMeltingBook = () => {
 
   const getRowClassName = (record, i) => {
     // console.log(i, record, record._id)
-    return record.is_melting_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
+    return record.is_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
   };
 
   if (isLoading){

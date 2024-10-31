@@ -19,7 +19,7 @@ import { Tooltip } from 'antd';
 import { deleteLossAcctList, fetchLossAcctList } from "../../api/LossAcct.js";
 import { fetchGovindStockList, deleteGovindMeltingStockList } from "../../api/govindBook.js";
 
-const GovindMeltingBook = () => {
+const GovindCapMelting = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100000000); // Change this to show all
@@ -995,4 +995,4 @@ const GovindMeltingBook = () => {
   );
 };
 
-export default GovindMeltingBook;
+export default GovindCapMelting;

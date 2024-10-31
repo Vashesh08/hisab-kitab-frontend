@@ -7,14 +7,17 @@ import MeltingBook from '../pages/MeltingBook';
 import KareegarPage from '../pages/KareegarPage';
 import LossAcct from '../pages/LossAcct';
 import Polish from '../pages/Polish';
-import GovindMeltingBook from '../pages/govind/GovindMeltingBook';
-import GovindTarPattaBook from '../pages/govind/GovindTarPattaBook';
 import VijayMeltingBook from '../pages/vijay/VijayMeltingBook';
 import VijayTarPattaBook from '../pages/vijay/VijayTarPattaBook';
 import VijayKareegarBook from '../pages/vijay/VijayKareegarBook';
 import ManishKareegarBook from '../pages/vijay/ManishKareegarBook';
 import Solder from '../pages/vijay/Solder';
 import Joint from '../pages/vijay/Joint';
+import GovindMeltingBook from '../pages/govind/GovindMeltingBook';
+import GovindTarPattaBook from '../pages/govind/GovindTarPattaBook';
+import GovindMachineBook from '../pages/govind/GovindMachineBook';
+import GovindDaiBhuka from '../pages/govind/GovindDaiBhuka';
+import GovindCapMelting from '../pages/govindCapAccount/GovindCapMelting';
 
 function SideNav({ currentPage, handlePageChange, isVisible }) {
     return (
@@ -59,6 +62,10 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
             <GovindMeltingBook />
           ) : currentPage === "govindtarpatta" ?(
             <GovindTarPattaBook />
+          ) : currentPage === "govindmachine" ?(
+            <GovindMachineBook />
+          ) : currentPage === "govinddaibhuka" ?(
+            <GovindDaiBhuka />
           ) : currentPage === "vijaymeltingbook" ?(
             <VijayMeltingBook />
           ) : currentPage === "vijaytarpatta" ?(
@@ -71,6 +78,12 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
             <Solder />
           ) : currentPage === "joint" ?(
             <Joint />
+          // ) : currentPage === "babumelting" ?(
+          //   <Joint />
+          ) : currentPage === "govindcapmelting" ?(
+            <GovindCapMelting />
+          // ) : currentPage === "govindcapacccount" ?(
+          //   <Joint />
           ) : (
             <Home />
           )

@@ -232,7 +232,7 @@ const ManishKareegarBook = () => {
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
-        if (dataIndex === "meltingDate"){
+        if (dataIndex === "manishDate"){
           if (getFormattedDate(user[dataIndex]).toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
             array.push(user);
           }

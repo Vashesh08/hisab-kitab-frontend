@@ -9,17 +9,11 @@ import {
   Space, 
 } from "antd";
 import Highlighter from 'react-highlight-words';
-import { getUtilityData, updateUtility } from "../../api/utility.js";
-import { fetchGovindTarPattaBookList, deleteGovindTarPattaBookList } from "../../api/govind/govindTarPatta.js";
-import GovindMeltingBookAdd from "../../components/Govind/GovindMeltingBookAdd.js";
 import '../../style/pages.css';
 import Loading from "../../components/Loading.js";
-import GovindMeltingBookUpdate from "../../components/Govind/GovindMeltingBookUpdate.js";
-// import MeltingBookUpdate from "../../components/MeltingBookUpdate.js";
-import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
-import { Tooltip } from 'antd';
-import { deleteLossAcctList, fetchLossAcctList } from "../../api/LossAcct.js";
-// import { deleteLossAcctList, fetchLossAcctList } from "../../api/LossAcct.js";
+import { EditOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
+import { fetchGovindStockList } from "../../api/govindBook.js";
+import GovindTarPattaBookUpdate from "../../components/Govind/GovindTarPattaBookUpdate.js";
 
 const GovindTarPattaBook = () => {
   const screenWidth = window.innerWidth;
@@ -27,21 +21,18 @@ const GovindTarPattaBook = () => {
   const [itemsPerPage] = useState(100000000); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [updateData, setUpdateData] = useState([]);
+  const [editModalData, setEditModalData] = useState([]);
   const [fullData, setFullData] = useState([]);
-  const [totalWeightQuantity, setTotalWeight] = useState(0);
-  const [totalRecvQuantity, setTotalRecvQty] = useState(0);
-  const [totalIssueQuantity, setTotalIssueQty] = useState(0);
-  const [totalIssueActualQuantity, setTotalIssueActualQty] = useState(0);
-  const [totalLossQuantity, setTotalLossQty] = useState(0);
-  const [openingBalance, setOpeningBalance] = useState(0);
-  const [closingBalance, setClosingBalance] = useState(0);
-  const [opening995Balance, setOpening995Balance] = useState(0);
-  const [closing995Balance, setClosing995Balance] = useState(0);
-  const [opening100Balance, setOpening100Balance] = useState(0);
-  const [closing100Balance, setClosing100Balance] = useState(0);
+  const [issueBalance, setIssueBalance] = useState(0);
+  const [receiveBalance, setReceiveBalance] = useState(0);
+  const [bhukaBalance, setBhukaBalance] = useState(0);
+  const [lossBalance, setLossBalance] = useState(0);
+  const [meltingWtBalance, setMeltingWtBalance] = useState(0);
 
   const getFormattedDate = (date) => {
+    if (date === undefined){
+      return ""
+    }
     const dateEntry = date;
     const curDateEntry = new Date(dateEntry);
     
@@ -63,19 +54,12 @@ const GovindTarPattaBook = () => {
     const deleted_data = [];
     // console.log("data", data)
     
-    const balanceData = await getUtilityData(token);
-    setOpeningBalance(parseFloat(balanceData[0]["meltingBookOpeningBalance"]).toFixed(2));
-    setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2));
-    setOpening995Balance(parseFloat(balanceData[0]["meltingBookOpening995Balance"]).toFixed(2));
-    setClosing995Balance(parseFloat(balanceData[0]["meltingBookClosing995Balance"]).toFixed(2));
-    setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
-    setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
-
-    const docs = await fetchGovindTarPattaBookList(page, itemsPerPage, token);
+    const allData = await fetchGovindStockList(page, itemsPerPage, token);
+    const docs = allData.filter(item => item.meltingReceive.length > 0);
     setFullData(docs);
 
     for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag){
+      if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
         deleted_data.push(docs[eachEntry]);
       }
       else{
@@ -95,59 +79,52 @@ const GovindTarPattaBook = () => {
       setRows(deleted_data);
     }
 
-    let totalWeight = 0.000;
+    let totalMeltingWeight = 0.000;
     let totalRecvQty = 0.0;
     let totalIssueQty = 0.0;
     let totalLossQty = 0.0;
-    let totalIssueActualQty = 0.0;
-  //   data.forEach(({ weight24k, receive22k, issue22k, issue22kActual, loss22k}) => {
-  //     // console.log(weight24k, receive22k, issue22k, loss22k);
-  //     if (isNaN(parseFloat(receive22k))) {
-  //       receive22k = 0; // Set it to zero if it's NaN
-  //     } 
-  //     if (isNaN(parseFloat(issue22k))) {
-  //       issue22k = 0; // Set it to zero if it's NaN
-  //     } 
-  //     if (isNaN(parseFloat(weight24k))){
-  //       weight24k = 0; // Set it to zero if it's NaN
-  //     }
-  //     if (isNaN(parseFloat(loss22k))){
-  //       loss22k = 0; // Set it to zero if it's NaN
-  //     }
-  //     if (isNaN(parseFloat(issue22kActual))){
-  //       issue22kActual = 0; // Set it to zero if it's NaN
-  //     }
-  //     const sumOfWeights = weight24k.map(Number).reduce((acc, curr) => acc + curr, 0);
-  //     // console.log(sumOfWeights);
-  //     totalWeight += parseFloat(sumOfWeights);
-  //     totalRecvQty += parseFloat(receive22k);
-  //     totalIssueQty += parseFloat(issue22k);
-  //     totalIssueActualQty += parseFloat(issue22kActual);
-  //     totalLossQty += parseFloat(loss22k);
-  //   });
-  //   // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-  //   setTotalWeight(totalWeight.toFixed(2));
-  //   setTotalRecvQty(totalRecvQty.toFixed(2));
-  //   setTotalIssueQty(totalIssueQty.toFixed(2));
-  //   setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
-  //   setTotalLossQty(totalLossQty.toFixed(2));
+    let totalBhukaQty = 0.0;
+    data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
+      // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
+      if (isNaN(parseFloat(tarpattaReceive))) {
+        tarpattaReceive = [0]; // Set it to zero if it's NaN
+      } 
+      if (isNaN(parseFloat(tarpattaIssue))) {
+        tarpattaIssue = [0]; // Set it to zero if it's NaN
+      } 
+      if (isNaN(parseFloat(meltingReceive))){
+        meltingReceive = 0; // Set it to zero if it's NaN
+      }
+      if (isNaN(parseFloat(tarpattaLoss))){
+        tarpattaLoss = 0; // Set it to zero if it's NaN
+      }
+      if (isNaN(parseFloat(tarpattaBhuka))){
+        tarpattaBhuka = [0]; // Set it to zero if it's NaN
+      }
+      // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
+      // console.log(sumOfWeights);
+      const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
+      const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
+      const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
+      
+      totalMeltingWeight += parseFloat(meltingReceive);
+      totalRecvQty += parseFloat(sumOfTarpattaReceive);
+      totalIssueQty += parseFloat(sumOfTarpattaIssue);
+      totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
+      totalLossQty += parseFloat(tarpattaLoss);
+    });
+    // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
+    setMeltingWtBalance(totalMeltingWeight.toFixed(2));
+    setReceiveBalance(totalRecvQty.toFixed(2));
+    setIssueBalance(totalIssueQty.toFixed(2));
+    setBhukaBalance(totalBhukaQty.toFixed(2));
+    setLossBalance(totalLossQty.toFixed(2));
     
-  //   // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+    // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 
     useEffect(() => {
-        const handleKeyDown = (event) => {
-            // Check if the specific key combination is pressed
-            if ((event.ctrlKey && event.key === 'q') || (event.ctrlKey && event.key === 'Q')) { // Ctrl + S
-                event.preventDefault();
-                showModal();
-            }
-        };
-
-        // Add event listener for keydown event
-        window.addEventListener('keydown', handleKeyDown);
-
         (async () => {
 
         setIsLoading(true);
@@ -156,21 +133,14 @@ const GovindTarPattaBook = () => {
         const data = [];
         const deleted_data = [];
         // console.log("data", data)
-
-        const balanceData = await getUtilityData(token);
-        setOpeningBalance(parseFloat(balanceData[0]["meltingBookOpeningBalance"]).toFixed(2));
-        setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2))
-        setOpening995Balance(parseFloat(balanceData[0]["meltingBookOpening995Balance"]).toFixed(2));
-        setClosing995Balance(parseFloat(balanceData[0]["meltingBookClosing995Balance"]).toFixed(2));
-        setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
-        setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
-    
-        const docs = await fetchGovindTarPattaBookList(page, itemsPerPage, token);
+        
+        const allData = await fetchGovindStockList(page, itemsPerPage, token);
+        const docs = allData.filter(item => item.meltingReceive.length > 0);
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag){
-            deleted_data.push(docs[eachEntry]);
+          if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
+              deleted_data.push(docs[eachEntry]);
           }
           else{
             data.push(docs[eachEntry]);
@@ -179,158 +149,76 @@ const GovindTarPattaBook = () => {
         data.reverse();
         setRows(data);
 
-        let totalWeight = 0.000;
+        let totalMeltingWeight = 0.000;
         let totalRecvQty = 0.0;
         let totalIssueQty = 0.0;
         let totalLossQty = 0.0;
-        let totalIssueActualQty = 0.0;
-        data.forEach(({ weight24k, receive22k, issue22k, issue22kActual, loss22k}) => {
-          // console.log(weight24k, receive22k, issue22k, loss22k);
-          if (isNaN(parseFloat(receive22k))) {
-            receive22k = 0; // Set it to zero if it's NaN
+        let totalBhukaQty = 0.0;
+        data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
+          // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
+          // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
+          if (isNaN(parseFloat(tarpattaReceive))) {
+            tarpattaReceive = [0]; // Set it to zero if it's NaN
+          }
+          if (isNaN(parseFloat(tarpattaIssue))) {
+            tarpattaIssue = [0]; // Set it to zero if it's NaN
           } 
-          if (isNaN(parseFloat(issue22k))) {
-            issue22k = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(weight24k))){
-            weight24k = 0 // Set it to zero if it's NaN
+          if (isNaN(parseFloat(meltingReceive))){
+            meltingReceive = 0 // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(loss22k))){
-            loss22k = 0  // Set it to zero if it's NaN
+          if (isNaN(parseFloat(tarpattaLoss))){
+            tarpattaLoss = 0  // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(issue22kActual))){
-            issue22kActual = 0; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(tarpattaBhuka))){
+            tarpattaBhuka = [0]; // Set it to zero if it's NaN
           }
-          const sumOfWeights = weight24k.map(Number).reduce((acc, curr) => acc + curr, 0);
+          // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
           // console.log(sumOfWeights);
-          totalWeight += parseFloat(sumOfWeights);
-          totalRecvQty += parseFloat(receive22k);
-          totalIssueQty += parseFloat(issue22k);
-          totalIssueActualQty += parseFloat(issue22kActual);
-          totalLossQty += parseFloat(loss22k);
+          const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
+          const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
+          const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
+          
+          totalMeltingWeight += parseFloat(meltingReceive);
+          totalRecvQty += parseFloat(sumOfTarpattaReceive);
+          totalIssueQty += parseFloat(sumOfTarpattaIssue);
+          totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
+          totalLossQty += parseFloat(tarpattaLoss);
+              
         });
-        // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-        setTotalWeight(totalWeight.toFixed(2));
-        setTotalRecvQty(totalRecvQty.toFixed(2));
-        setTotalIssueQty(totalIssueQty.toFixed(2));
-        setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
-        setTotalLossQty(totalLossQty.toFixed(2));
+        // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
+        setMeltingWtBalance(totalMeltingWeight.toFixed(2));
+        setReceiveBalance(totalRecvQty.toFixed(2));
+        setIssueBalance(totalIssueQty.toFixed(2));
+        setBhukaBalance(totalBhukaQty.toFixed(2));
+        setLossBalance(totalLossQty.toFixed(2));
         // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
 
         setIsLoading(false);
     })();
-
-    // Clean up the event listener on component unmount
-    return () => {
-        window.removeEventListener('keydown', handleKeyDown);
-    };
   
     }, [page, itemsPerPage]);
 
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
 
   const showAddPopup = (text) => {
-    // console.log(text);
+    console.log("addpopup", text);
+    setEditModalData(text);
+    console.log("updateData",editModalData);
     setIsEditModalOpen(true);
-    setUpdateData(text)
   };
 
-  const showDeletePopup = (text) => {
-    setIsDeleteModalOpen(true)
-  }
-
-  const deleteModal = async () => {
-    setIsLoading(true);
-    const token = localStorage.getItem("token");
-    const meltingBookId = {
-      _id: selectedRowKeys
-    }
-    const balanceData = await getUtilityData(token);
-    const lossAcctData = await fetchLossAcctList(page, itemsPerPage, token);
-    const lossIds = [];
-    
-    let currMeltingBookClosingBalance = parseFloat(balanceData[0]["meltingBookClosingBalance"])
-    let currMeltingBookClosing995Balance = parseFloat(balanceData[0]["meltingBookClosing995Balance"])
-    let currMeltingBookClosing100Balance = parseFloat(balanceData[0]["meltingBookClosing100Balance"])
-
-    const docs = await fetchGovindTarPattaBookList(page, itemsPerPage, token);
-
-    // console.log(selectedRowKeys, rows);
-    selectedRowKeys.map((item, index) => {
-
-      const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Melting")
-      if (matchedData){
-        lossIds.push(matchedData._id);
-      }
-
-      for (let i = 0; i < docs.length; i++) {
-        if (docs[i]["_id"] === item && !docs[i]["is_deleted_flag"]) {
-          // console.log(rows[i]);
-
-            docs[i]["weight24k"].forEach((element, index) => {
-              console.log(element)
-              if (docs[i]["category"][index] === "Gold"){
-                if (parseFloat(docs[i]["purity"][index]) === 99.5){
-                  currMeltingBookClosing995Balance += parseFloat(element);
-                }
-                else if (parseFloat(docs[i]["purity"][index]) === 100){
-                  currMeltingBookClosing100Balance += parseFloat(element);
-                }
-                else{
-                  currMeltingBookClosingBalance += parseFloat(element);
-                }
-              }
-            });
-        }
-        }
-      }
-    )
-
-    const deleteFromLossAcct = {
-      lossId: lossIds,
-    }
-    await deleteLossAcctList(deleteFromLossAcct, token);
-
-    const utilityData = {
-      _id: balanceData[0]["_id"],
-      meltingBookClosingBalance: currMeltingBookClosingBalance,
-      meltingBookClosing995Balance: currMeltingBookClosing995Balance,
-      meltingBookClosing100Balance: currMeltingBookClosing100Balance,
-    }
-    await updateUtility(utilityData, token);
-
-    // console.log(meltingBookId);
-    await deleteGovindTarPattaBookList(meltingBookId, token);
-
-    await updateRows("valid");
-    setSelectedRowKeys([]);
-    setIsDeleteModalOpen(false);
-    setIsLoading(false);
-  }
   const handleCancel = () => {
-    // updateRows("valid");
-    setIsModalOpen(false);
+    updateRows("valid");
     setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
-    setUpdateData([]);
+    setEditModalData([]);
   };
 
   const handleUpdateClose = () => {
     updateRows("valid");
-    setIsModalOpen(false);
     setIsEditModalOpen(false);
-    setIsDeleteModalOpen(false);
-    setUpdateData([]);
+    setEditModalData([]);
   }
 
   const [searchText, setSearchText] = useState('');
@@ -344,7 +232,7 @@ const GovindTarPattaBook = () => {
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
-        if (dataIndex === "date"){
+        if (dataIndex === "tarpattaDate"){
           if (getFormattedDate(user[dataIndex]).toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
             array.push(user);
           }
@@ -435,7 +323,7 @@ const GovindTarPattaBook = () => {
       }
     },
     render: (text) =>
-      dataIndex === "date" ? (
+      dataIndex === "tarpattaDate" ? (
         searchedColumn === dataIndex ? (<Highlighter
           highlightStyle={{
             backgroundColor: '#ffc069',
@@ -448,7 +336,7 @@ const GovindTarPattaBook = () => {
         ) : (
           getFormattedDate(text)
         )
-      ) : dataIndex === "weight24k" ?(
+      ) : dataIndex === "tarpattaWeight" ?(
         // searchedColumn === dataIndex ? (<Highlighter
         //   highlightStyle={{
         //     backgroundColor: '#ffc069',
@@ -466,22 +354,37 @@ const GovindTarPattaBook = () => {
           )
           )
         // )
-      ) : dataIndex === "purity" ?(
+      ) : dataIndex === "tarpattaPurity" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ) : dataIndex === "conversion" ?(
+      ) : dataIndex === "tarpattaConversion" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ) : dataIndex === "category" ?(
+      ) : dataIndex === "tarpattaCategory" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"left"}}>{eachText}</div>
         )
         )
-      ): (
+      ): dataIndex === "tarpattaIssue" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+        )
+      ): dataIndex === "tarpattaReceive" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+        )
+      ): dataIndex === "tarpattaBhuka" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+        )
+      ):(
       searchedColumn === dataIndex ? (
         <Highlighter
           highlightStyle={{
@@ -500,8 +403,20 @@ const GovindTarPattaBook = () => {
 
   const columns = [
     {
+      title: "Melting Wt",
+      dataIndex: "meltingReceive",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      ...getColumnSearchProps('meltingReceive'),
+      align: 'right',
+    },
+    {
       title: "Date",
-      dataIndex: "date",
+      dataIndex: "tarpattaDate",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
           {getFormattedDate(text)}
@@ -510,36 +425,23 @@ const GovindTarPattaBook = () => {
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
       width: '9%',
       sortDirections: ['ascend', "descend", 'ascend'],
-      ...getColumnSearchProps('date'),
+      ...getColumnSearchProps('tarpattaDate'),
+      align: 'right',
     },
     {
-      title: "Goods",
-      dataIndex: "goods",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text.map((eachText) => (
-            <div style={{textAlign:"left"}}>{eachText}</div>
-          )
-          )}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('goods'),
-    },
-    {
-      title: "Melting Wt",
-      dataIndex: "meltingWt",
+      title: "Description",
+      dataIndex: "tarpattaDescription",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('meltingWt'),
+      ...getColumnSearchProps('tarpattaDescription'),
     },
     {
       title: "Issue",
-      dataIndex: "issue",
+      dataIndex: "tarpattaIssue",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -549,12 +451,12 @@ const GovindTarPattaBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('issue'),
+      ...getColumnSearchProps('tarpattaIssue'),
       align: 'right',
     },
     {
-      title: "Receive Wt",
-      dataIndex: "receive",
+      title: "Receive",
+      dataIndex: "tarpattaReceive",
       render: text => (
         <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -564,12 +466,12 @@ const GovindTarPattaBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('purity'),
+      ...getColumnSearchProps('tarpattaReceive'),
       align: 'right',
     },
     {
-      title: "Loss Qty",
-      dataIndex: "loss",
+      title: "Bhuka",
+      dataIndex: "tarpattaBhuka",
       render: text => (
         <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -579,55 +481,43 @@ const GovindTarPattaBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('loss'),
+      ...getColumnSearchProps('tarpattaBhuka'),
       align: 'right',
     },
     // {
     //   title: "Issue Wt (F)",
-    //   dataIndex: "issue22k",
+    //   dataIndex: "meltingIssue",
     //   render: text => (
     //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
     //       {text}
     //     </div>
     //   ),
     //   width: '10%',
-    //   ...getColumnSearchProps('issue22k'),
+    //   ...getColumnSearchProps('meltingIssue'),
     // },
+    {
+      title: "Loss",
+      dataIndex: "tarpattaLoss",
+      render: text => (
+        <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      ...getColumnSearchProps('tarpattaLoss'),
+      align: 'right',
+    },
     // {
-    //   title: "Issue Wt",
-    //   dataIndex: "issue22kActual",
+    //   title: "Assigned To",
+    //   dataIndex: "issue_to_kareegar",
     //   render: text => (
-    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
+    //     <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
     //       {text}
     //     </div>
     //   ),
     //   width: '10%',
-    //   ...getColumnSearchProps('issue22kActual'),
-    //   align: 'right',
-    // },
-    // {
-    //   title: "Receive Wt",
-    //   dataIndex: "receive22k",
-    //   render: text => (
-    //     <div style={{minWidth: '140px', maxWidth: '140px', whiteSpace:"nowrap !important", textAlign: 'center'}} className="whitespace-nowrap">
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '15%',
-    //   ...getColumnSearchProps('receive22k'),
-    //   align: 'right',
-    // },
-    // {
-    //   title: "Loss Qty",
-    //   dataIndex: "loss22k",
-    //   render: text => (
-    //     <div style={{minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '12%',
-    //   ...getColumnSearchProps('loss22k'),
-    //   align: 'right',
+    //   align: 'center',
+    //   ...getColumnSearchProps('issue_to_kareegar'),
     // },
     {
       title: "Action",
@@ -636,15 +526,11 @@ const GovindTarPattaBook = () => {
       
       render: (text, record, index) => (
         <>
-          {text.is_receiver_updated || text.is_deleted_flag ? (
-          <div></div>
-        ) : (
           <div style={{ textAlign:"center"}}>
           <Space>
             <EditOutlined style={{ color:"#1f2937", fontSize: '175%'}} onClick={() => showAddPopup(text)}/>
           </Space>
           </div>
-        )}
         </>
       )
     }
@@ -720,233 +606,41 @@ const GovindTarPattaBook = () => {
 
   return (
     <div>
-        {screenWidth > 953 ? (
-          <>
-            <div className="text-xl border-transparent flex justify-between items-center">
+      {screenWidth > 953 ? (
+          <div className="text-xl border-transparent flex justify-between items-center">
             <div style={{ 
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Govind Tar Patta Book
+                Govind TarPatta Book
               </div>
-
-              <div className="flex flex-col">
-                <div className="mb-1 flex justify-between items-center h-10">
-                <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto font-medium h-10 bg-[#ABD6DFFF] p-1 border-white border-x-2 border-y-1 flex items-center justify-center">
-                    <span className="!w-48 !h-10 !text-[#00203FFF] !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
-                    Purity
-                    </span>
-                    <span className="!w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
-                    99.5
-                    </span>
-                    <span className="!w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
-                    100
-                    </span>
-                    <span className="!w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1">
-                    Others
-                    </span>
-                  </div>
-                    <Tooltip title="Add" placement="topRight">
-                    <PlusCircleOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showModal} />
-                  </Tooltip>
-                </div>
-                <div className="flex justify-end h-10 mr-12">
-                <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto h-10 font-light	bg-[#ABD6DFFF] p-1 border-white border-x-2 border-y-1 flex items-center justify-center">
-                    <span className="!w-48 !h-10 !text-[#00203FFF] font-medium !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
-                    Opening Balance
-                    </span>
-                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
-                    {opening995Balance}
-                    </span>
-                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
-                    {opening100Balance}
-                    </span>
-                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1">
-                    {openingBalance}
-                    </span>
-                  </div>
-                    {/* <Tooltip title="Delete" placement="bottomRight">
-                    <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
-                  </Tooltip> */}
-                </div>
-                <div className="mt-1 flex justify-end h-10">
-                <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto h-10 font-light	bg-[#ABD6DFFF] p-1 border-white border-x-2 border-y-1 flex items-center justify-center">
-                    <span className="!w-48 !h-10 !text-[#00203FFF] font-medium !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
-                    Remaining Balance
-                    </span>
-                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
-                    {closing995Balance}
-                    </span>
-                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1 border-r-white border-r-2">
-                    {closing100Balance}
-                    </span>
-                    <span className="overflow-auto !w-24 !h-10 !text-[#00203FFF] text-right !text-lg py-1 pr-1 pl-1">
-                    {closingBalance}
-                    </span>
-                  </div>
-                    <Tooltip title="Delete" placement="bottomRight">
-                    <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
-                  </Tooltip>
-                </div>
-              </div>
-            </div>
-            <br/>
-          </>
-        ) : screenWidth > 500 ? (
-          <>
+          </div>
+          ) : screenWidth > 500 ? (
             <div style={{
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Govind Tar Patta Book</div>
+              }} className="text-center text-[#00203FFF]" >Govind TarPatta Book</div>
 
-          <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
-            <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
-            <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={showDeletePopup} />
-          </div>
-          
-          <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto h-10 font-medium bg-[#ABD6DFFF] p-1 border-white border-2 flex items-center justify-center">
-            <span className="!w-2/5 text-left !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
-            Purity
-            </span>
-            <span className="!w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
-            99.5
-            </span>
-            <span className="!w-1/5	text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
-            100
-            </span>
-            <span className="!w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1">
-            Others
-            </span>
-          </div>
-          <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto h-10 font-light bg-[#ABD6DFFF] p-1 border-white border-2 flex items-center justify-center">
-            <span className="!w-2/5 font-medium text-left !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
-            Opening Balance
-            </span>
-            <span className="overflow-auto !w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
-            {opening995Balance}
-            </span>
-            <span className="overflow-auto !w-1/5	text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
-            {opening100Balance}
-            </span>
-            <span className="overflow-auto !w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1">
-            {openingBalance}
-            </span>
-          </div>
-          <div className="rounded text-[#00203FFF] whitespace-nowrap w-auto h-10 font-light bg-[#ABD6DFFF] p-1 border-white border-2 flex items-center justify-center">
-            <span className="!w-2/5 font-medium text-left !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
-            Closing Balance
-            </span>
-            <span className="overflow-auto !w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
-            {closing995Balance}
-            </span>
-            <span className="overflow-auto !w-1/5	text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1 border-r-white border-r-2">
-            {closing100Balance}
-            </span>
-            <span className="overflow-auto !w-1/5 text-right !h-10 !text-[#00203FFF] py-2 pr-1 pl-1">
-            {closingBalance}
-            </span>
-          </div>
-          </>
-        ): (
-          <>
-            <div style={{
-              fontSize: '250%',
-              fontWeight: 'bolder',
-              lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Govind Tar Patta Book</div>
-
-          <div className="text-xl border-b-8 border-transparent border-t-4 pt-4	border-transparent flex justify-between items-center">
-            <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
-            <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={showDeletePopup} />
-          </div>
-          <div className="text-[#00203FFF] whitespace-nowrap w-auto h-10 font-medium bg-[#ABD6DFFF] p-2 border-white border-2 flex items-center justify-center">
-            <span className="overflow-x-auto !w-1/4 flex items-center justify-center text-left !h-10 !text-[#00203FFF] py-2 pr-10 pl-5 border-r-white border-r-2">
-            Purity
-            </span>
-            <span className="!w-1/4 flex items-center justify-center text-right !h-10 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
-            99.5
-            </span>
-            <span className="!w-1/4	flex items-center justify-center text-right !h-10 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
-            100
-            </span>
-            <span className="!w-1/4 flex items-center justify-center text-right !h-10 !text-[#00203FFF] py-2 pr-2 pl-10">
-            Others
-            </span>
-          </div>
-          <div className="text-[#00203FFF] !h-20 whitespace-nowrap w-auto font-light bg-[#ABD6DFFF] p-2 border-white border-2 flex items-center justify-center">
-            <span className="overflow-x-auto !w-1/4 font-medium flex items-center justify-center text-left !h-20 !text-[#00203FFF] whitespace-break-spaces py-2 pl-8 pr-8 border-r-white border-r-2">
-            Opening Balance
-            </span>
-            <span className="!w-1/4 flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
-            {opening995Balance}
-            </span>
-            <span className="!w-1/4	flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
-            {opening100Balance}
-            </span>
-            <span className="!w-1/4 flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10">
-            {openingBalance}
-            </span>
-          </div>
-          <div className="text-[#00203FFF] !h-20 whitespace-nowrap w-auto font-light bg-[#ABD6DFFF] p-2 border-white border-2 flex items-center justify-center">
-            <span className="overflow-x-auto !w-1/4 font-medium flex items-center justify-center text-left !h-20 !text-[#00203FFF] whitespace-break-spaces py-2 pl-4 border-r-white border-r-2">
-            Remaining Balance
-            </span>
-            <span className="overflow-x-auto !w-1/4 flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
-            {closing995Balance}
-            </span>
-            <span className="overflow-x-auto !w-1/4	flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10 border-r-white border-r-2">
-            {closing100Balance}
-            </span>
-            <span className="overflow-x-auto !w-1/4 flex items-center justify-center text-right !h-20 !text-[#00203FFF] py-2 pr-2 pl-10">
-            {closingBalance}
-            </span>
-          </div>
-          </>
+            ): (
+              <div style={{
+                fontSize: '250%',
+                fontWeight: 'bolder',
+                lineHeight: "2em",
+                }} className="text-center text-[#00203FFF]" >Govind TarPatta Book</div>
         )}
 
       <Modal
-        title="Add Item To Govind Melting Book"
-        open={isModalOpen}
-        onCancel={handleCancel}
-        footer={null}
-      >
-      <GovindMeltingBookAdd
-          handleOk={handleUpdateClose}
-          closingBalance={parseFloat(closingBalance)}
-          setClosingBalance={setClosingBalance}
-          setClosing995Balance={setClosing995Balance}
-          setClosing100Balance={setClosing100Balance}
-          />
-      </Modal>
-
-      <Modal
-        title="Are you sure you want to delete the selected rows ?"
-        open={isDeleteModalOpen}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <div className="flex justify-center	">
-        <Button className="bg-[#ABD6DFFF] mr-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={deleteModal}>
-            Yes
-        </Button>
-        <Button className="bg-[#ABD6DFFF] ml-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={handleCancel}>
-            No
-        </Button>
-        </div>
-      </Modal>
-
-      <Modal
-        title="Add Receive Quantity"
+        title="Add Items"
         open={isEditModalOpen}
         onCancel={handleCancel}
         footer={null}
       >
-      <GovindMeltingBookUpdate
+      <GovindTarPattaBookUpdate
           handleOk={handleUpdateClose}
-          textData={updateData}
+          textData={editModalData}
           />
       </Modal>
 
@@ -962,31 +656,35 @@ const GovindTarPattaBook = () => {
           return (
             <>
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-                <Table.Summary.Cell index={0} className="" colSpan={4}>Total</Table.Summary.Cell>
+                <Table.Summary.Cell index={0} className="" colSpan={1}>Total</Table.Summary.Cell> 
                 {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
                 {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
+                <Table.Summary.Cell index={1}>
+                  {meltingWtBalance}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                </Table.Summary.Cell>
                 <Table.Summary.Cell index={3}>
-                  {totalWeightQuantity}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={4}>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={3}>
                   {/* {totalWeightQuantity} */}
-                </Table.Summary.Cell>
+                  {issueBalance}
+                  </Table.Summary.Cell>
                 {/* <Table.Summary.Cell index={5}>
                   {totalIssueQuantity}
                 </Table.Summary.Cell> */}
+                  <Table.Summary.Cell index={5}>
+                  {receiveBalance}
+                </Table.Summary.Cell>
                 <Table.Summary.Cell index={6}>
-                  {totalIssueActualQuantity}
-                  {/* Add Total Issue Weight {totalIssueQuantity} */}
+                {bhukaBalance}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={7}>
-                  {totalRecvQuantity}
+                  {lossBalance}
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={8}>
-                  {totalLossQuantity}
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={9}></Table.Summary.Cell>
+                <Table.Summary.Cell index={8}></Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={9}></Table.Summary.Cell> */}
+                
               </Table.Summary.Row>
             </>
           );

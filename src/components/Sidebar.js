@@ -121,7 +121,7 @@ export default function Sidebar({ changeVisibility, isVisible }) {
               </List>
             </AccordionBody>
             </Accordion>
-          {/* <Accordion
+          <Accordion
             open={open === 3}
             icon={
               <ChevronDownIcon
@@ -155,17 +155,17 @@ export default function Sidebar({ changeVisibility, isVisible }) {
                   className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                     Machine
                 </ListItem>
-                <ListItem onClick={() => changePage("govinddaibhukha")}
+                <ListItem onClick={() => changePage("govinddaibhuka")}
                   className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                     Dai + Bhukha
                 </ListItem>
-                <ListItem onClick={() => changePage("govinddai")}
+                {/* <ListItem onClick={() => changePage("govinddai")}
                   className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                     Dai + (83.50 + 75 A/C)
-                </ListItem>
+                </ListItem> */}
               </List>
             </AccordionBody>
-            </Accordion> */}
+            </Accordion>
             <Accordion
             open={open === 4}
             icon={
@@ -223,6 +223,41 @@ export default function Sidebar({ changeVisibility, isVisible }) {
                 </List>
               </AccordionBody>
             </Accordion>
+            {/* <Accordion
+            open={open === 5}
+            icon={
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`mx-auto h-4 w-4 transition-transform ${open === 4 ? "rotate-180" : ""}`}
+              />
+            }
+          >
+            <ListItem className="p-0" selected={open === 5}>
+            <AccordionHeader onClick={() => handleOpen(5)} className="border-b-0 p-3 text-white hover:text-black active:text-black">
+              <ListItemPrefix>
+                <BookOpenIcon className="h-5 w-5" />
+              </ListItemPrefix>
+              <Typography className="mr-auto font-normal">
+                Govind Cap Account
+              </Typography>
+            </AccordionHeader>
+          </ListItem>
+          
+              <AccordionBody className="py-1">
+                <List className="p-0 items-center">
+                  <ListItem onClick={() => changePage("govindcapmelting")}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Cap Melting
+                  </ListItem>
+                </List>
+                <List className="p-0 items-center">
+                  <ListItem onClick={() => changePage("govindcapaccount")}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Cap Account
+                  </ListItem>
+                </List>
+              </AccordionBody>
+            </Accordion> */}
             </>
           ):(
             <></>

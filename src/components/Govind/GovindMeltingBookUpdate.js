@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { updateGovindMeltingBook } from "../../api/govind/govindMeltingBook.js";
+import { updateGovindBook } from "../../api/govindBook.js";
 import Loading from "../Loading.js";
 import { Button, Form, InputNumber } from "antd";
 import { postLossAcct } from "../../api/LossAcct.js";
-import { postGovindTarPattaBook } from "../../api/govind/govindTarPatta.js";
+
 
 function GovindMeltingBookUpdate({handleOk, textData}) {
     const [form] = Form.useForm();
@@ -43,29 +43,56 @@ function GovindMeltingBookUpdate({handleOk, textData}) {
           recv_weight,
           // issue22kActual
         } = user;
+        
+        const temp = Array(5).fill("-1");
+
         // console.log(recv_weight);
         const backendData = {
         _id: textData._id,
         // issue22kActual: issue22kActual,
-        receive22k: String(recv_weight),
-        loss22k: (textData.issue22kActual - recv_weight).toFixed(2)
+        meltingReceive: String(recv_weight.toFixed(2)),
+        meltingLoss: (textData.meltingIssueActual - recv_weight).toFixed(2),
+        is_melting_receiver_updated: true,
+        solderDate: temp,
+        solderLotNo: temp,
+        solderItem: temp,
+        solderMelting: temp,
+        solderChainReceive: temp,
+        solderPowder: temp,
+        solderBhuka: temp,
+        solderTotal: temp,
+        solderR1: temp,
+        solderR2: temp,
+        is_solder_updated: temp,
+        jointDate: temp,
+        jointLotNo: temp,
+        jointItem: temp,
+        jointMelting: temp,
+        jointChainIssue: temp,
+        jointChainReceive: temp,
+        jointPowder: temp,
+        jointBhuka: temp,
+        jointTotal: temp,
+        jointR1: temp,
+        jointR2: temp,
+        is_joint_updated: temp,
         };
         // console.log("Vashesh", backendData);
-        await updateGovindMeltingBook(backendData, token);
+        await updateGovindBook(backendData, token);
 
-        const tarpattaData = {
-            meltingWt: recv_weight,
-            meltingId: textData._id,
-        }
-        await postGovindTarPattaBook(tarpattaData, token);
+        // const tarpattaData = {
+        //     meltingWt: recv_weight,
+        //     meltingId: textData._id,
+        // }
+        // await postGovindTarPattaBook(tarpattaData, token);
         
-        if ((textData.issue22kActual - recv_weight) >= 0){
+        if ((textData.meltingIssueActual - recv_weight) > 0){
           const lossData = {
-            "type": "Melting",
-            "date": textData.date,
-            "lossWt": (textData.issue22kActual - recv_weight).toFixed(2),
+            "type": "Govind Melting",
+            "date": textData.meltingDate,
+            "lossWt": (textData.meltingIssueActual - recv_weight).toFixed(2),
             "transactionId": textData._id,
-            "description": "Melting Loss"
+            "description": "Govind Melting Loss"
           }
           await postLossAcct(lossData, token)
         }
