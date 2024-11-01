@@ -53,7 +53,8 @@ const GovindDaiBhuka = () => {
     // console.log("data", data)
     
     const allData = await fetchGovindStockList(page, itemsPerPage, token);
-    const docs = allData.filter(item => item.machineIssue.length > 0);
+    const filteredData = allData.filter(item => item.machineIssue.length > 0);
+    const docs = filteredData.filter(item => item.is_assigned_to === "Dai + Bhuka");
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -121,7 +122,8 @@ const GovindDaiBhuka = () => {
         // console.log("data", data)
         
         const allData = await fetchGovindStockList(page, itemsPerPage, token);
-        const docs = allData.filter(item => item.machineIssue.length > 0);
+        const filteredData = allData.filter(item => item.machineIssue.length > 0);
+        const docs = filteredData.filter(item => item.is_assigned_to === "Dai + Bhuka");
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {

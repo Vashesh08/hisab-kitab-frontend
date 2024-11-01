@@ -17,6 +17,7 @@ import GovindMeltingBook from '../pages/govind/GovindMeltingBook';
 import GovindTarPattaBook from '../pages/govind/GovindTarPattaBook';
 import GovindMachineBook from '../pages/govind/GovindMachineBook';
 import GovindDaiBhuka from '../pages/govind/GovindDaiBhuka';
+import GovindDaiBhuka835 from '../pages/govind/GovindDaiBhuka835';
 import GovindCapMelting from '../pages/govindCapAccount/GovindCapMelting';
 
 function SideNav({ currentPage, handlePageChange, isVisible }) {
@@ -66,6 +67,8 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
             <GovindMachineBook />
           ) : currentPage === "govinddaibhuka" ?(
             <GovindDaiBhuka />
+          ) : currentPage === "govinddaibhuka835" ?(
+            <GovindDaiBhuka835 />
           ) : currentPage === "vijaymeltingbook" ?(
             <VijayMeltingBook />
           ) : currentPage === "vijaytarpatta" ?(

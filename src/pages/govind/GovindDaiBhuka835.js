@@ -13,9 +13,9 @@ import '../../style/pages.css';
 import Loading from "../../components/Loading.js";
 import { EditOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { fetchGovindStockList } from "../../api/govindBook.js";
-import GovindMachineBookUpdate from "../../components/Govind/GovindMachineBookUpdate.js";
+import GovindDaiBhuka835Update from "../../components/Govind/GovindDaiBhuka835Update.js";
 
-const GovindMachineBook = () => {
+const GovindDaiBhuka835 = () => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
   const [itemsPerPage] = useState(100000000); // Change this to show all
@@ -23,12 +23,10 @@ const GovindMachineBook = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [editModalData, setEditModalData] = useState([]);
   const [fullData, setFullData] = useState([]);
-  const [issueBalance, setIssueBalance] = useState(0);
-  const [receiveBalance, setReceiveBalance] = useState(0);
-  const [bhukaBalance, setBhukaBalance] = useState(0);
-  const [lossBalance, setLossBalance] = useState(0);
-  const [tarpattaRecvBalance, setTarpattaRecvBalance] = useState(0);
-
+  const [machineIssueBalance, setMachineIssueBalance] = useState(0);
+  const [daiBhukaDaiBalance, setDaiBhukaDaiBalance] = useState(0);
+  const [daiBhukaBhukaBalance, setDaiBhukaBhukaBalance] = useState(0);
+  
   const getFormattedDate = (date) => {
     if (date === undefined){
       return ""
@@ -55,7 +53,8 @@ const GovindMachineBook = () => {
     // console.log("data", data)
     
     const allData = await fetchGovindStockList(page, itemsPerPage, token);
-    const docs = allData.filter(item => item.tarpattaReceive.length > 0);
+    const filteredData = allData.filter(item => item.machineIssue.length > 0);
+    const docs = filteredData.filter(item => item.is_assigned_to === "83.50 + 75 A/C");
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -79,42 +78,34 @@ const GovindMachineBook = () => {
       setRows(deleted_data);
     }
 
-    let totalTarpattaWt = 0.000;
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    let totalLossQty = 0.0;
-    data.forEach(({ tarpattaReceive, machineIssue, machineReceive, machineLoss}) => {
+    let totalDaiBhukaDaiQty = 0.000;
+    let totalmachineIssueQty = 0.0;
+    let totalDaiBhukaBhukaQty = 0.000;
+    data.forEach(({ machineIssue, daiBhuka835Dai, daiBhuka835Bhuka}) => {
       // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
       // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
-      if (isNaN(parseFloat(tarpattaReceive))) {
-        tarpattaReceive = [0]; // Set it to zero if it's NaN
+      if (isNaN(parseFloat(daiBhuka835Dai))) {
+        daiBhuka835Dai = [0]; // Set it to zero if it's NaN
       }
       if (isNaN(parseFloat(machineIssue))) {
         machineIssue = [0]; // Set it to zero if it's NaN
       } 
-      if (isNaN(parseFloat(machineReceive))){
-        machineReceive = 0 // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(machineLoss))){
-        machineLoss = 0  // Set it to zero if it's NaN
+      if (isNaN(parseFloat(daiBhuka835Bhuka))){
+        daiBhuka835Bhuka = [0] // Set it to zero if it's NaN
       }
       
-      const sumOfTarpattaRecv = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      // console.log(sumOfWeights);
+      const sumOfDaiBhukaDai = daiBhuka835Dai.map(Number).reduce((acc, curr) => acc + curr, 0)
+      const sumOfDaiBhukaBhuka = daiBhuka835Bhuka.map(Number).reduce((acc, curr) => acc + curr, 0)
       const sumOfMachineIssue = machineIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-      // const sumOfMachineReceive = machineReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
       
-      totalTarpattaWt += parseFloat(sumOfTarpattaRecv);
-      totalRecvQty += parseFloat(machineReceive);
-      totalIssueQty += parseFloat(sumOfMachineIssue);
-      totalLossQty += parseFloat(machineLoss);
+      totalDaiBhukaDaiQty += parseFloat(sumOfDaiBhukaDai);
+      totalDaiBhukaBhukaQty += parseFloat(sumOfDaiBhukaBhuka);
+      totalmachineIssueQty += parseFloat(sumOfMachineIssue);
        
     });
-    // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-    setTarpattaRecvBalance(totalTarpattaWt.toFixed(2));
-    setReceiveBalance(totalRecvQty.toFixed(2));
-    setIssueBalance(totalIssueQty.toFixed(2));
-    setLossBalance(totalLossQty.toFixed(2));
+    setMachineIssueBalance(totalmachineIssueQty);
+    setDaiBhukaDaiBalance(totalDaiBhukaDaiQty);
+    setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty);
 
     // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
@@ -131,9 +122,9 @@ const GovindMachineBook = () => {
         // console.log("data", data)
         
         const allData = await fetchGovindStockList(page, itemsPerPage, token);
-        const docs = allData.filter(item => item.tarpattaReceive.length > 0);
+        const filteredData = allData.filter(item => item.machineIssue.length > 0);
+        const docs = filteredData.filter(item => item.is_assigned_to === "83.50 + 75 A/C");
         setFullData(docs);
-    
         // console.log("data", docs);
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
@@ -146,48 +137,35 @@ const GovindMachineBook = () => {
         data.reverse();
         setRows(data);
 
-        let totalTarpattaWt = 0.000;
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        let totalLossQty = 0.0;
-        data.forEach(({ tarpattaReceive, machineIssue, machineReceive, machineLoss}) => {
+        let totalDaiBhukaDaiQty = 0.000;
+        let totalmachineIssueQty = 0.0;
+        let totalDaiBhukaBhukaQty = 0.000;
+        data.forEach(({ machineIssue, daiBhuka835Dai, daiBhuka835Bhuka}) => {
           // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
           // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
-          if (isNaN(parseFloat(tarpattaReceive))) {
-            tarpattaReceive = [0]; // Set it to zero if it's NaN
+          if (isNaN(parseFloat(daiBhuka835Dai))) {
+            daiBhuka835Dai = [0]; // Set it to zero if it's NaN
           }
           if (isNaN(parseFloat(machineIssue))) {
             machineIssue = [0]; // Set it to zero if it's NaN
           } 
-          if (isNaN(parseFloat(machineReceive))){
-            machineReceive = 0 // Set it to zero if it's NaN
+          if (isNaN(parseFloat(daiBhuka835Bhuka))){
+            daiBhuka835Bhuka = [0] // Set it to zero if it's NaN
           }
-          if (isNaN(parseFloat(machineLoss))){
-            machineLoss = 0  // Set it to zero if it's NaN
-          }
-          // if (isNaN(parseFloat(tarpattaBhuka))){
-          //   tarpattaBhuka = [0]; // Set it to zero if it's NaN
-          // }
-          // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-          // console.log(sumOfWeights);
-          const sumOfTarpattaRecv = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfMachineIssue = machineIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-          // const sumOfMachineReceive = machineReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          // const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
           
-          totalTarpattaWt += parseFloat(sumOfTarpattaRecv);
-          totalRecvQty += parseFloat(machineReceive);
-          totalIssueQty += parseFloat(sumOfMachineIssue);
-          totalLossQty += parseFloat(machineLoss);
-              
+          const sumOfDaiBhukaDai = daiBhuka835Dai.map(Number).reduce((acc, curr) => acc + curr, 0)
+          const sumOfDaiBhukaBhuka = daiBhuka835Bhuka.map(Number).reduce((acc, curr) => acc + curr, 0)
+          const sumOfMachineIssue = machineIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
+          
+          totalDaiBhukaDaiQty += parseFloat(sumOfDaiBhukaDai);
+          totalDaiBhukaBhukaQty += parseFloat(sumOfDaiBhukaBhuka);
+          totalmachineIssueQty += parseFloat(sumOfMachineIssue);
+           
         });
-        // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-        setTarpattaRecvBalance(totalTarpattaWt.toFixed(2));
-        setReceiveBalance(totalRecvQty.toFixed(2));
-        setIssueBalance(totalIssueQty.toFixed(2));
-        setLossBalance(totalLossQty.toFixed(2));
-        // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
-
+        setMachineIssueBalance(totalmachineIssueQty);
+        setDaiBhukaDaiBalance(totalDaiBhukaDaiQty);
+        setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty);
+    
         setIsLoading(false);
     })();
   
@@ -227,7 +205,7 @@ const GovindMachineBook = () => {
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
-        if (dataIndex === "machineDate"){
+        if (dataIndex === "daiBhuka835Date"){
           if (getFormattedDate(user[dataIndex]).toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
             array.push(user);
           }
@@ -318,7 +296,7 @@ const GovindMachineBook = () => {
       }
     },
     render: (text) =>
-      dataIndex === "machineDate" ? (
+      dataIndex === "daiBhuka835Date" ? (
         searchedColumn === dataIndex ? (<Highlighter
           highlightStyle={{
             backgroundColor: '#ffc069',
@@ -331,7 +309,7 @@ const GovindMachineBook = () => {
         ) : (
           getFormattedDate(text)
         )
-      ) : dataIndex === "tarpattaReceive" ?(
+      ) : dataIndex === "machineIssue" ?(
         // searchedColumn === dataIndex ? (<Highlighter
         //   highlightStyle={{
         //     backgroundColor: '#ffc069',
@@ -364,7 +342,12 @@ const GovindMachineBook = () => {
           <div style={{textAlign:"left"}}>{eachText}</div>
         )
         )
-      ): dataIndex === "machineIssue" ?(
+      ): dataIndex === "daiBhuka835Dai" ?(
+        text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+        )
+      ): dataIndex === "daiBhuka835Bhuka" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
@@ -374,13 +357,6 @@ const GovindMachineBook = () => {
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ): dataIndex === "tarpattaBhuka" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ): dataIndex === "is_assigned_to" ?(
-          <div style={{textAlign:"right"}}>{text}</div>
       ):(
       searchedColumn === dataIndex ? (
         <Highlighter
@@ -400,20 +376,20 @@ const GovindMachineBook = () => {
 
   const columns = [
     {
-      title: "Tarpatta Recv",
-      dataIndex: "tarpattaReceive",
+      title: "Machine Issue",
+      dataIndex: "machineIssue",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('tarpattaReceive'),
+      ...getColumnSearchProps('machineIssue'),
       align: 'right',
     },
     {
       title: "Date",
-      dataIndex: "machineDate",
+      dataIndex: "daiBhuka835Date",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto'}}>
           {getFormattedDate(text)}
@@ -422,23 +398,23 @@ const GovindMachineBook = () => {
       sorter: (a, b) => new Date(a.date) - new Date(b.date),
       width: '9%',
       sortDirections: ['ascend', "descend", 'ascend'],
-      ...getColumnSearchProps('machineDate'),
+      ...getColumnSearchProps('daiBhuka835Date'),
       align: 'right',
     },
     {
       title: "Description",
-      dataIndex: "machineDescription",
+      dataIndex: "daiBhuka835Description",
       render: text => (
         <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
           {text}
         </div>
       ),
       width: '10%',
-      ...getColumnSearchProps('machineDescription'),
+      ...getColumnSearchProps('daiBhuka835Description'),
     },
     {
-      title: "Issue",
-      dataIndex: "machineIssue",
+      title: "Dai",
+      dataIndex: "daiBhuka835Dai",
       render: text => (
         <div style={{ minWidth: '85px', maxWidth: '85px', overflow: 'auto', textAlign: 'center'}}>
           {text.map((eachText) => (
@@ -448,70 +424,23 @@ const GovindMachineBook = () => {
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('machineIssue'),
+      ...getColumnSearchProps('daiBhuka835Dai'),
       align: 'right',
     },
     {
-      title: "Receive",
-      dataIndex: "machineReceive",
+      title: "Bhuka",
+      dataIndex: "daiBhuka835Bhuka",
       render: text => (
         <div style={{minWidth: '85px', maxWidth: '85px',  overflow: 'auto', textAlign: 'center'}}>
-          {text}          
+          {text.map((eachText) => (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )}
         </div>
       ),
       width: '9%',
-      ...getColumnSearchProps('machineReceive'),
+      ...getColumnSearchProps('daiBhuka835Bhuka'),
       align: 'right',
-    },
-    // {
-    //   title: "Bhuka",
-    //   dataIndex: "tarpattaBhuka",
-    //   render: text => (
-    //     <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
-    //       {text.map((eachText) => (
-    //         <div style={{textAlign:"right"}}>{eachText}</div>
-    //       )
-    //       )}
-    //     </div>
-    //   ),
-    //   width: '9%',
-    //   ...getColumnSearchProps('tarpattaBhuka'),
-    //   align: 'right',
-    // },
-    // {
-    //   title: "Issue Wt (F)",
-    //   dataIndex: "meltingIssue",
-    //   render: text => (
-    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   ...getColumnSearchProps('meltingIssue'),
-    // },
-    {
-      title: "Loss",
-      dataIndex: "machineLoss",
-      render: text => (
-        <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      ...getColumnSearchProps('machineLoss'),
-      align: 'right',
-    },
-    {
-      title: "Assigned To",
-      dataIndex: "is_assigned_to",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      align: 'center',
-      ...getColumnSearchProps('is_assigned_to'),
     },
     {
       title: "Action",
@@ -608,7 +537,7 @@ const GovindMachineBook = () => {
               lineHeight: "3em",
               marginTop: "-3rem",
               }} className="text-center text-[#00203FFF]" >
-                Govind Machine Book
+                Govind Dai 83.5 + 75 Book
               </div>
           </div>
           ) : screenWidth > 500 ? (
@@ -616,14 +545,14 @@ const GovindMachineBook = () => {
               fontSize: '250%',
               fontWeight: 'bolder',
               lineHeight: "2em",
-              }} className="text-center text-[#00203FFF]" >Govind Machine Book</div>
+              }} className="text-center text-[#00203FFF]" >Govind Dai 83.5 + 75 Book</div>
 
             ): (
               <div style={{
                 fontSize: '250%',
                 fontWeight: 'bolder',
                 lineHeight: "2em",
-                }} className="text-center text-[#00203FFF]" >Govind Machine Book</div>
+                }} className="text-center text-[#00203FFF]" >Govind Dai 83.5 + 75 Book</div>
         )}
 
       <Modal
@@ -632,7 +561,7 @@ const GovindMachineBook = () => {
         onCancel={handleCancel}
         footer={null}
       >
-      <GovindMachineBookUpdate
+      <GovindDaiBhuka835Update
           handleOk={handleUpdateClose}
           textData={editModalData}
           />
@@ -654,7 +583,7 @@ const GovindMachineBook = () => {
                 {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
                 {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={1}>
-                  {tarpattaRecvBalance}
+                  {machineIssueBalance}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={2}>
                 </Table.Summary.Cell>
@@ -662,22 +591,22 @@ const GovindMachineBook = () => {
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={4}>
                   {/* {totalWeightQuantity} */}
-                  {issueBalance}
+                  {daiBhukaDaiBalance}
                   </Table.Summary.Cell>
                 {/* <Table.Summary.Cell index={5}>
                   {totalIssueQuantity}
                 </Table.Summary.Cell> */}
                   <Table.Summary.Cell index={5}>
-                  {receiveBalance}
+                  {daiBhukaBhukaBalance}
                 </Table.Summary.Cell>
                 {/* <Table.Summary.Cell index={6}>
                 {bhukaBalance}
                 </Table.Summary.Cell> */}
-                <Table.Summary.Cell index={7}>
+                {/* <Table.Summary.Cell index={7}>
                   {lossBalance}
-                </Table.Summary.Cell>
+                </Table.Summary.Cell> */}
                 <Table.Summary.Cell index={8}></Table.Summary.Cell>
-                <Table.Summary.Cell index={9}></Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={9}></Table.Summary.Cell> */}
                 
               </Table.Summary.Row>
             </>
@@ -689,4 +618,4 @@ const GovindMachineBook = () => {
   );
 };
 
-export default GovindMachineBook;
+export default GovindDaiBhuka835;

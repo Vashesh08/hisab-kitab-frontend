@@ -6,13 +6,13 @@ import { Button, Form, InputNumber, Input, DatePicker, Select } from "antd";
 import { postLossAcct, updateLossBook } from "../../api/LossAcct.js";
 
 
-function GovindDaiBhukaUpdate({handleOk, textData}) {
+function GovindDaiBhuka835Update({handleOk, textData}) {
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
-    const [numberOfDaiItems, setNumberOfDaiItems] = useState(textData.daiBhukaDai.length || 1);
-    const [numberOfBhukaItems, setNumberOfBhukaItems] = useState(textData.daiBhukaBhuka.length || 1);
-    const [daiItems, setDaiItems] = useState(textData.daiBhukaDai || [0, 0, 0, 0, 0]);
-    const [bhukaItems, setBhukaItems] = useState(textData.daiBhukaBhuka || [0, 0, 0, 0, 0]);
+    const [numberOfDai835Items, setNumberOfDai835Items] = useState(textData.daiBhuka835Dai.length || 1);
+    const [numberOfBhuka835Items, setNumberOfBhuka835Items] = useState(textData.daiBhuka835Bhuka.length || 1);
+    const [dai835Items, setDai835Items] = useState(textData.daiBhuka835Dai || [0, 0, 0, 0, 0]);
+    const [bhuka835Items, setBhuka835Items] = useState(textData.daiBhuka835Bhuka || [0, 0, 0, 0, 0]);
     const [lastDate, setDate] = useState(dayjs());
 
     const disabledDate = (current) => {
@@ -46,37 +46,37 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
 
     const handleNumberOfBhukaItems = (value) => {
         if (value >= 1 && value <= 5) {
-          setNumberOfBhukaItems(value);
+          setNumberOfBhuka835Items(value);
         }
       }
     
     const handleNumberOfDaiItems = (value) => {
         if (value >= 1 && value <= 5) {
-          setNumberOfDaiItems(value);
+          setNumberOfDai835Items(value);
         }
       }    
 
     
     useEffect(() => {
         setIsLoading(true);
-        if (textData.daiBhukaDai.length > 0){
-            setNumberOfDaiItems(textData.daiBhukaDai.length);
-            setDaiItems(textData.daiBhukaDai);
+        if (textData.daiBhuka835Dai.length > 0){
+            setNumberOfDai835Items(textData.daiBhuka835Dai.length);
+            setDai835Items(textData.daiBhuka835Dai);
           }
-        if (textData.daiBhukaBhuka.length > 0){
-            setNumberOfBhukaItems(textData.daiBhukaBhuka.length);
-            setBhukaItems(textData.daiBhukaBhuka);
+        if (textData.daiBhuka835Bhuka.length > 0){
+            setNumberOfBhuka835Items(textData.daiBhuka835Bhuka.length);
+            setBhuka835Items(textData.daiBhuka835Bhuka);
         }
         setIsLoading(false);
     }, [textData]);
 
 
     const renderDaiItems = ()  => {
-        return [...Array(numberOfDaiItems)].map((_, index) => (
+        return [...Array(numberOfDai835Items)].map((_, index) => (
             <Form.Item
-          name={["user", `daiBhukaDaiWeight${index}`]}
+          name={["user", `daiBhuka835DaiWeight${index}`]}
           label={`Dai Weight ${index+1}`}
-          initialValue={Number(daiItems[index])}
+          initialValue={Number(dai835Items[index])}
           rules={[{ type: "number", min: 0, required: true }]}
           // onChange={(e) => onChangeWt(e, "weight", index)}
           >
@@ -86,11 +86,11 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
     }
 
     const renderBhukaItems = ()  => {
-        return [...Array(numberOfBhukaItems)].map((_, index) => (
+        return [...Array(numberOfBhuka835Items)].map((_, index) => (
             <Form.Item
-          name={["user", `daiBhukaBhukaWeight${index}`]}
+          name={["user", `daiBhuka835BhukaWeight${index}`]}
           label={`Bhuka Weight ${index+1}`}
-          initialValue={Number(bhukaItems[index])}
+          initialValue={Number(bhuka835Items[index])}
           rules={[{ type: "number", min: 0, required: true }]}
         //   onChange={(e) => onChangeWt(e, "weight", index)}
           >
@@ -106,29 +106,30 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
         // console.log(user);
         
         const {
-          daiBhukaDate,
-          daiBhukaDescription,
+          daiBhuka835Date,
+          daiBhuka835Description,
         } = user;
 
         
-        const daiBhukaDaiWeightKeys = [...Array(numberOfDaiItems)].map((_, index) => `daiBhukaDaiWeight${index}`);
-        const daiBhukaDaiWeightValues = daiBhukaDaiWeightKeys.map((key) => user[key]);
+        const daiBhuka835DaiWeightKeys = [...Array(numberOfDai835Items)].map((_, index) => `daiBhuka835DaiWeight${index}`);
+        const daiBhuka835DaiWeightValues = daiBhuka835DaiWeightKeys.map((key) => user[key]);
 
-        const daiBhukaBhukaWeightKeys = [...Array(numberOfBhukaItems)].map((_, index) => `daiBhukaBhukaWeight${index}`);
-        const daiBhukaBhukaWeightValues = daiBhukaBhukaWeightKeys.map((key) => user[key]);
+        const daiBhuka835BhukaWeightKeys = [...Array(numberOfBhuka835Items)].map((_, index) => `daiBhuka835BhukaWeight${index}`);
+        const daiBhuka835BhukaWeightValues = daiBhuka835BhukaWeightKeys.map((key) => user[key]);
 
-        let totalIssueQty = 0;
+        console.log(daiBhuka835BhukaWeightValues, daiBhuka835DaiWeightValues);
+        let totalIssueQty = 0.0;
         for (let index = 0; index < textData.machineIssue.length; index++) {
           totalIssueQty += parseFloat(textData.machineIssue[index]);
         }
         
-        let totalReceiveQty = 0;
-        let totalLossQty = 0;
-        for (let index = 0; index < numberOfDaiItems; index++) {
-          totalReceiveQty += parseFloat(daiBhukaDaiWeightValues[index]);
+        let totalReceiveQty = 0.0;
+        let totalLossQty = 0.0;
+        for (let index = 0; index < numberOfDai835Items; index++) {
+          totalReceiveQty += parseFloat(daiBhuka835DaiWeightValues[index]);
         }
-        for (let index = 0; index < numberOfBhukaItems; index++) {
-          totalReceiveQty += parseFloat(daiBhukaBhukaWeightValues[index]);
+        for (let index = 0; index < numberOfBhuka835Items; index++) {
+          totalReceiveQty += parseFloat(daiBhuka835BhukaWeightValues[index]);
         }
         totalLossQty += totalIssueQty - totalReceiveQty;
         
@@ -136,10 +137,10 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
         if (totalLossQty >= 0){
           const backendData = {
             _id: textData._id,
-            daiBhukaDate: daiBhukaDate,
-            daiBhukaDescription: daiBhukaDescription,
-            daiBhukaDai: daiBhukaDaiWeightValues,
-            daiBhukaBhuka: daiBhukaBhukaWeightValues,
+            daiBhuka835Date: daiBhuka835Date,
+            daiBhuka835Description: daiBhuka835Description,
+            daiBhuka835Dai: daiBhuka835DaiWeightValues,
+            daiBhuka835Bhuka: daiBhuka835BhukaWeightValues,
             machineReceive: totalReceiveQty.toFixed(2),
             machineLoss: totalLossQty.toFixed(2),
           }
@@ -181,7 +182,7 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
     >
 
           <Form.Item
-            name={["user", "daiBhukaDate"]}
+            name={["user", "daiBhuka835Date"]}
             label="Date"
             rules={[
               {
@@ -193,17 +194,17 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
             <DatePicker format="DD MMM, YYYY" disabledDate={disabledDate} />
           </Form.Item>
 
-          <Form.Item name={["user", "daiBhukaDescription"]} label="Description" initialValue={textData.daiBhukaDescription || ""}>
+          <Form.Item name={["user", "daiBhuka835Description"]} label="Description" initialValue={textData.daiBhuka835Description || ""}>
             <Input/>
           </Form.Item>
 
         <Form.Item
-          name={["user", "daiItems"]}
+          name={["user", "dai835Items"]}
           label="Number of Dai Items"
           rules={[
             { type: "number", min: 1, max: 5, required: true, step:1 }
           ]}
-          initialValue={numberOfDaiItems}
+          initialValue={numberOfDai835Items}
         >
         <InputNumber
           onChange={handleNumberOfDaiItems}
@@ -213,12 +214,12 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
           
 
         <Form.Item
-          name={["user", "daiBhukaItems"]}
+          name={["user", "daiBhuka835Items"]}
           label="Number of Bhuka Items"
           rules={[
             { type: "number", min: 1, max: 5, required: true, step:1 }
           ]}
-          initialValue={numberOfBhukaItems}
+          initialValue={numberOfBhuka835Items}
         >
         <InputNumber
           onChange={handleNumberOfBhukaItems}
@@ -242,4 +243,4 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
     );    
 }
 
-export default GovindDaiBhukaUpdate;
+export default GovindDaiBhuka835Update;

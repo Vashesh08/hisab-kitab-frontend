@@ -10,9 +10,7 @@ function GovindMachineBookUpdate({handleOk, textData}) {
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
     const [numberOfIssueItems, setNumberOfIssueItems] = useState(textData.machineIssue.length || 1);
-    const [numberOfReceiveItems, setNumberOfReceiveItems] = useState(textData.machineReceive.length || 1);
     const [issueItems, setIssueItems] = useState(textData.machineIssue || [0, 0, 0, 0, 0]);
-    const [receiveItems, setReceiveItems] = useState(textData.machineReceive || [0, 0, 0, 0, 0]);
     const [lastDate, setDate] = useState(dayjs());
   
     const disabledDate = (current) => {
@@ -44,12 +42,6 @@ function GovindMachineBookUpdate({handleOk, textData}) {
     },
     };
 
-    const handleNumberOfReceiveItems = (value) => {
-        if (value >= 1 && value <= 5) {
-          setNumberOfReceiveItems(value);
-        }
-      }
-    
     const handleNumberOfIssueItems = (value) => {
         if (value >= 1 && value <= 5) {
           setNumberOfIssueItems(value);
@@ -63,10 +55,6 @@ function GovindMachineBookUpdate({handleOk, textData}) {
             setNumberOfIssueItems(textData.machineIssue.length);
             setIssueItems(textData.machineIssue);            
           }
-        if (textData.machineReceive.length > 0){
-            setNumberOfReceiveItems(textData.machineReceive.length);
-            setReceiveItems(textData.machineReceive);
-        }
         setIsLoading(false);
     }, [textData]);
 
@@ -85,20 +73,6 @@ function GovindMachineBookUpdate({handleOk, textData}) {
     ))
     }
 
-    const renderReceiveItems = ()  => {
-        return [...Array(numberOfReceiveItems)].map((_, index) => (
-            <Form.Item
-          name={["user", `receiveWeight${index}`]}
-          label={`Receive Weight ${index+1}`}
-          initialValue={Number(receiveItems[index])}
-          rules={[{ type: "number", min: 0, required: true }]}
-        //   onChange={(e) => onChangeWt(e, "weight", index)}
-          >
-          <InputNumber/>
-          </Form.Item>
-    ))
-    }
-
     const onFinish = async ({ user }) => {
         const token = localStorage.getItem("token");
     
@@ -108,33 +82,32 @@ function GovindMachineBookUpdate({handleOk, textData}) {
         const {
           machineDate,
           machineDescription,
-          // issue22kActual
+          // issue22kActual,
+          is_assigned_to
         } = user;
 
         
         const issueWeightKeys = [...Array(numberOfIssueItems)].map((_, index) => `issueWeight${index}`);
         const issueWeightValues = issueWeightKeys.map((key) => user[key]);
 
-        const receiveWeightKeys = [...Array(numberOfReceiveItems)].map((_, index) => `receiveWeight${index}`);
-        const receiveWeightValues = receiveWeightKeys.map((key) => user[key]);
 
-
-        console.log("Vashesh", issueWeightValues, receiveWeightValues);
+        console.log("Vashesh", issueWeightValues, textData.machineReceive,is_assigned_to);
         if (textData.machineReceive.length === 0){
           const backendData = {
             _id: textData._id,
             machineDate: machineDate,
             machineIssue: issueWeightValues,
-            machineDescription: machineDescription
+            machineDescription: machineDescription,
+            is_assigned_to: is_assigned_to
           }
           await updateGovindBook(backendData, token);
           }
         else{
           let totalIssueQty = 0;
           for (let index = 0; index < numberOfIssueItems; index++) {
-            totalIssueQty += issueWeightValues[index];
+            totalIssueQty += parseFloat(issueWeightValues[index]);
           }
-          let totalReceiveQty = textData.machineReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
+          let totalReceiveQty = parseFloat(textData.machineReceive);
           let totalLossQty = 0;
           totalLossQty += totalIssueQty - totalReceiveQty;
           
@@ -145,6 +118,7 @@ function GovindMachineBookUpdate({handleOk, textData}) {
               machineDescription: machineDescription,
               machineIssue: issueWeightValues,
               machineLoss: totalLossQty.toFixed(2),
+              is_assigned_to: is_assigned_to,
             }
             await updateGovindBook(backendData, token);
             
@@ -214,6 +188,24 @@ function GovindMachineBookUpdate({handleOk, textData}) {
         />
       </Form.Item>
           {renderIssueItems()}
+
+          <Form.Item
+        name={["user", `is_assigned_to`]}
+        label={`Assigned To`}
+        rules={[
+          {
+            required: false,
+          },
+        ]}
+        initialValue={textData.is_assigned_to || ""}
+      >
+        <Select
+          options={[
+            { value: "Dai + Bhuka", label: "Dai + Bhuka" },
+            { value: "83.50 + 75 A/C", label: "83.50 + 75 A/C" },
+          ]}
+        />
+      </Form.Item>
 
         <Form.Item
         wrapperCol={{
