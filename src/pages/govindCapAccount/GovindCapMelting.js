@@ -10,14 +10,14 @@ import {
 } from "antd";
 import Highlighter from 'react-highlight-words';
 import { getUtilityData, updateUtility } from "../../api/utility.js"; 
-import GovindMeltingBookAdd from  "../../components/Govind/GovindMeltingBookAdd.js";
+import GovindCapMeltingBookAdd from "../../components/GovindCap/GovindCapMeltingBookAdd.js";
 import '../../style/pages.css';
 import Loading from "../../components/Loading.js";
-import GovindMeltingBookUpdate from "../../components/Govind/GovindMeltingBookUpdate.js";
+import GovindCapMeltingBookUpdate from "../../components/GovindCap/GovindCapMeltingBookUpdate.js";
 import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
 import { deleteLossAcctList, fetchLossAcctList } from "../../api/LossAcct.js";
-import { fetchGovindStockList, deleteGovindMeltingStockList } from "../../api/govindBook.js";
+import { fetchGovindCapMeltingStockList, deleteGovindCapMeltingStockList } from "../../api/govindCapMeltingBook.js";
 
 const GovindCapMelting = () => {
   const screenWidth = window.innerWidth;
@@ -69,7 +69,7 @@ const GovindCapMelting = () => {
     setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
     setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
 
-    const docs = await fetchGovindStockList(page, itemsPerPage, token);
+    const docs = await fetchGovindCapMeltingStockList(page, itemsPerPage, token);
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -163,7 +163,7 @@ const GovindCapMelting = () => {
         setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
         setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
     
-        const docs = await fetchGovindStockList(page, itemsPerPage, token);
+        const docs = await fetchGovindCapMeltingStockList(page, itemsPerPage, token);
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
@@ -261,12 +261,12 @@ const GovindCapMelting = () => {
     let currMeltingBookClosing995Balance = parseFloat(balanceData[0]["meltingBookClosing995Balance"])
     let currMeltingBookClosing100Balance = parseFloat(balanceData[0]["meltingBookClosing100Balance"])
 
-    const docs = await fetchGovindStockList(page, itemsPerPage, token);
+    const docs = await fetchGovindCapMeltingStockList(page, itemsPerPage, token);
 
     // console.log(selectedRowKeys, rows);
     selectedRowKeys.map((item, index) => {
 
-      const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Melting")
+      const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Govind Cap Melting")
       if (matchedData){
         lossIds.push(matchedData._id);
       }
@@ -308,7 +308,7 @@ const GovindCapMelting = () => {
     await updateUtility(utilityData, token);
 
     // console.log(meltingBookId);
-    await deleteGovindMeltingStockList(meltingBookId, token);
+    await deleteGovindCapMeltingStockList(meltingBookId, token);
 
     await updateRows("valid");
     setSelectedRowKeys([]);
@@ -911,7 +911,7 @@ const GovindCapMelting = () => {
         onCancel={handleCancel}
         footer={null}
       >
-      <GovindMeltingBookAdd
+      <GovindCapMeltingBookAdd
           handleOk={handleUpdateClose}
           closingBalance={parseFloat(closingBalance)}
           setClosingBalance={setClosingBalance}
@@ -942,7 +942,7 @@ const GovindCapMelting = () => {
         onCancel={handleCancel}
         footer={null}
       >
-      <GovindMeltingBookUpdate
+      <GovindCapMeltingBookUpdate
           handleOk={handleUpdateClose}
           textData={updateData}
           />

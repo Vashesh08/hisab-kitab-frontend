@@ -107,7 +107,7 @@ const GovindMeltingBook = () => {
         meltingIssue = 0; // Set it to zero if it's NaN
       } 
       if (isNaN(parseFloat(meltingWeight))){
-        meltingWeight = 0; // Set it to zero if it's NaN
+        meltingWeight = [0]; // Set it to zero if it's NaN
       }
       if (isNaN(parseFloat(meltingLoss))){
         meltingLoss = 0; // Set it to zero if it's NaN
@@ -191,7 +191,7 @@ const GovindMeltingBook = () => {
             meltingIssue = 0; // Set it to zero if it's NaN
           } 
           if (isNaN(parseFloat(meltingWeight))){
-            meltingWeight = 0 // Set it to zero if it's NaN
+            meltingWeight = [0] // Set it to zero if it's NaN
           }
           if (isNaN(parseFloat(meltingLoss))){
             meltingLoss = 0  // Set it to zero if it's NaN
@@ -266,7 +266,7 @@ const GovindMeltingBook = () => {
     // console.log(selectedRowKeys, rows);
     selectedRowKeys.map((item, index) => {
 
-      const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Melting")
+      const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Govind Melting")
       if (matchedData){
         lossIds.push(matchedData._id);
       }

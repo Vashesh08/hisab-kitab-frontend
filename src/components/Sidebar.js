@@ -42,7 +42,7 @@ export default function Sidebar({ changeVisibility, isVisible }) {
           }
         >
           <ListItem className="p-0" selected={open === 1}>
-            <AccordionHeader onClick={() => handleOpen(1)} className="border-b-0 p-3 text-white hover:text-black active:text-black">
+            <AccordionHeader onClick={() => handleOpen(1)} className="border-b-0 py-3 px-1 text-white hover:text-black active:text-black">
               <ListItemPrefix>
                 <BookOpenIcon className="h-5 w-5" />
               </ListItemPrefix>
@@ -86,7 +86,7 @@ export default function Sidebar({ changeVisibility, isVisible }) {
             }
           >
             <ListItem className="p-0" selected={open === 2}>
-            <AccordionHeader onClick={() => handleOpen(2)} className="border-b-0 p-3 text-white hover:text-black active:text-black">
+            <AccordionHeader onClick={() => handleOpen(2)} className="border-b-0 py-3 px-1 text-white hover:text-black active:text-black">
               <ListItemPrefix>
                 <BookOpenIcon className="h-5 w-5" />
               </ListItemPrefix>
@@ -131,7 +131,7 @@ export default function Sidebar({ changeVisibility, isVisible }) {
             }
           >
             <ListItem className="p-0" selected={open === 3}>
-            <AccordionHeader onClick={() => handleOpen(3)} className="border-b-0 p-3 text-white hover:text-black active:text-black">
+            <AccordionHeader onClick={() => handleOpen(3)} className="border-b-0 py-3 px-1 text-white hover:text-black active:text-black">
               <ListItemPrefix>
                 <BookOpenIcon className="h-5 w-5" />
               </ListItemPrefix>
@@ -176,7 +176,7 @@ export default function Sidebar({ changeVisibility, isVisible }) {
             }
           >
             <ListItem className="p-0" selected={open === 4}>
-            <AccordionHeader onClick={() => handleOpen(4)} className="border-b-0 p-3 text-white hover:text-black active:text-black">
+            <AccordionHeader onClick={() => handleOpen(4)} className="border-b-0 py-3 px-1 text-white hover:text-black active:text-black">
               <ListItemPrefix>
                 <BookOpenIcon className="h-5 w-5" />
               </ListItemPrefix>
@@ -223,21 +223,21 @@ export default function Sidebar({ changeVisibility, isVisible }) {
                 </List>
               </AccordionBody>
             </Accordion>
-            {/* <Accordion
+            <Accordion
             open={open === 5}
             icon={
               <ChevronDownIcon
                 strokeWidth={2.5}
-                className={`mx-auto h-4 w-4 transition-transform ${open === 4 ? "rotate-180" : ""}`}
+                className={`mx-auto h-4 w-4 transition-transform ${open === 5 ? "rotate-180" : ""}`}
               />
             }
           >
             <ListItem className="p-0" selected={open === 5}>
-            <AccordionHeader onClick={() => handleOpen(5)} className="border-b-0 p-3 text-white hover:text-black active:text-black">
+            <AccordionHeader onClick={() => handleOpen(5)} className="border-b-0 py-3 px-1 text-white hover:text-black active:text-black">
               <ListItemPrefix>
                 <BookOpenIcon className="h-5 w-5" />
               </ListItemPrefix>
-              <Typography className="mr-auto font-normal">
+              <Typography className="mr-auto font-normal whitespace-nowrap">
                 Govind Cap Account
               </Typography>
             </AccordionHeader>
@@ -257,7 +257,7 @@ export default function Sidebar({ changeVisibility, isVisible }) {
                   </ListItem>
                 </List>
               </AccordionBody>
-            </Accordion> */}
+            </Accordion>
             </>
           ):(
             <></>
