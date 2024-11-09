@@ -8,16 +8,16 @@ import {
   Input,
   Space, 
 } from "antd";
-import { getUtilityData, updateUtility } from "../../api/utility.js";
 import Highlighter from 'react-highlight-words';
 import GovindCapBookAdd from "../../components/GovindCap/GovindCapBookAdd.js";
 import '../../style/pages.css';
 import Loading from "../../components/Loading.js";
 // import GovindCapBookUpdate from "../../components/GovindCap/GovindCapBookUpdate.js";
-import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
 import { deleteLossAcctList, fetchLossAcctList } from "../../api/LossAcct.js";
 import { fetchGovindCapStockList, deleteGovindCapStockList } from "../../api/govindCapBook.js";
+import GovindCapBookClose from "../../components/GovindCap/GovindCapBookClose.js";
 
 const GovindCapAccountBook = () => {
   const screenWidth = window.innerWidth;
@@ -217,12 +217,17 @@ const GovindCapAccountBook = () => {
     const lossAcctData = await fetchLossAcctList(page, itemsPerPage, token);
     const lossIds = [];
     
+    const docs = await fetchGovindCapStockList(page, itemsPerPage, token);
+    
     // console.log(selectedRowKeys, rows);
     selectedRowKeys.map((item, index) => {
-
-      const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Govind Cap Account")
-      if (matchedData){
-        lossIds.push(matchedData._id);
+      for (let i = 0; i < docs.length; i++) {
+        if (docs[i]["capAcctLoss"] !== "" && !isNaN(docs[i]["capAcctLoss"])) {
+        const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Govind Cap Account")
+        if (matchedData){
+          lossIds.push(matchedData._id);
+        }
+      }
       }
     }
     )
@@ -574,10 +579,10 @@ const GovindCapAccountBook = () => {
                     <PlusCircleOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showModal} />
                   </Tooltip>
                 </div>
-                <div className="mt-1 flex justify-end items-end h-12">
-                  {/* <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
+                <div className="mt-1 flex justify-between items-center h-12">
+                  <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
                   Close Daily Account: <PlusCircleOutlined className="ml-12 float-end" style={{ fontSize:"125%"}} onClick={showCompleteModal}/> 
-                    </span> */}
+                    </span>
                     <Tooltip title="Delete" placement="bottomRight">
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
                   </Tooltip>
@@ -598,11 +603,11 @@ const GovindCapAccountBook = () => {
             <PlusCircleOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="w-1/2" onClick={showModal} />
             <DeleteOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="place-content-end	w-28" onClick={showDeletePopup} />
           </div>
-          {/* <div className="	text-xl flex justify-end items-center">
+          <div className="my-2 text-xl flex justify-end items-center">
               <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
                 Close Daily Account: <PlusCircleOutlined className=" float-end" style={{ fontSize:"140%"}} onClick={showCompleteModal}/> 
               </span>
-            </div> */}
+            </div>
           </>
         )}
 
@@ -639,9 +644,9 @@ const GovindCapAccountBook = () => {
       onCancel={handleCancel}
       footer={null}
       >
-        {/* <KaareegarClose
+        <GovindCapBookClose
         handleOk={handleUpdateClose}
-        /> */}
+        />
       </Modal>
 
       {/* <Modal

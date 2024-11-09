@@ -374,8 +374,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     // console.log(kareegarData, balance);
     const lossAcctData = await fetchLossAcctList(page, itemsPerPage, token);
     const lossIds = [];
-    console.log(lossAcctData);
-    console.log(selectedRowKeys);
+    // console.log(lossAcctData);
+    // console.log(selectedRowKeys);
 
     const docs = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
 
