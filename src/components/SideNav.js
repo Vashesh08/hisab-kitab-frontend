@@ -20,6 +20,7 @@ import GovindDaiBhuka from '../pages/govind/GovindDaiBhuka';
 import GovindDaiBhuka835 from '../pages/govind/GovindDaiBhuka835';
 import GovindCapMelting from '../pages/govindCapAccount/GovindCapMelting';
 import GovindCapAccountBook from '../pages/govindCapAccount/GovindCapAccountBook';
+import BabuMelting from '../pages/babu/BabuMelting';
 
 function SideNav({ currentPage, handlePageChange, isVisible }) {
     return (
@@ -82,8 +83,8 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
             <Solder />
           ) : currentPage === "joint" ?(
             <Joint />
-          // ) : currentPage === "babumelting" ?(
-          //   <Joint />
+          ) : currentPage === "babumelting" ?(
+            <BabuMelting />
           ) : currentPage === "govindcapmelting" ?(
             <GovindCapMelting />
           ) : currentPage === "govindcapaccount" ?(

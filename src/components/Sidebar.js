@@ -258,6 +258,35 @@ export default function Sidebar({ changeVisibility, isVisible }) {
                 </List>
               </AccordionBody>
             </Accordion>
+            <Accordion
+            open={open === 6}
+            icon={
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`mx-auto h-4 w-4 transition-transform ${open === 6 ? "rotate-180" : ""}`}
+              />
+            }
+          >
+            <ListItem className="p-0" selected={open === 6}>
+            <AccordionHeader onClick={() => handleOpen(6)} className="border-b-0 py-3 px-1 text-white hover:text-black active:text-black">
+              <ListItemPrefix>
+                <BookOpenIcon className="h-5 w-5" />
+              </ListItemPrefix>
+              <Typography className="mr-auto font-normal whitespace-nowrap">
+                Babu Book
+              </Typography>
+            </AccordionHeader>
+          </ListItem>
+          
+              <AccordionBody className="py-1">
+                <List className="p-0 items-center">
+                  <ListItem onClick={() => changePage("babumelting")}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Babu Melting Book
+                  </ListItem>
+                </List>
+              </AccordionBody>
+            </Accordion>
             </>
           ):(
             <></>
