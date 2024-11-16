@@ -3,10 +3,13 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import Login from './pages/Login';
 import Dashboard from './components/Dashboard';
+import { getUtilityData } from './api/utility';
 
 function App() {
   const [isVisible, setIsVisible] = useState(false);
   const [isLoggedIn, setLoggedIn] = useState(false);
+  const [currentPage, setCurrentPage] = useState('home');
+
   const checkLoggedIn = () => {
     const session_key = localStorage.getItem('token');
     // console.log("session_key",session_key);
@@ -23,9 +26,21 @@ function App() {
         // Check if the specific key combination is pressed
         // console.log("pressed", event);
         if (event.ctrlKey && event.keyCode === 72) { // Show Modal
-          console.log("changed from " + isVisible);
+          // console.log("changed from " + isVisible);
           event.preventDefault();
-            setIsVisible(prev => !prev); // Toggle isVisible
+            (async () => {
+            const token = localStorage.getItem("token");
+            const utilityData = await getUtilityData(token);
+            // console.log(utilityData[0]['visible']);
+            if (utilityData[0]['visible']){
+              setIsVisible(prev => !prev); // Toggle isVisible
+              setCurrentPage("home");
+            }
+            else{
+              setIsVisible(false); // Toggle isVisible
+              setCurrentPage("home");
+            }
+            })();
         }
     };
 
@@ -38,7 +53,7 @@ function App() {
   }, [isLoggedIn, isVisible]);
 
   if (isLoggedIn){
-    return <Dashboard isVisible={isVisible} checkLoggedIn={checkLoggedIn}/>
+    return <Dashboard isVisible={isVisible} checkLoggedIn={checkLoggedIn} currentPage={currentPage} setCurrentPage={setCurrentPage}/>
   }
   return (
       <div className="App">
