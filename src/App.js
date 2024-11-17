@@ -53,7 +53,7 @@ function App() {
   }, [isLoggedIn, isVisible]);
 
   if (isLoggedIn){
-    return <Dashboard isVisible={isVisible} checkLoggedIn={checkLoggedIn} currentPage={currentPage} setCurrentPage={setCurrentPage}/>
+    return <Dashboard isVisible={isVisible} checkLoggedIn={checkLoggedIn} currentPage={currentPage} setCurrentPage={setCurrentPage} setIsVisible={setIsVisible}/>
   }
   return (
       <div className="App">

@@ -37,3 +37,18 @@ export async function updateUtility(utilityData, token){
     const body = await res.json();
     return body;
 }
+
+export async function deleteUtilityList(token) {
+    const response = await fetch(`${config.API_URL}/admin/utilityDelete`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json, text/plain, */*'
+        },
+    })
+    if (response.status !== 200) {
+        throw Error('Failed to update');
+    }
+    const data = await response.json();
+    return data;
+}

@@ -22,7 +22,7 @@ import GovindCapMelting from '../pages/govindCapAccount/GovindCapMelting';
 import GovindCapAccountBook from '../pages/govindCapAccount/GovindCapAccountBook';
 import BabuMelting from '../pages/babu/BabuMelting';
 
-function SideNav({ currentPage, handlePageChange, isVisible }) {
+function SideNav({ currentPage, handlePageChange, isVisible, setIsVisible }) {
     return (
         <>
     <button data-drawer-target="sidebar-multi-level-sidebar" data-drawer-toggle="sidebar-multi-level-sidebar" aria-controls="sidebar-multi-level-sidebar" type="button"
@@ -43,7 +43,7 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
 
 
 <aside id="sidebar-multi-level-sidebar" className="fixed left-0 z-50 w-64 h-screen transition-transform -translate-x-full" aria-label="Sidebar">
-<Sidebar changeVisibility = {handlePageChange} isVisible={isVisible}/>
+<Sidebar changeVisibility = {handlePageChange} isVisible={isVisible} setIsVisible={setIsVisible}/>
 </aside>
 
 

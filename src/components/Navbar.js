@@ -4,8 +4,18 @@ import { Disclosure } from '@headlessui/react';
 // import { Disclosure, Menu, Transition } from '@headlessui/react';
 // import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 // import Sidebar from "./Sidebar.js";
-import { HomeFilled, LogoutOutlined } from '@ant-design/icons';
+import { HomeFilled, LogoutOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
+import { useState, useEffect } from 'react';
+import {
+  Divider,
+  Table,
+  Button,
+  Modal,
+  Input,
+  Space,
+} from "antd";
+import { deleteUtilityList } from '../api/utility';
 
 // const user = {
 //   name: 'username',
@@ -30,7 +40,7 @@ const navigation = [
 
 
 export default function Navbar(checkLoggedIn) {
- 
+  
   const handleLogoClick = () => {
     // console.log("home")
     checkLoggedIn.handlePageChange("home");
@@ -62,10 +72,27 @@ export default function Navbar(checkLoggedIn) {
       navigation[index].current = true;
     }
     }
-    
-    // const userNavigation = [
-    // { name: 'Sign out', href: '#', click: handleLogout},
-    // ]
+
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+    const handleDisableAll = () => {
+      setIsDeleteModalOpen(true);
+    }
+
+    const handleCancel = () => {
+      setIsDeleteModalOpen(false);
+    }
+
+    const deleteModal = () => {
+      (async () => {
+        const token = localStorage.getItem('token');    
+        await deleteUtilityList(token);
+      })();
+      checkLoggedIn.handlePageChange("home");
+      checkLoggedIn.setIsVisible(false);
+      setIsDeleteModalOpen(false);  
+    }
+
   
   return (
     <>
@@ -108,6 +135,15 @@ export default function Navbar(checkLoggedIn) {
                       <HomeFilled className="mt-1.5 mr-5 mb-2" style={{fontSize: "190%"}} aria-hidden="true" onClick={handleLogoClick}/>
                     </Tooltip>
                     </div>
+                    {(checkLoggedIn.isVisible)?(
+                      <div className="flex-shrink-0 text-white hover:text-gray-400 focus:outline-none">
+                      <Tooltip title="Disable All">
+                        <DeleteOutlined className="mt-1.5 mr-5 mb-2" style={{fontSize: "190%"}} aria-hidden="true" onClick={handleDisableAll}/>
+                      </Tooltip>
+                      </div>
+                    ):(
+                      <></>
+                    )}
                     <div className="flex-shrink-0 text-white hover:text-gray-400 focus:outline-none">
                     <Tooltip title="Logout">
                       <LogoutOutlined style={{fontSize: "175%"}} onClick={handleLogout}/>
@@ -235,6 +271,24 @@ export default function Navbar(checkLoggedIn) {
         </Disclosure>
 
       </div>
+    
+      <Modal
+        title="Are you sure you want to delete the selected rows ?"
+        open={isDeleteModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <div className="flex justify-center	">
+          <Button className="bg-[#ABD6DFFF] mr-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={deleteModal}>
+              Yes
+          </Button>
+          <Button className="bg-[#ABD6DFFF] ml-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={handleCancel}>
+              No
+          </Button>
+        </div>
+      </Modal>
+
     </>
+    
   )
 }

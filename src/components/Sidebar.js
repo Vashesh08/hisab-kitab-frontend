@@ -16,13 +16,24 @@ import {
   ChevronRightIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
- 
-export default function Sidebar({ changeVisibility, isVisible }) {
+import { deleteUtilityList } from "../api/utility";
+
+export default function Sidebar({ changeVisibility, isVisible, setIsVisible }) {
   const [open, setOpen] = React.useState(0);
  
   const changePage = (value) => {
     changeVisibility(value);
   }
+
+  const DisableAndRedirect = () => {
+    (async () => {
+      const token = localStorage.getItem('token');    
+      await deleteUtilityList(token);
+    })();
+    changePage("home");
+    setIsVisible(false);
+  };
+
 
   const handleOpen = (value) => {
     setOpen(open === value ? 0 : value);
@@ -287,6 +298,35 @@ export default function Sidebar({ changeVisibility, isVisible }) {
                 </List>
               </AccordionBody>
             </Accordion>
+            {/* <Accordion
+            open={open === 7}
+            icon={
+              <ChevronDownIcon
+                strokeWidth={2.5}
+                className={`mx-auto h-4 w-4 transition-transform ${open === 7 ? "rotate-180" : ""}`}
+              />
+            }
+          >
+            <ListItem className="p-0" selected={open === 7}>
+            <AccordionHeader onClick={() => handleOpen(7)} className="border-b-0 py-3 px-1 text-white hover:text-black active:text-black">
+              <ListItemPrefix>
+                <BookOpenIcon className="h-5 w-5" />
+              </ListItemPrefix>
+              <Typography className="mr-auto font-normal whitespace-nowrap">
+                Disable Book
+              </Typography>
+            </AccordionHeader>
+          </ListItem>
+          
+              <AccordionBody className="py-1">
+                <List className="p-0 items-center">
+                  <ListItem onClick={() => DisableAndRedirect()}
+                    className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                      Disable All Books
+                  </ListItem>
+                </List>
+              </AccordionBody>
+            </Accordion> */}
             </>
           ):(
             <></>
