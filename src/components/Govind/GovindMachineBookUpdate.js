@@ -91,8 +91,8 @@ function GovindMachineBookUpdate({handleOk, textData}) {
         const issueWeightValues = issueWeightKeys.map((key) => user[key]);
 
 
-        console.log("Vashesh", issueWeightValues, textData.machineReceive,is_assigned_to);
-        if (textData.machineReceive.length === 0){
+        console.log("Vashesh", issueWeightValues, textData.machineIssue,is_assigned_to);
+        if (textData.machineIssue.length === 0){
           const backendData = {
             _id: textData._id,
             machineDate: machineDate,
