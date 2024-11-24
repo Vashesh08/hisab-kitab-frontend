@@ -54,8 +54,8 @@ const GovindTarPattaBook = () => {
     const deleted_data = [];
     // console.log("data", data)
     
-    const allData = await fetchGovindStockList(page, itemsPerPage, token);
-    const docs = allData.filter(item => item.meltingReceive.length > 0);
+    const docs = await fetchGovindStockList(page, itemsPerPage, token);
+    // const docs = allData.filter(item => (item.meltingReceive && item.meltingReceive.length > 0));
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -134,8 +134,8 @@ const GovindTarPattaBook = () => {
         const deleted_data = [];
         // console.log("data", data)
         
-        const allData = await fetchGovindStockList(page, itemsPerPage, token);
-        const docs = allData.filter(item => item.meltingReceive.length > 0);
+        const docs = await fetchGovindStockList(page, itemsPerPage, token);
+        // const docs = allData.filter(item => (item.meltingReceive && item.meltingReceive.length > 0));
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {

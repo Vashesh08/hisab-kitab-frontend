@@ -55,7 +55,7 @@ const GovindMachineBook = () => {
     // console.log("data", data)
     
     const allData = await fetchGovindStockList(page, itemsPerPage, token);
-    const docs = allData.filter(item => item.tarpattaReceive.length > 0);
+    const docs = allData.filter(item => (item.tarpattaReceive && item.tarpattaReceive.length > 0));
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -131,7 +131,7 @@ const GovindMachineBook = () => {
         // console.log("data", data)
         
         const allData = await fetchGovindStockList(page, itemsPerPage, token);
-        const docs = allData.filter(item => item.tarpattaReceive.length > 0);
+        const docs = allData.filter(item => (item.tarpattaReceive && item.tarpattaReceive.length > 0));
         setFullData(docs);
     
         // console.log("data", docs);

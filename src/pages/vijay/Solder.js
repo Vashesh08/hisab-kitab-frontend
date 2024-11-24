@@ -57,7 +57,7 @@ const Solder = () => {
     const originaldata = await fetchVijayStockList(page, itemsPerPage, token);
     const docs = originaldata.flatMap(item => {
       // If item has tags1 array
-      if (item.solderChainIssue.length > 0) {
+      if (item.solderChainIssue && item.solderChainIssue.length > 0) {
         console.log("Issue", item.solderChainIssue);
         return item.solderChainIssue.map((tag, index) => ({
           ...item,
@@ -150,7 +150,7 @@ const Solder = () => {
         const originaldata = await fetchVijayStockList(page, itemsPerPage, token);
         const docs = originaldata.flatMap(item => {
           // If item has tags1 array
-          if (item.solderChainIssue.length > 0) {
+          if (item.solderChainIssue && item.solderChainIssue.length > 0) {
             // console.log("Issue", item.solderChainIssue);
             return item.solderChainIssue.map((tag, index) => ({
               ...item,
