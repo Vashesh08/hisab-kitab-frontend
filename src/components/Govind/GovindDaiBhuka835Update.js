@@ -91,9 +91,15 @@ function GovindDaiBhuka835Update({handleOk, textData}) {
           name={["user", `daiBhuka835BhukaWeight${index}`]}
           label={`Bhuka Weight ${index+1}`}
           initialValue={Number(bhuka835Items[index])}
-          rules={[{ type: "number", min: 0, required: true }]}
-        //   onChange={(e) => onChangeWt(e, "weight", index)}
-          >
+          rules={[{  type: "number", min: 0,
+            //   onChange={(e) => onChangeWt(e, "weight", index)}
+            validator: (_, value) => 
+            (isNaN(value) || value >= 0) 
+            ? Promise.resolve()
+            : Promise.reject(new Error("Item is not a valid number!")),
+              }
+              ]}
+            >
           <InputNumber/>
           </Form.Item>
     ))
@@ -119,8 +125,8 @@ function GovindDaiBhuka835Update({handleOk, textData}) {
 
         console.log(daiBhuka835BhukaWeightValues, daiBhuka835DaiWeightValues);
         let totalIssueQty = 0.0;
-        for (let index = 0; index < textData.machineIssue.length; index++) {
-          totalIssueQty += parseFloat(textData.machineIssue[index]);
+        for (let index = 0; index < textData.machine835Issue.length; index++) {
+          totalIssueQty += parseFloat(textData.machine835Issue[index]);
         }
         
         let totalReceiveQty = 0.0;
@@ -129,7 +135,7 @@ function GovindDaiBhuka835Update({handleOk, textData}) {
           totalReceiveQty += parseFloat(daiBhuka835DaiWeightValues[index]);
         }
         for (let index = 0; index < numberOfBhuka835Items; index++) {
-          totalReceiveQty += parseFloat(daiBhuka835BhukaWeightValues[index]);
+          totalReceiveQty += isNaN(parseFloat(daiBhuka835BhukaWeightValues[index])) ? 0 : parseFloat(daiBhuka835BhukaWeightValues[index]);
         }
         totalLossQty += totalIssueQty - totalReceiveQty;
         
@@ -141,14 +147,14 @@ function GovindDaiBhuka835Update({handleOk, textData}) {
             daiBhuka835Description: daiBhuka835Description,
             daiBhuka835Dai: daiBhuka835DaiWeightValues,
             daiBhuka835Bhuka: daiBhuka835BhukaWeightValues,
-            machineReceive: totalReceiveQty.toFixed(2),
-            machineLoss: totalLossQty.toFixed(2),
+            machine835Receive: totalReceiveQty.toFixed(2),
+            machine835Loss: totalLossQty.toFixed(2),
           }
 
           await updateGovindBook(backendData, token);
           
           const lossData = {
-            "type": "Govind Machine",
+            "type": "Govind Machine 83.5",
             date: lastDate,
             "transactionId": textData._id,
             "lossWt": totalLossQty.toFixed(2),
@@ -217,7 +223,7 @@ function GovindDaiBhuka835Update({handleOk, textData}) {
           name={["user", "daiBhuka835Items"]}
           label="Number of Bhuka Items"
           rules={[
-            { type: "number", min: 1, max: 5, required: true, step:1 }
+            { type: "number", min: 1, max: 5, step:1 }
           ]}
           initialValue={numberOfBhuka835Items}
         >

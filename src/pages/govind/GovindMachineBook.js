@@ -55,7 +55,8 @@ const GovindMachineBook = () => {
     // console.log("data", data)
     
     const allData = await fetchGovindStockList(page, itemsPerPage, token);
-    const docs = allData.filter(item => (item.tarpattaReceive && item.tarpattaReceive.length > 0));
+    const filteredData = allData.filter(item => (item.tarpattaReceive && item.tarpattaReceive.length > 0));
+    const docs = filteredData.filter(item => item.is_assigned_to === "Dai + Bhuka")
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -131,7 +132,8 @@ const GovindMachineBook = () => {
         // console.log("data", data)
         
         const allData = await fetchGovindStockList(page, itemsPerPage, token);
-        const docs = allData.filter(item => (item.tarpattaReceive && item.tarpattaReceive.length > 0));
+        const filteredData = allData.filter(item => (item.tarpattaReceive && item.tarpattaReceive.length > 0));
+        const docs = filteredData.filter(item => item.is_assigned_to === "Dai + Bhuka")
         setFullData(docs);
     
         // console.log("data", docs);
@@ -364,6 +366,10 @@ const GovindMachineBook = () => {
           <div style={{textAlign:"left"}}>{eachText}</div>
         )
         )
+      ) : dataIndex === "machineReceive" ?(
+        <div style={{textAlign:"left"}}>{text}</div>
+      ) : dataIndex === "machineLoss" ?(
+        <div style={{textAlign:"left"}}>{text}</div>
       ): dataIndex === "machineIssue" ?(
         text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
@@ -379,8 +385,6 @@ const GovindMachineBook = () => {
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
-      ): dataIndex === "is_assigned_to" ?(
-          <div style={{textAlign:"right"}}>{text}</div>
       ):(
       searchedColumn === dataIndex ? (
         <Highlighter
@@ -501,18 +505,18 @@ const GovindMachineBook = () => {
       ...getColumnSearchProps('machineLoss'),
       align: 'right',
     },
-    {
-      title: "Assigned To",
-      dataIndex: "is_assigned_to",
-      render: text => (
-        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-          {text}
-        </div>
-      ),
-      width: '10%',
-      align: 'center',
-      ...getColumnSearchProps('is_assigned_to'),
-    },
+    // {
+    //   title: "Assigned To",
+    //   dataIndex: "is_assigned_to",
+    //   render: text => (
+    //     <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+    //       {text}
+    //     </div>
+    //   ),
+    //   width: '10%',
+    //   align: 'center',
+    //   ...getColumnSearchProps('is_assigned_to'),
+    // },
     {
       title: "Action",
       key: "action",
@@ -677,7 +681,7 @@ const GovindMachineBook = () => {
                   {lossBalance}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={8}></Table.Summary.Cell>
-                <Table.Summary.Cell index={9}></Table.Summary.Cell>
+                {/* <Table.Summary.Cell index={9}></Table.Summary.Cell> */}
                 
               </Table.Summary.Row>
             </>

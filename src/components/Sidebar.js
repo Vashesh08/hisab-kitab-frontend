@@ -170,9 +170,13 @@ export default function Sidebar({ changeVisibility, isVisible, setIsVisible }) {
                   className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
                     Dai + Bhukha
                 </ListItem>
+                <ListItem onClick={() => changePage("govindmachine835")}
+                  className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
+                    Machine (83.50 A/C)
+                </ListItem>
                 <ListItem onClick={() => changePage("govinddaibhuka835")}
                   className="text-[#ABD6DFFF] w-10/12 hover:text-black active:text-black">
-                    Dai + (83.50 + 75 A/C)
+                    Dai (83.50 A/C)
                 </ListItem>
               </List>
             </AccordionBody>

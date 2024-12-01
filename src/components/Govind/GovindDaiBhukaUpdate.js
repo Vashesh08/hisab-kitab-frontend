@@ -91,8 +91,14 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
           name={["user", `daiBhukaBhukaWeight${index}`]}
           label={`Bhuka Weight ${index+1}`}
           initialValue={Number(bhukaItems[index])}
-          rules={[{ type: "number", min: 0, required: true }]}
-        //   onChange={(e) => onChangeWt(e, "weight", index)}
+          rules={[{  type: "number", min: 0,
+          //   onChange={(e) => onChangeWt(e, "weight", index)}
+          validator: (_, value) => 
+          (isNaN(value) || value >= 0) 
+          ? Promise.resolve()
+          : Promise.reject(new Error("Item is not a valid number!")),
+            }
+            ]}
           >
           <InputNumber/>
           </Form.Item>
@@ -128,7 +134,7 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
           totalReceiveQty += parseFloat(daiBhukaDaiWeightValues[index]);
         }
         for (let index = 0; index < numberOfBhukaItems; index++) {
-          totalReceiveQty += parseFloat(daiBhukaBhukaWeightValues[index]);
+          totalReceiveQty += isNaN(parseFloat(daiBhukaBhukaWeightValues[index])) ? 0 : parseFloat(daiBhukaBhukaWeightValues[index]);
         }
         totalLossQty += totalIssueQty - totalReceiveQty;
         
@@ -216,7 +222,7 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
           name={["user", "daiBhukaItems"]}
           label="Number of Bhuka Items"
           rules={[
-            { type: "number", min: 1, max: 5, required: true, step:1 }
+            { type: "number", min: 1, max: 5, step:1 }
           ]}
           initialValue={numberOfBhukaItems}
         >

@@ -6,7 +6,7 @@ import { Button, Form, InputNumber, Input, DatePicker, Select } from "antd";
 import { postLossAcct, updateLossBook } from "../../api/LossAcct.js";
 
 
-function GovindMachineBookUpdate({handleOk, textData}) {
+function GovindMachine835BookUpdate({handleOk, textData}) {
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
     const [numberOfIssueItems, setNumberOfIssueItems] = useState(textData.machineIssue.length || 1);
@@ -52,8 +52,8 @@ function GovindMachineBookUpdate({handleOk, textData}) {
     useEffect(() => {
         setIsLoading(true);
         if (textData.machineIssue.length > 0){
-            setNumberOfIssueItems(textData.machineIssue.length);
-            setIssueItems(textData.machineIssue);            
+            setNumberOfIssueItems(textData.machine835Issue.length);
+            setIssueItems(textData.machine835Issue);
           }
         setIsLoading(false);
     }, [textData]);
@@ -80,8 +80,8 @@ function GovindMachineBookUpdate({handleOk, textData}) {
         // console.log(user);
         
         const {
-          machineDate,
-          machineDescription,
+          machine835Date,
+          machine835Description,
           // issue22kActual,
           // is_assigned_to
         } = user;
@@ -91,13 +91,12 @@ function GovindMachineBookUpdate({handleOk, textData}) {
         const issueWeightValues = issueWeightKeys.map((key) => user[key]);
 
 
-        // console.log("Vashesh", issueWeightValues, textData.machineIssue,is_assigned_to);
-        if (textData.machineIssue.length === 0 || isNaN(textData.machineReceive)){
-          const backendData = {
+        if (textData.machine835Issue.length === 0 || isNaN(textData.machine835Receive)){
+            const backendData = {
             _id: textData._id,
-            machineDate: machineDate,
-            machineIssue: issueWeightValues,
-            machineDescription: machineDescription,
+            machine835Date: machine835Date,
+            machine835Issue: issueWeightValues,
+            machine835Description: machine835Description,
             // is_assigned_to: is_assigned_to
           }
           await updateGovindBook(backendData, token);
@@ -107,33 +106,32 @@ function GovindMachineBookUpdate({handleOk, textData}) {
           for (let index = 0; index < numberOfIssueItems; index++) {
             totalIssueQty += parseFloat(issueWeightValues[index]);
           }
-          let totalReceiveQty = parseFloat(textData.machineReceive);
+          let totalReceiveQty = parseFloat(textData.machine835Receive);
           let totalLossQty = 0;
           totalLossQty += totalIssueQty - totalReceiveQty;
           
           if (totalLossQty >= 0){
             const backendData = {
               _id: textData._id,
-              machineDate: machineDate,
-              machineDescription: machineDescription,
-              machineIssue: issueWeightValues,
-              machineLoss: totalLossQty.toFixed(2),
+              machine835Date: machine835Date,
+              machine835Description: machine835Description,
+              machine835Issue: issueWeightValues,
+              machine835Loss: totalLossQty.toFixed(2),
               // is_assigned_to: is_assigned_to,
             }
             await updateGovindBook(backendData, token);
             
             const lossData = {
-              "type": "Govind Machine",
+              "type": "Govind Machine 83.5",
               date: lastDate,
               "transactionId": textData._id,
               "lossWt": totalLossQty.toFixed(2),
-              "description": "Govind Machine Loss"
+              "description": "Govind Machine 83.5 Loss"
             }
 
             await updateLossBook(lossData, token);
 
           }
-          
         }
 
         form.resetFields();
@@ -159,7 +157,7 @@ function GovindMachineBookUpdate({handleOk, textData}) {
     >
 
           <Form.Item
-            name={["user", "machineDate"]}
+            name={["user", "machine835Date"]}
             label="Date"
             rules={[
               {
@@ -171,7 +169,7 @@ function GovindMachineBookUpdate({handleOk, textData}) {
             <DatePicker format="DD MMM, YYYY" disabledDate={disabledDate} />
           </Form.Item>
           
-          <Form.Item name={["user", "machineDescription"]} label="Description">
+          <Form.Item name={["user", "machine835Description"]} label="Description">
             <Input />
           </Form.Item>
 
@@ -204,4 +202,4 @@ function GovindMachineBookUpdate({handleOk, textData}) {
     
 }
 
-export default GovindMachineBookUpdate;
+export default GovindMachine835BookUpdate;

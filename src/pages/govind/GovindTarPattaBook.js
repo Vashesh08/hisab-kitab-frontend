@@ -384,6 +384,8 @@ const GovindTarPattaBook = () => {
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
+      ): dataIndex === "is_assigned_to" ?(
+        <div style={{textAlign:"right"}}>{text}</div>
       ):(
       searchedColumn === dataIndex ? (
         <Highlighter
@@ -507,18 +509,18 @@ const GovindTarPattaBook = () => {
       ...getColumnSearchProps('tarpattaLoss'),
       align: 'right',
     },
-    // {
-    //   title: "Assigned To",
-    //   dataIndex: "issue_to_kareegar",
-    //   render: text => (
-    //     <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   align: 'center',
-    //   ...getColumnSearchProps('issue_to_kareegar'),
-    // },
+    {
+      title: "Assigned To",
+      dataIndex: "is_assigned_to",
+      render: text => (
+        <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      align: 'center',
+      ...getColumnSearchProps('is_assigned_to'),
+    },
     {
       title: "Action",
       key: "action",
@@ -683,7 +685,7 @@ const GovindTarPattaBook = () => {
                   {lossBalance}
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={8}></Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={9}></Table.Summary.Cell> */}
+                <Table.Summary.Cell index={9}></Table.Summary.Cell>
                 
               </Table.Summary.Row>
             </>

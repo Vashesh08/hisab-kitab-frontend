@@ -123,9 +123,15 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
           label={`Bhuka Weight ${index+1}`}
           // initialValue={meltingIssueWt}
           initialValue={Number(bhukaItems[index])}
-          rules={[{ type: "number", min: 0, required: true }]}
-        //   onChange={(e) => onChangeWt(e, "weight", index)}
-          >
+          rules={[{  type: "number", min: 0,
+            //   onChange={(e) => onChangeWt(e, "weight", index)}
+            validator: (_, value) => 
+            (isNaN(value) || value >= 0) 
+            ? Promise.resolve()
+            : Promise.reject(new Error("Item is not a valid number!")),
+              }
+              ]}
+            >
           <InputNumber/>
           </Form.Item>
     ))
@@ -141,6 +147,7 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
           tarpattaDate,
           tarpattaDescription,
           // issue22kActual
+          is_assigned_to,
         } = user;
 
         
@@ -153,29 +160,30 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
         const bhukaWeightKeys = [...Array(numberOfBhukaItems)].map((_, index) => `bhukaWeight${index}`);
         const bhukaWeightValues = bhukaWeightKeys.map((key) => user[key]);
 
-        console.log("Vashesh", issueWeightValues, receiveWeightValues, bhukaWeightValues);
+        // console.log("Vashesh", issueWeightValues, receiveWeightValues, bhukaWeightValues);
         if (textData.tarpattaIssue.length === 0){
           const backendData = {
             _id: textData._id,
             tarpattaDate: tarpattaDate,
             tarpattaIssue: issueWeightValues,
-            tarpattaDescription: tarpattaDescription
+            tarpattaDescription: tarpattaDescription,
+            is_assigned_to: is_assigned_to
           }
           await updateGovindBook(backendData, token);
         }
         else if (textData.tarpattaLoss === undefined){
           let totalIssueQty = 0;
           for (let index = 0; index < numberOfIssueItems; index++) {
-            totalIssueQty += issueWeightValues[index];
+            totalIssueQty += parseFloat(issueWeightValues[index]);
           }
           let totalReceiveQty = 0;
           let totalBhukaQty = 0;
           let totalLossQty = 0;
           for (let index = 0; index < numberOfReceiveItems; index++) {
-            totalReceiveQty += receiveWeightValues[index];
+            totalReceiveQty += parseFloat(receiveWeightValues[index]);
           }
           for (let index = 0; index < numberOfBhukaItems; index++) {
-            totalBhukaQty += bhukaWeightValues[index];
+            totalBhukaQty += isNaN(parseFloat(bhukaWeightValues[index])) ? 0 : parseFloat(bhukaWeightValues[index]);
           }
           totalLossQty += totalIssueQty - totalReceiveQty - totalBhukaQty;
           
@@ -186,6 +194,7 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
               tarpattaBhuka: bhukaWeightValues,
               tarpattaLoss: totalLossQty.toFixed(2),
               tarpattaDescription: tarpattaDescription,
+              is_assigned_to: is_assigned_to
             }
 
             await updateGovindBook(backendData, token);
@@ -205,16 +214,16 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
         else{
           let totalIssueQty = 0;
           for (let index = 0; index < numberOfIssueItems; index++) {
-            totalIssueQty += issueWeightValues[index];
+            totalIssueQty += parseFloat(issueWeightValues[index]);
           }
           let totalReceiveQty = 0;
           let totalBhukaQty = 0;
           let totalLossQty = 0;
           for (let index = 0; index < numberOfReceiveItems; index++) {
-            totalReceiveQty += receiveWeightValues[index];
+            totalReceiveQty += parseFloat(receiveWeightValues[index]);
           }
           for (let index = 0; index < numberOfBhukaItems; index++) {
-            totalBhukaQty += bhukaWeightValues[index];
+            totalBhukaQty += isNaN(parseFloat(bhukaWeightValues[index])) ? 0 : parseFloat(bhukaWeightValues[index]);
           }
           totalLossQty += totalIssueQty - totalReceiveQty - totalBhukaQty;
           
@@ -225,6 +234,7 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
               tarpattaReceive: receiveWeightValues,
               tarpattaBhuka: bhukaWeightValues,
               tarpattaLoss: totalLossQty.toFixed(2),
+              is_assigned_to: is_assigned_to
             }
 
             await updateGovindBook(backendData, token);
@@ -338,7 +348,7 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
           name={["user", "bhukaItems"]}
           label="Number of Bhuka Items"
           rules={[
-            { type: "number", min: 1, max: 5, required: true, step:1 }
+            { type: "number", min: 1, max: 5, step:1 }
           ]}
           initialValue={numberOfBhukaItems}
         >
@@ -352,7 +362,24 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
           
           </>
         )}
-          
+        <Form.Item
+        name={["user", `is_assigned_to`]}
+        label={`Assigned To`}
+        rules={[
+          {
+            required: false,
+          },
+        ]}
+        initialValue={textData.is_assigned_to || ""}
+      >
+        <Select
+          options={[
+            { value: "Dai + Bhuka", label: "Machine" },
+            { value: "83.50 + 75 A/C", label: "83.50 + 75 A/C" },
+          ]}
+        />
+      </Form.Item>
+
         <Form.Item
         wrapperCol={{
             ...layout.wrapperCol,
