@@ -273,7 +273,7 @@ export default function Navbar(checkLoggedIn) {
       </div>
     
       <Modal
-        title="Are you sure you want to delete the selected rows ?"
+        title="Are you sure you want to hide everything ?"
         open={isDeleteModalOpen}
         onCancel={handleCancel}
         footer={null}

@@ -190,6 +190,7 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
           if (totalLossQty >= 0){
             const backendData = {
               _id: textData._id,
+              tarpattaIssue: issueWeightValues,
               tarpattaReceive: receiveWeightValues,
               tarpattaBhuka: bhukaWeightValues,
               tarpattaLoss: totalLossQty.toFixed(2),
@@ -230,6 +231,7 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
           if (totalLossQty >= 0){
             const backendData = {
               _id: textData._id,
+              tarpattaIssue: issueWeightValues,
               tarpattaDescription: tarpattaDescription,
               tarpattaReceive: receiveWeightValues,
               tarpattaBhuka: bhukaWeightValues,

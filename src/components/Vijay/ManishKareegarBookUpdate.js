@@ -186,6 +186,7 @@ function ManishKareegarBookUpdate({handleOk, textData}) {
             const backendData = {
               _id: textData._id,
               manishDescription: manishDescription,
+              manishIssue: issueWeightValues,
               manishReceive: receiveWeightValues,
               solderChainIssue: receiveWeightValues,
               manishBhuka: bhukaWeightValues,
@@ -250,6 +251,7 @@ function ManishKareegarBookUpdate({handleOk, textData}) {
           if (totalLossQty > 0){
             const backendData = {
               _id: textData._id,
+              manishIssue: issueWeightValues,
               manishDescription: manishDescription,
               manishReceive: receiveWeightValues,
               solderChainIssue: receiveWeightValues,

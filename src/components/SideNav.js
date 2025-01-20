@@ -22,6 +22,7 @@ import GovindDaiBhuka835 from '../pages/govind/GovindDaiBhuka835';
 import GovindCapMelting from '../pages/govindCapAccount/GovindCapMelting';
 import GovindCapAccountBook from '../pages/govindCapAccount/GovindCapAccountBook';
 import BabuMelting from '../pages/babu/BabuMelting';
+import Tarpatta from '../pages/Tarpatta';
 
 function SideNav({ currentPage, handlePageChange, isVisible, setIsVisible }) {
     return (
@@ -56,6 +57,8 @@ className="z-50 top-1 fixed text-white inline-flex items-center p-2 mt-2 ms-3 te
           <Masterstoke />
           ) : currentPage === "meltingbook" ?(
             <MeltingBook />
+          ) :currentPage === "meltingtarpattabook" ?(
+            <Tarpatta />
           ) : currentPage === "kareegardetails" ?(
             <KareegarPage />
           ) : currentPage === "lossacct" ?(

@@ -185,6 +185,7 @@ function VijayKareegarBookUpdate({handleOk, textData}) {
             const backendData = {
               _id: textData._id,
               vijayDescription: vijayDescription,
+              vijayIssue: issueWeightValues,
               vijayReceive: receiveWeightValues,
               solderChainIssue: receiveWeightValues,
               vijayBhuka: bhukaWeightValues,
@@ -250,6 +251,7 @@ function VijayKareegarBookUpdate({handleOk, textData}) {
             const backendData = {
               _id: textData._id,
               vijayDescription: vijayDescription,
+              vijayIssue: issueWeightValues,
               vijayReceive: receiveWeightValues,
               solderChainIssue: receiveWeightValues,
               vijayBhuka: bhukaWeightValues,
