@@ -63,9 +63,9 @@ function VijayJointUpdate({handleOk, textData}) {
             jointR2,
           } = user;
           const jointTotal = parseFloat(jointChainReceive) + parseFloat(jointBhuka);
-          const jointPowder = parseFloat(jointTotal) - parseFloat(textData.jointChainIssue);
+          const jointPowder = parseFloat(jointTotal) - parseFloat(textData.jointChainIssue[textData.index]);
           const jointR1 = (parseFloat(jointChainIssue) * parseFloat(jointMelting)) / parseFloat(jointTotal);
-          
+
           const updatedData = { ...textData };
           updatedData.jointDate[textData.index] = jointDate;
           updatedData.jointLotNo[textData.index] = jointLotNo;

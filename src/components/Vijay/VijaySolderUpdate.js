@@ -61,8 +61,8 @@ function VijaySolderUpdate({handleOk, textData}) {
           solderR2,
         } = user;
         const solderTotal = parseFloat(solderChainReceive) + parseFloat(solderBhuka);
-        const solderPowder = parseFloat(solderTotal) - parseFloat(textData.solderChainIssue);
-        const solderR1 = (parseFloat(textData.solderChainIssue) * parseFloat(solderMelting)) / parseFloat(solderTotal);
+        const solderPowder = parseFloat(solderTotal) - parseFloat(textData.solderChainIssue[textData.index]);
+        const solderR1 = (parseFloat(textData.solderChainIssue[textData.index]) * parseFloat(solderMelting)) / parseFloat(solderTotal);
         
         const updatedData = { ...textData };
         updatedData.solderDate[textData.index] = solderDate;
@@ -150,7 +150,7 @@ function VijaySolderUpdate({handleOk, textData}) {
       </Form.Item>
 
       <Form.Item name={["user", "solderChainIssue"]} label="Chain(I)">
-        {textData.solderChainIssue}
+        {textData.solderChainIssue[textData.index]}
       </Form.Item>
 
       <Form.Item name={["user", "solderChainReceive"]} label="Chain(R)"
@@ -196,7 +196,7 @@ function VijaySolderUpdate({handleOk, textData}) {
       </Form.Item>
 
       <Form.Item name={["user", "solderChainIssue"]} label="Chain(I)">
-        {textData.solderChainIssue}
+        {textData.solderChainIssue[textData.index]}
       </Form.Item>
 
       <Form.Item name={["user", "solderChainReceive"]} label="Chain(R)">
