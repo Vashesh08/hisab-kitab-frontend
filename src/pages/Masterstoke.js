@@ -233,7 +233,7 @@ const MasterStock = () => {
         if (docs[i]["_id"] === item && !docs[i]["is_deleted_flag"]) {
           console.log(docs[i])
           if (docs[i]["type"] === "Issue"){
-              curMasterStockClosingBalance += parseFloat(docs[i]["weight"])
+              curMasterStockClosingBalance += parseFloat(docs[i]["issue22k"])
           }
           else if (docs[i]["type"] === "Receive"){
               if (docs[i]["category"] === "metal"){
