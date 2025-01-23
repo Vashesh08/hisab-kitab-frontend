@@ -54,11 +54,11 @@ function KareegarBookUpdate({handleOk, textData, kareegarId}) {
         if (!isNaN(beads_recv_weight)){
             const backendData = {
                 _id: textData._id,
-                recv_wt: recv_weight.toFixed(2),
-                beads_recv_wt: beads_recv_weight.toFixed(2),
+                recv_wt: parseFloat(recv_weight).toFixed(2),
+                beads_recv_wt: parseFloat(beads_recv_weight).toFixed(2),
             };
-            balance -= parseFloat(recv_weight);
-            beads_balance_last -= parseFloat(beads_recv_weight);
+            balance -= parseFloat(recv_weight).toFixed(2);
+            beads_balance_last -= parseFloat(beads_recv_weight).toFixed(2);
             await updateKareegarBook(backendData, token);
         }
         else{
@@ -66,7 +66,7 @@ function KareegarBookUpdate({handleOk, textData, kareegarId}) {
                 _id: textData._id,
                 recv_wt: recv_weight.toFixed(2),
             }
-            balance -= parseFloat(recv_weight);
+            balance -= parseFloat(recv_weight).toFixed(2);
             await updateKareegarBook(backendData, token);
         }
         // console.log("Vashesh", backendData);

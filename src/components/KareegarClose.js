@@ -69,10 +69,10 @@ function KareegarClose({ kareegarId, handleOk}){
         const kareegarData = data.find(item => item._id === kareegarId);
         let balance = parseFloat(kareegarData.balance)
         let boxWt = parseFloat(kareegarData.boxWt)
-        let loss = (parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ).toFixed(2)
+        if (((parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ) >= 0) && (closingWt >= boxWt)){
         const kareegarBalanceData = {
           '_id': kareegarId,
-          "balance": (balance - parseFloat(loss)).toFixed(2)
+          "balance": (parseFloat(closingWt) - parseFloat(boxWt)).toFixed(2)
         }
         await updateKareegarBalance(kareegarBalanceData, token);
 
@@ -90,7 +90,6 @@ function KareegarClose({ kareegarId, handleOk}){
         const updatedData = await postKareegarBook(backendData, token);
         console.log("updatedData",updatedData);
 
-        if ((parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ) > 0){
           const lossData = {
             "type": "Kareegar",
             "date": date,
@@ -99,7 +98,6 @@ function KareegarClose({ kareegarId, handleOk}){
             "description": kareegarData.name + " Loss for " + getFormattedDate(date)
           }
           await postLossAcct(lossData, token)
-        }
 
         // const today = dayjs();
         const tomorrow = date.add(1, 'day');
@@ -114,6 +112,7 @@ function KareegarClose({ kareegarId, handleOk}){
         }
 
         await postKareegarBook(backendData2, token);
+      }
 
 
     form.resetFields();

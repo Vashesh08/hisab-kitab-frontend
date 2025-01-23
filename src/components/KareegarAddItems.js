@@ -105,9 +105,9 @@ function KareegarAddItems({ kareegarId, handleOk}) {
         type: "Issue",
         date: dayjs(date, "YYYY-MM-DD"),
         category: category,
-        description,
-        issue_wt,
-        beads_issue_wt,
+        description: description,
+        issue_wt: issue_wt,
+        beads_issue_wt: beads_issue_wt,
         is_receiver_updated: false,
       };
       await postKareegarBook(backendData, token);
@@ -132,9 +132,9 @@ function KareegarAddItems({ kareegarId, handleOk}) {
         type: "Receive",
         date: dayjs(date, "YYYY-MM-DD"),
         category: category,
-        description,
-        recv_wt,
-        beads_recv_wt
+        description: description,
+        recv_wt: recv_wt,
+        beads_recv_wt: beads_recv_wt
       };
       await postKareegarBook(backendData, token);
       // const updated = await postMasterStock(backendData, token);
@@ -158,11 +158,11 @@ function KareegarAddItems({ kareegarId, handleOk}) {
         type: "Issue & Receive",
         date: dayjs(date, "YYYY-MM-DD"),
         category: category,
-        description,
-        issue_wt,
-        beads_issue_wt,
-        recv_wt,
-        beads_recv_wt
+        description: description,
+        issue_wt: issue_wt,
+        beads_issue_wt: beads_issue_wt,
+        recv_wt: recv_wt,
+        beads_recv_wt: beads_recv_wt
       };
       await postKareegarBook(backendData, token);
       // console.log(issue_wt,  typeof issue_wt)
