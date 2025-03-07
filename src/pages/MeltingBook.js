@@ -276,7 +276,7 @@ const MeltingBook = () => {
           // console.log(rows[i]);
 
             docs[i]["weight24k"].forEach((element, index) => {
-              console.log(element)
+              //console.log(element)
               if (docs[i]["category"][index] === "Gold"){
                 if (parseFloat(docs[i]["purity"][index]) === 99.5){
                   currMeltingBookClosing995Balance += parseFloat(element);

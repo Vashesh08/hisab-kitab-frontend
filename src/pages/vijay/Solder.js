@@ -58,7 +58,7 @@ const Solder = () => {
     const docs = originaldata.flatMap(item => {
       // If item has tags1 array
       if (item.solderChainIssue && item.solderChainIssue.length > 0) {
-        console.log("Issue", item.solderChainIssue);
+        //console.log("Issue", item.solderChainIssue);
         return item.solderChainIssue.map((tag, index) => ({
           ...item,
           solderChainIssue: tag,
@@ -68,7 +68,7 @@ const Solder = () => {
       // If neither exists, return the item as is
       return [];
     });
-    console.log("Vashesh", docs);
+    //console.log("Vashesh", docs);
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -161,7 +161,7 @@ const Solder = () => {
           // If neither exists, return the item as is
           return [];
         });
-        console.log("Vashesh", docs);
+        //console.log("Vashesh", docs);
         setFullData(docs);
         
         for (let eachEntry in docs) {
@@ -229,9 +229,9 @@ const Solder = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const showAddPopup = (text) => {
-    console.log("addpopup", text);
+    //console.log("addpopup", text);
     setEditModalData(text);
-    console.log("updateData",editModalData);
+    //console.log("updateData",editModalData);
     setIsEditModalOpen(true);
   };
 

@@ -81,7 +81,7 @@ function VijayKareegarBookUpdate({handleOk, textData}) {
             setNumberOfBhukaItems(textData.vijayBhuka.length);
             setBhukaItems(textData.vijayBhuka);
         }
-        console.log("loaded");
+        //("loaded");
         setIsLoading(false);
     }, [textData]);
 
@@ -154,7 +154,7 @@ function VijayKareegarBookUpdate({handleOk, textData}) {
         const bhukaWeightKeys = [...Array(numberOfBhukaItems)].map((_, index) => `bhukaWeight${index}`);
         const bhukaWeightValues = bhukaWeightKeys.map((key) => user[key]);
 
-        console.log("Vashesh", issueWeightValues, receiveWeightValues, bhukaWeightValues, textData);
+        //console.log("Vashesh", issueWeightValues, receiveWeightValues, bhukaWeightValues, textData);
         if (textData.vijayIssue.length === 0){
           const backendData = {
             _id: textData._id,

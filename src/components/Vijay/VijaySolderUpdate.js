@@ -61,8 +61,8 @@ function VijaySolderUpdate({handleOk, textData}) {
           solderR2,
         } = user;
         const solderTotal = parseFloat(solderChainReceive) + parseFloat(solderBhuka);
-        const solderPowder = parseFloat(solderTotal) - parseFloat(textData.solderChainIssue[textData.index]);
-        const solderR1 = (parseFloat(textData.solderChainIssue[textData.index]) * parseFloat(solderMelting)) / parseFloat(solderTotal);
+        const solderPowder = parseFloat(solderTotal) - parseFloat(textData.solderChainIssue);
+        const solderR1 = (parseFloat(textData.solderChainIssue) * parseFloat(solderMelting)) / parseFloat(solderTotal);
         
         const updatedData = { ...textData };
         updatedData.solderDate[textData.index] = solderDate;
@@ -76,7 +76,7 @@ function VijaySolderUpdate({handleOk, textData}) {
         updatedData.solderPowder[textData.index] = parseFloat(solderPowder).toFixed(2);
         updatedData.solderR1[textData.index] = parseFloat(solderR1).toFixed(2);
         updatedData.is_solder_updated[textData.index] = 1;
-        console.log("updated", updatedData, solderPowder, solderR1);
+        //console.log("updated", updatedData, solderPowder, solderR1);
 
         // const temp = Array(updatedData.solderChainReceive.length).fill("-1");
 
@@ -95,7 +95,7 @@ function VijaySolderUpdate({handleOk, textData}) {
           is_solder_updated: updatedData.is_solder_updated,
         }
 
-        console.log("updatedData", backendData);
+        //console.log("updatedData", backendData);
         await updateVijayBook(backendData, token);
 
         form.resetFields();
@@ -150,7 +150,7 @@ function VijaySolderUpdate({handleOk, textData}) {
       </Form.Item>
 
       <Form.Item name={["user", "solderChainIssue"]} label="Chain(I)">
-        {textData.solderChainIssue[textData.index]}
+        {textData.solderChainIssue}
       </Form.Item>
 
       <Form.Item name={["user", "solderChainReceive"]} label="Chain(R)"
@@ -196,7 +196,7 @@ function VijaySolderUpdate({handleOk, textData}) {
       </Form.Item>
 
       <Form.Item name={["user", "solderChainIssue"]} label="Chain(I)">
-        {textData.solderChainIssue[textData.index]}
+        {textData.solderChainIssue}
       </Form.Item>
 
       <Form.Item name={["user", "solderChainReceive"]} label="Chain(R)">

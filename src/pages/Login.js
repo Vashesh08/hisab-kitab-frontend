@@ -22,7 +22,7 @@ function Login(checkLoggedIn) {
         });
 
         if ('token' in response.data) {
-            console.log("valid login");
+            //console.log("valid login");
         
 
         // Assuming your backend sends a token upon successful authentication

@@ -79,7 +79,7 @@ function VijayJointUpdate({handleOk, textData}) {
           updatedData.jointPowder[textData.index] = parseFloat(jointPowder).toFixed(2);
           updatedData.jointR1[textData.index] = parseFloat(jointR1).toFixed(2);
           updatedData.is_joint_updated[textData.index] = 1;
-          console.log("updated", updatedData, jointPowder, jointR1);
+          //console.log("updated", updatedData, jointPowder, jointR1);
 
           // const temp = Array(updatedData.jointDate).fill("-1");
 
@@ -99,7 +99,7 @@ function VijayJointUpdate({handleOk, textData}) {
             is_joint_updated: updatedData.is_joint_updated,
           }
 
-          console.log("updatedData", backendData);
+          //console.log("updatedData", backendData);
           await updateVijayBook(backendData, token);
         }else{
           const {
@@ -119,7 +119,7 @@ function VijayJointUpdate({handleOk, textData}) {
             is_joint_updated: updatedData.is_joint_updated,
           }
 
-          console.log("updatedData", backendData);
+          //console.log("updatedData", backendData);
           await updateVijayBook(backendData, token);
         }
         form.resetFields();
@@ -143,7 +143,6 @@ function VijayJointUpdate({handleOk, textData}) {
         }}
         validateMessages={validateMessages}
     >
-      {console.log("Vashesh test", textData, textData.is_joint_updated, textData.is_joint_updated[textData.index])}
     {(textData.jointChainIssue[textData.index] !== "-1" && textData.jointChainReceive[textData.index] === "-1")?(
       <>
       <Form.Item

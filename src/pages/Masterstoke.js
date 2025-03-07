@@ -213,7 +213,7 @@ const MasterStock = () => {
     const masterStockId = {
       masterstockId: selectedRowKeys
     }
-    console.log(selectedRowKeys, rows);
+    //console.log(selectedRowKeys, rows);
 
     const balanceData = await getUtilityData(token);
 
@@ -231,7 +231,7 @@ const MasterStock = () => {
     selectedRowKeys.map((item, index) => {
       for (let i = 0; i < docs.length; i++) {
         if (docs[i]["_id"] === item && !docs[i]["is_deleted_flag"]) {
-          console.log(docs[i])
+          //console.log(docs[i])
           if (docs[i]["type"] === "Issue"){
               curMasterStockClosingBalance += parseFloat(docs[i]["issue22k"])
           }
@@ -239,7 +239,7 @@ const MasterStock = () => {
               if (docs[i]["category"] === "metal"){
                 curMasterStockOpeningBalance -= parseFloat(docs[i]["receive22k"])
                 curMasterStockClosingBalance -= parseFloat(docs[i]["receive22k"])
-                console.log(docs[i]["purity"]);
+                //console.log(docs[i]["purity"]);
                 if (docs[i]["purity"] === 99.5){
                   curMeltingBookOpening995Balance -= parseFloat(docs[i]["weight"])
                   curMeltingBookClosing995Balance -= parseFloat(docs[i]["weight"])
@@ -262,7 +262,7 @@ const MasterStock = () => {
             if (docs[i]["category"] === "metal"){
               curMasterStockOpeningBalance -= parseFloat(docs[i]["receive22k"])
               curMasterStockClosingBalance -= parseFloat(docs[i]["receive22k"])
-              console.log(docs[i]["purity"]);
+              //console.log(docs[i]["purity"]);
               if (docs[i]["purity"] === 99.5){
                 curMeltingBookOpening995Balance -= parseFloat(docs[i]["weight"])
                 curMeltingBookClosing995Balance -= parseFloat(docs[i]["weight"])

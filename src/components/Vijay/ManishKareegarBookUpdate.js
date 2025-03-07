@@ -81,7 +81,7 @@ function ManishKareegarBookUpdate({handleOk, textData}) {
             setNumberOfBhukaItems(textData.manishBhuka.length);
             setBhukaItems(textData.manishBhuka);
         }
-        console.log("loaded");
+        //console.log("loaded");
         setIsLoading(false);
     }, [textData]);
 
@@ -154,7 +154,7 @@ function ManishKareegarBookUpdate({handleOk, textData}) {
         const bhukaWeightKeys = [...Array(numberOfBhukaItems)].map((_, index) => `bhukaWeight${index}`);
         const bhukaWeightValues = bhukaWeightKeys.map((key) => user[key]);
 
-        console.log("Vashesh", issueWeightValues, receiveWeightValues, bhukaWeightValues, textData);
+        //console.log("Vashesh", issueWeightValues, receiveWeightValues, bhukaWeightValues, textData);
         if (textData.manishIssue.length === 0){
           const backendData = {
             _id: textData._id,

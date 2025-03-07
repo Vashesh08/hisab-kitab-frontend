@@ -176,9 +176,9 @@ const GovindDaiBhuka = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const showAddPopup = (text) => {
-    console.log("addpopup", text);
+    //("addpopup", text);
     setEditModalData(text);
-    console.log("updateData",editModalData);
+    //console.log("updateData",editModalData);
     setIsEditModalOpen(true);
   };
 

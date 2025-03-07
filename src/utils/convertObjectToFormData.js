@@ -9,7 +9,7 @@ export default function convertObjectToFormData(data) {
         // console.log(data, key)
         if (Array.isArray(data[key])) {
             data[key].forEach(item => {
-                if (!!item) {
+                if (!!item||item===0) {
                     formData.append(key, item);
                 }
             })

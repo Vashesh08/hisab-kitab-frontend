@@ -58,7 +58,7 @@ const Joint = () => {
     const filteredData = originaldata.flatMap(item => {
       // If item has tags1 array
       if (item.solderChainReceive && item.solderChainReceive.length > 0) {
-        console.log("Issue", item.solderChainReceive);
+        //console.log("Issue", item.solderChainReceive);
         return item.solderChainReceive.map((tag, index) => ({
           ...item,
           solderChainReceive: tag,
@@ -69,7 +69,7 @@ const Joint = () => {
       return [];
     });
     const docs = filteredData.filter((item) => item.solderChainReceive !== "-1");
-    console.log("Vashesh", docs);
+    //console.log("Vashesh", docs);
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -163,7 +163,7 @@ const Joint = () => {
           return [];
         });
         const docs = filteredData.filter((item) => item.solderChainReceive !== "-1");
-        console.log("Vashesh", docs);
+        //console.log("Vashesh", docs);
         setFullData(docs);
         
         for (let eachEntry in docs) {
@@ -231,9 +231,9 @@ const Joint = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const showAddPopup = (text) => {
-    console.log("addpopup", text);
+    //console.log("addpopup", text);
     setEditModalData(text);
-    console.log("updateData",editModalData);
+    //console.log("updateData",editModalData);
     setIsEditModalOpen(true);
   };
 

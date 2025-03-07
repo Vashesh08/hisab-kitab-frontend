@@ -256,7 +256,7 @@ const Polish = () => {
     const polishBookId = {
       polishId: selectedRowKeys
     }
-    console.log(selectedRowKeys, rows);
+    //console.log(selectedRowKeys, rows);
     const lossIds = [];
     const balanceData = await getUtilityData(token)
     let curPolishLoss = parseFloat(balanceData[0]["polishLoss"])

@@ -125,7 +125,7 @@ const GovindDaiBhuka835 = () => {
         const filteredData = allData.filter(item => (item.machine835Issue.length > 0));
         const docs = filteredData.filter(item => item.is_assigned_to === "83.50 + 75 A/C");
         setFullData(docs);
-        console.log("data", filteredData);
+        //console.log("data", filteredData);
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
               deleted_data.push(docs[eachEntry]);
@@ -176,9 +176,9 @@ const GovindDaiBhuka835 = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const showAddPopup = (text) => {
-    console.log("addpopup", text);
+    //console.log("addpopup", text);
     setEditModalData(text);
-    console.log("updateData",editModalData);
+    //console.log("updateData",editModalData);
     setIsEditModalOpen(true);
   };
 

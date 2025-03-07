@@ -276,7 +276,7 @@ const GovindMeltingBook = () => {
           // console.log(rows[i]);
 
             docs[i]["meltingWeight"].forEach((element, index) => {
-              console.log(element)
+              //console.log(element)
               if (docs[i]["meltingCategory"][index] === "Gold"){
                 if (parseFloat(docs[i]["meltingPurity"][index]) === 99.5){
                   currMeltingBookClosing995Balance += parseFloat(element);
