@@ -14,18 +14,20 @@ import { fetchKareegarBookList, deleteKareegarBookList } from "../api/kareegarBo
 import KareegarAddItems from "../components/KareegarAddItems.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
-import { EditOutlined, DeleteOutlined, LeftOutlined , PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, LeftOutlined , PlusCircleOutlined, BarsOutlined, SearchOutlined, EnterOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
-import { getKareegarData, updateKareegarBalance } from "../api/kareegarDetail.js";
+import { closeKareegarBook } from "../api/kareegarBook.js";
+import { getKareegarData, updateKareegarBalance, updateKareegarDetail } from "../api/kareegarDetail.js";
 import KaareegarChangeBoxWt from "../components/KareegarChangeBoxWt.js"
 import KaareegarClose from "../components/KareegarClose.js";
 import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
 import KareegarBookUpdate from "../components/KareegarBookUpdate.js";
+import { Select } from 'antd';
 
 const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => {
   const screenWidth = window.innerWidth;
   const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [itemsPerPage] = useState(1); // Change this to show all
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
@@ -37,7 +39,10 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const [totalBeadsIssueQuantity, setTotalBeadsIssueQty] = useState(0);
   const [totalBeadsRecvQuantity, setTotalBeadsRecvQty] = useState(0);
   const [boxWt, setBoxWt] = useState(0);
+  const [dateSelectOption, setDateSelectOption] = useState([]);
+  const [currentSelectedDate, setCurrentSelectedDate] = useState(0);
   // const [closingBalance, setClosingBalance] = useState(0);
+  const latestDateValueRef = useRef();
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -51,6 +56,15 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
 
     return formattedDate
   }
+
+  const handleDateChange = (value) => {
+    // console.log("value", value);
+    if (!isNaN(parseFloat(value))){
+      latestDateValueRef.current = value;
+      setCurrentSelectedDate(value);
+      updateRows("all", value);
+    }
+  };
 
   const handleOpeningChange = (event) => {
     // console.log(event.target.value, isNaN(event.target.value))
@@ -83,7 +97,12 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     const today = dayjs();
     // console.log("data", data)
 
-    const docs = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
+    const allData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
+    // const docs = allData.filter(item => item.is_editable_flag===true);
+    const docs = allData.filter(item => 
+      latestDateValueRef.current === dateSelectOption.length ? item.cutoffDateNumber === 0 : item.cutoffDateNumber === latestDateValueRef.current
+    );
+    //console.log("currentSelectedDate",allData, latestDateValueRef.current,dateSelectOption.length);
     setFullData(docs);
 
     for (let eachEntry in docs) {
@@ -258,8 +277,42 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           
           const token = localStorage.getItem("token");
           const kareegarUtilityData =  await getKareegarData(page, itemsPerPage, token);
+          //console.log("kareegarUtilityData",kareegarUtilityData);
           const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
-          setBoxWt(kareegarData["boxWt"])
+          //console.log(kareegarId, kareegarData);
+
+          // console.log("kareegarUtilityData",kareegarData);
+
+          // console.log(typeof kareegarData.kareegarCutoffStartDate);
+          // const startDates = [...kareegarData.kareegarCutoffStartDate];
+          const startDates = Array.isArray(kareegarData.kareegarCutoffStartDate) && kareegarData.kareegarCutoffStartDate.length > 0 
+          ? [...kareegarData.kareegarCutoffStartDate] 
+          : [dayjs("2000-01-01")];
+
+          const endDates = [...kareegarData.kareegarCutoffEndDate];
+
+          // const startDates = kareegarData.kareegarCutoffStartDate || [dayjs("2000-01-01")];
+          // const endDates = kareegarData.kareegarCutoffEndDate || [];
+          endDates.push("")
+          
+          // Example
+          // startDates = [2000, 2002, 2004, 2006]
+          // endDates = [2002, 2004, 2006]
+          // index = [1, 2, 3, 0]
+          
+          const combinedDates = [];
+          for (let i = 0; i < startDates.length; i++) {
+            combinedDates.push({ start: startDates[i], end: endDates[i] });
+          }
+          // currentSelectedDate[-1]
+          setDateSelectOption(combinedDates);
+
+          // console.log("combinedDates",combinedDates,kareegarData,startDates,endDates);
+          // let lastDate = combinedDates[combinedDates.length - 1];
+          // console.log("selectedDate",lastDate);
+          latestDateValueRef.current = combinedDates.length;
+          setCurrentSelectedDate(combinedDates.length);
+          setBoxWt(kareegarData["boxWt"]);
     
         // send request to check authenticated
         const data = [];
@@ -268,9 +321,12 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         const today = dayjs();
         // console.log("data", data)
 
-        const docs = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
+        const allData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
+        const docs = allData.filter(item => item.is_editable_flag===true);
+        //console.log("filterData", docs);
+
         setFullData(docs);
-        // console.log("data", docs);
+
         for (let eachEntry in docs) {
           if (docs[eachEntry].is_deleted_flag){
             deleted_data.push(docs[eachEntry]);
@@ -338,6 +394,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCutoffDateModalOpen, setIsCutoffDateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isBoxWtModalOpen, setIsBoxWtModalOpen] = useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
@@ -345,6 +402,10 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const showModal = () => {
     setIsModalOpen(true);
   };
+  
+  const showCutoffDateModal = (text) => {
+    setIsCutoffDateModalOpen(true);
+  }
 
   const showAddPopup = (text) => {
     // console.log(text);
@@ -362,6 +423,42 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
 
   const showDeletePopup = (text) => {
     setIsDeleteModalOpen(true)
+  }
+
+  const enterCutoffDate = async () => {
+    setIsLoading(true);
+    const token = localStorage.getItem("token");
+    const kareegarUtilityData =  await getKareegarData(page,itemsPerPage, token);
+    const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
+    const today = dayjs();
+    //console.log(kareegarUtilityData,kareegarData);
+
+    const updatedKareegarDetail = {
+      kareegar_id: kareegarId,
+      cutoffDateNumber: parseInt(kareegarData.kareegarCutoffDateNumber) + 1,
+    }
+    //console.log("updatedKareegarDetail",updatedKareegarDetail);
+    closeKareegarBook(updatedKareegarDetail, token);
+    
+    updateRows("today");
+
+    const newKareegarCutoffStartDate = [...kareegarData.kareegarCutoffStartDate];
+    newKareegarCutoffStartDate.push(today);
+
+    const newKareegarCutoffEndDate = [...kareegarData.kareegarCutoffEndDate];
+    newKareegarCutoffEndDate.push(today);
+    
+    const kareegarBalanceData = {
+      '_id': kareegarId,
+      kareegarCutoffDateNumber: parseInt(kareegarData.kareegarCutoffDateNumber)+1,
+      kareegarCutoffStartDate: newKareegarCutoffStartDate,
+      kareegarCutoffEndDate: newKareegarCutoffEndDate,
+    }
+    // // console.log(balance);
+    await updateKareegarDetail(kareegarBalanceData, token);
+    setKareegarDetailsPage(true);
+    setIsCutoffDateModalOpen(false);
+    setIsLoading(false);
   }
 
   const deleteModal = async () => {
@@ -413,10 +510,10 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
               beads_balance += parseFloat(docs[i]["beads_recv_wt"]);
             }
           }
-          if (docs[i]["loss_wt"] !== "" && !isNaN(docs[i]["loss_wt"])) {
+          if (!isNaN(docs[i]["loss_wt"]) && docs[i]["loss_wt"] !== "") {
             balance += parseFloat(docs[i]["loss_wt"]);
             const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Kareegar")
-            console.log(item, matchedData, docs[i]);
+            // console.log(item, matchedData, docs[i]);
             if (matchedData){
               lossIds.push(matchedData._id);  
             }
@@ -426,7 +523,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       }
     })
 
-    console.log(lossIds);
+    // console.log(lossIds);
     const deleteFromLossAcct = {
       lossId: lossIds,
     }
@@ -437,7 +534,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       "balance": balance.toFixed(2),
       "beads_balance": beads_balance.toFixed(2)
     }
-    console.log(balance);
+    // console.log(balance);
     await updateKareegarBalance(kareegarBalanceData, token);
 
     const kareegarBookId = {
@@ -457,6 +554,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     setIsBoxWtModalOpen(false);
     setIsEditModalOpen(false);
     setIsModalOpen(false);
+    setIsCutoffDateModalOpen(false);
     setIsCompleteModalOpen(false);
     setIsDeleteModalOpen(false);
   };
@@ -466,6 +564,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     setIsBoxWtModalOpen(false);
     setIsModalOpen(false);
     setIsEditModalOpen(false);
+    setIsCutoffDateModalOpen(false);
     setIsCompleteModalOpen(false);
     setIsDeleteModalOpen(false);
   }
@@ -727,7 +826,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       
       render: (text, record, index) => (
         <>
-          {text.is_receiver_updated || text.is_deleted_flag ? (
+          {text.is_receiver_updated || text.is_deleted_flag || (text.is_editable_flag===false) ? (
           <div></div>
         ) : (
           <div style={{ textAlign:"center"}}>
@@ -766,7 +865,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     selectedRowKeys,
     onChange: onSelectChange,
     getCheckboxProps: (record) => ({
-      disabled: record.is_deleted_flag === true,
+      disabled: ((record.is_deleted_flag === true) || (record.is_editable_flag === false)),
     }),
     selections: [
       {
@@ -802,7 +901,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
 
   const getRowClassName = (record, i) => {
     // console.log(i, record, record._id)
-    return record.is_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
+    return record.is_deleted_flag ? 'striked-row delete' : (record.is_editable_flag===false)? "not-editable": i % 2 ? "odd" : "even";
   };
 
   if (isLoading){
@@ -846,6 +945,31 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
                   </Tooltip>
                 </div>
+                <div className="mt-1 flex justify-between items-center bg-[#ABD6DFFF] h-12 p-2">
+                <span className="text-[#00203FFF] whitespace-nowrap w-full font-medium h-12 py-2 flex ">
+                Cutoff Date &nbsp;
+                  <Select
+                  selectorBg="#ABD6DF"
+                  value={currentSelectedDate}
+                  //value={`${getFormattedDate(dateSelectOption[dateSelectOption.length - 1].start)} - ${dateSelectOption[dateSelectOption.length - 1].end && dateSelectOption[dateSelectOption.length - 1].end !== "" ? getFormattedDate(dateSelectOption[dateSelectOption.length - 1].end) : 'Current'}`}
+                    //String(getFormattedDate(dateSelectOption[dateSelectOption.length-1].start) + " - " + "Present")}
+                  onChange={handleDateChange}
+                  style={{
+                    width: '180px',
+                    height: '100%',
+                  }}
+                >
+                  {dateSelectOption.map((date, index) => (
+                    <Select.Option key={index} value={index+1}>
+                      {`${getFormattedDate(date.start)} - ${date.end && date.end !== "" ? getFormattedDate(date.end) : 'Current'}`}
+                    </Select.Option>
+                  ))}
+                </Select>
+                </span>
+                <Tooltip title="Close Monthly Account" placement="bottomRight">
+                  <EnterOutlined className="ml-2 float-end" style={{ fontSize:"125%"}} onClick={showCutoffDateModal}/> 
+                </Tooltip>
+                </div>
               </div>
             </div>
             <br/>
@@ -880,8 +1004,37 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
                 Close Daily Account: <PlusCircleOutlined className=" float-end" style={{ fontSize:"140%"}} onClick={showCompleteModal}/> 
               </span>
             </div>
+            
+            <div className="	text-xl flex justify-end items-center">
+              <span className="text-[#00203FFF] font-medium	 w-full bg-[#ABD6DFFF] p-2">
+                Close Account: <EnterOutlined className=" float-end" style={{ fontSize:"140%"}} onClick={showCutoffDateModal}/> 
+              </span>
+            </div>
           </>
         )}
+        
+        <Modal
+        title={
+          <>
+          Close Monthly Book
+          </>
+        }
+        open={isCutoffDateModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+      >
+              Are you sure you want to make today cutoff date? <br />
+              This will hide all previous entries. <br />
+              {/* Total Loss for this month = {(totalIssueQuantity-totalRecvQuantity-totalLossQuantity).toFixed(2)} */}
+        <div className="flex justify-center	">
+        <Button className="bg-[#ABD6DFFF] mr-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={enterCutoffDate}>
+            Yes
+        </Button>
+        <Button className="bg-[#ABD6DFFF] ml-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={handleCancel}>
+            No
+        </Button>
+        </div>
+      </Modal> 
 
       <Modal
         title="Add Item"
@@ -955,7 +1108,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         dataSource={rows}
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
-        pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100']}}
+        pagination={{ defaultPageSize: 100, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000', '10000']}}
         summary={() => {
           return (
             <>

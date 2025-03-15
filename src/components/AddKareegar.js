@@ -54,10 +54,12 @@ function AddKareegar({ handleOk}){
             date: date,
             name: name,
             category: category,
-            kareegarCutoffDate: currentDate,
+            kareegarCutoffDateNumber: 0,
+            kareegarCutoffStartDate: [String(currentDate)],
+            kareegarCutoffEndDate: [""],
             is_hidden_flag: false
             }
-
+            
         await postKareegarData(backendData,token);
 
     form.resetFields();

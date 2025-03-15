@@ -68,6 +68,10 @@ th.ant-table-cell::before {
   background-color: #e4e7eb;
 }
 
+.not-editable{
+  background-color: antiquewhite;
+}
+
 .even {
   background-color: #eff1f3;
   /* background-color: #b3c4c7; */

@@ -10,6 +10,8 @@ import { deleteKareegarBookList, fetchKareegarBookList } from "../api/kareegarBo
 
 export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage, setKareegarName }) {
     const { Meta } = Card;
+    const [page] = useState(1);
+    const [itemsPerPage] = useState(100000000); 
     const [allKareegarDetails, setAllKareegarDetails] = useState([])
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,7 +25,6 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         const token = localStorage.getItem("token");
         const data = await getKareegarData(1, 100000000, token);
         const filteredData = data.filter(item => item.is_deleted_flag === false && item.is_hidden_flag === false);
-
         setAllKareegarDetails(filteredData);
 
         setIsLoading(false);
@@ -93,10 +94,10 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
                   lossIds.push(matchedData._id);  
                 }
               }
-              console.log("balance", balance, beads_balance);
+              //console.log("balance", balance, beads_balance);
             }
           }
-          console.log("lossIds",lossIds);
+          //console.log("lossIds",lossIds);
         
           const deleteFromLossAcct = {
             lossId: lossIds,
@@ -121,11 +122,69 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
       
       
         // console.log(kareegarId, "Delete ICon clicked");
-        const kareegar_data = await getKareegarData(1, 100000000, token);
+        const kareegar_data = await getKareegarData(page, itemsPerPage, token);
         const filteredData = kareegar_data.filter(item => item.is_deleted_flag === false && item.is_hidden_flag === false);
 
-        setAllKareegarDetails(filteredData);
+        const allKareegarIds = filteredData.map(item => item._id);
+        let kareegarDetails = [];
+
+        for (const item of filteredData) {
+          
+          const allData = await fetchKareegarBookList(page, itemsPerPage, item._id, token);
+          
+          let currentKareegarData = [];
+
+          for (let eachEntry in allData) {
+            // console.log(allData[eachEntry].is_editable_flag);
+            if (allData[eachEntry].is_deleted_flag === false && (allData[eachEntry].is_editable_flag === true)){
+              currentKareegarData.push(allData[eachEntry]);
+            }
+          }
+
+          // console.log(allData, "currentKareegarData", currentKareegarData);
+
+          let currentKareegarIssueQty = 0.0;
+          let currentKareegarRecvQty = 0.0;
+          let currentKareegarLossQty = 0.0;
+          let currentKareegarBeadsIssueQty = 0.0;
+          let currentKareegarBeadsRecvQty = 0.0;
+          currentKareegarData.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
+            // console.log(weight24k, receive22k, issue22k, loss22k);
+            if (isNaN(parseFloat(issue_wt))) {
+              issue_wt = 0.0; // Set it to zero if it's NaN
+            } 
+            if (isNaN(parseFloat(recv_wt))) {
+              recv_wt = 0.0; // Set it to zero if it's NaN
+            } 
+            if (isNaN(parseFloat(loss_wt))){
+              loss_wt = 0.0; // Set it to zero if it's NaN
+            }
+            if (isNaN(parseFloat(beads_issue_wt))){
+              beads_issue_wt = 0.0;  // Set it to zero if it's NaN
+            }
+            if (isNaN(parseFloat(beads_recv_wt))){
+              beads_recv_wt = 0.0; // Set it to zero if it's NaN
+            }
+            currentKareegarIssueQty += parseFloat(issue_wt);
+            currentKareegarRecvQty += parseFloat(recv_wt);
+            currentKareegarLossQty += parseFloat(loss_wt);
+            currentKareegarBeadsIssueQty += parseFloat(beads_issue_wt);
+            currentKareegarBeadsRecvQty += parseFloat(beads_recv_wt);
+          });
+
+
+          kareegarDetails.push({
+            "_id": item._id,
+            "name": item.name, 
+            "category": item.category,
+            "balance": parseFloat(currentKareegarIssueQty - currentKareegarRecvQty - currentKareegarLossQty).toFixed(2),
+            "bead balance": parseFloat(currentKareegarBeadsIssueQty - currentKareegarBeadsRecvQty).toFixed(2)
+          });
+
+        };
         
+        setAllKareegarDetails(kareegarDetails);
+       
         setIsDeleteModalOpen(false);
         setIsLoading(false);
     }
@@ -143,8 +202,69 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
             const token = localStorage.getItem("token");
             const data = await getKareegarData(1, 100000000, token);
             const filteredData = data.filter(item => item.is_deleted_flag === false && item.is_hidden_flag === false);
-            setAllKareegarDetails(filteredData);
-            // console.log(allKareegarDetails);
+            // console.log(data, filteredData)
+            const allKareegarIds = filteredData.map(item => item._id);
+            let kareegarDetails = [];
+
+            for (const item of filteredData) {
+              
+              const allData = await fetchKareegarBookList(page, itemsPerPage, item._id, token);
+              
+              let currentKareegarData = [];
+
+              for (let eachEntry in allData) {
+                if (allData[eachEntry].is_deleted_flag === false && (allData[eachEntry].is_editable_flag === true)){
+                  currentKareegarData.push(allData[eachEntry]);
+                }
+              }
+              // console.log("currentKareegarData",currentKareegarData, item._id,item.name,item.category);
+
+              // console.log(allData, "currentKareegarData", currentKareegarData);
+
+              let currentKareegarIssueQty = 0.0;
+              let currentKareegarRecvQty = 0.0;
+              let currentKareegarLossQty = 0.0;
+              let currentKareegarBeadsIssueQty = 0.0;
+              let currentKareegarBeadsRecvQty = 0.0;
+              currentKareegarData.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
+                // console.log(weight24k, receive22k, issue22k, loss22k);
+                if (isNaN(parseFloat(issue_wt))) {
+                  issue_wt = 0.0; // Set it to zero if it's NaN
+                } 
+                if (isNaN(parseFloat(recv_wt))) {
+                  recv_wt = 0.0; // Set it to zero if it's NaN
+                } 
+                if (isNaN(parseFloat(loss_wt))){
+                  loss_wt = 0.0; // Set it to zero if it's NaN
+                }
+                if (isNaN(parseFloat(beads_issue_wt))){
+                  beads_issue_wt = 0.0;  // Set it to zero if it's NaN
+                }
+                if (isNaN(parseFloat(beads_recv_wt))){
+                  beads_recv_wt = 0.0;  // Set it to zero if it's NaN
+                }
+                currentKareegarIssueQty += parseFloat(issue_wt);
+                currentKareegarRecvQty += parseFloat(recv_wt);
+                currentKareegarLossQty += parseFloat(loss_wt);
+                currentKareegarBeadsIssueQty += parseFloat(beads_issue_wt);
+                currentKareegarBeadsRecvQty += parseFloat(beads_recv_wt);
+              });
+
+
+              kareegarDetails.push({
+                "_id": item._id,
+                "name": item.name, 
+                "category": item.category,
+                "balance": parseFloat(currentKareegarIssueQty - currentKareegarRecvQty - currentKareegarLossQty).toFixed(2),
+                "beads_balance": parseFloat(currentKareegarBeadsIssueQty - currentKareegarBeadsRecvQty).toFixed(2)
+              });
+              // console.log(parseFloat(currentKareegarIssueQty - currentKareegarRecvQty - currentKareegarLossQty).toFixed(2));
+
+              //console.log(parseFloat(currentKareegarBeadsIssueQty - currentKareegarBeadsRecvQty).toFixed(2));
+            };
+            
+            setAllKareegarDetails(kareegarDetails);
+            
             setIsLoading(false);
         })();
     }, []);
@@ -154,8 +274,7 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
       }
     const renderCards = () => {
         return allKareegarDetails.map((i) => (
-            i.is_deleted_flag === false?(
-        <div className='hello float-left w-1/4 relative p-5 text-center' onClick={() => changePage(i._id, i.name)}>
+          <div className='hello float-left w-1/4 relative p-5 text-center' onClick={() => changePage(i._id, i.name)}>
             <Row gutter={16}>
             <Col className="hover:text-white" xs={24} xl={24}>
                 <Card 
@@ -185,7 +304,6 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
             
             <br />
         </div>
-        ): ("")
         ));
     };
 

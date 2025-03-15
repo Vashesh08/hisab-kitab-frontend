@@ -75,3 +75,23 @@ export async function updateKareegarBook(kareegarBook, token){
     const body = await res.json();
     return body;
 }
+
+export async function closeKareegarBook(kareegarCloseData, token){
+    // send request to check authenticated
+    const formData = await convertObjectToFormData(kareegarCloseData);
+
+    const res = await fetch(`${config.API_URL}/admin/kareegarBookClose`, {
+    method: 'PATCH',
+    headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json, text/plain, */*'
+    },
+    body:formData
+    });
+    // console.log(res);
+    if ( res.status !== 200) {
+        throw Error('Failed to update');
+    }
+    const body = await res.json();
+    return body;
+}

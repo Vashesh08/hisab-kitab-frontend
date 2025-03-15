@@ -2,15 +2,18 @@ import { useState } from "react";
 import React from "react";
 import Loading from "./Loading";
 import { Button, Form, InputNumber,DatePicker } from "antd";
-import { getKareegarData, updateKareegarBalance } from "../api/kareegarDetail.js";
+import { getKareegarData } from "../api/kareegarDetail.js";
 import { postKareegarBook } from "../api/kareegarBook.js";
 import dayjs from 'dayjs'; // Import Day.js
 import { postLossAcct } from "../api/LossAcct.js";
+import { fetchKareegarBookList } from "../api/kareegarBook.js";
 
 function KareegarClose({ kareegarId, handleOk}){
     const [form] = Form.useForm();
+    const [page] = useState(1);
+    const [itemsPerPage] = useState(10000000000);
     const [isLoading, setIsLoading] = useState(false);
-    const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
+    const [currentDate] = useState(dayjs()); // Initialize with Day.js
 
     const disabledDate = (current) => {
       // Disable dates after the current date
@@ -65,16 +68,53 @@ function KareegarClose({ kareegarId, handleOk}){
             closingWt
         } = user;
 
+
+        const currentKareegarAllData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
+        //console.log("test",currentKareegarAllData);
+        let currentKareegarData = [];
+
+        for (let eachEntry in currentKareegarAllData) {
+          // console.log(allData[eachEntry].is_editable_flag);
+          if (currentKareegarAllData[eachEntry].is_deleted_flag === false && (currentKareegarAllData[eachEntry].is_editable_flag === true)){
+            currentKareegarData.push(currentKareegarAllData[eachEntry]);
+          }
+        }
+
+        let currentKareegarIssueQty = 0.0;
+        let currentKareegarRecvQty = 0.0;
+        let currentKareegarLossQty = 0.0;
+        let currentKareegarBeadsIssueQty = 0.0;
+        let currentKareegarBeadsRecvQty = 0.0;
+        currentKareegarData.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
+          // console.log(weight24k, receive22k, issue22k, loss22k);
+          if (isNaN(parseFloat(issue_wt))) {
+            issue_wt = 0.0; // Set it to zero if it's NaN
+          } 
+          if (isNaN(parseFloat(recv_wt))) {
+            recv_wt = 0.0; // Set it to zero if it's NaN
+          } 
+          if (isNaN(parseFloat(loss_wt))){
+            loss_wt = 0.0; // Set it to zero if it's NaN
+          }
+          if (isNaN(parseFloat(beads_issue_wt))){
+            beads_issue_wt = 0.0;  // Set it to zero if it's NaN
+          }
+          if (isNaN(parseFloat(beads_recv_wt))){
+            beads_recv_wt = 0.0; // Set it to zero if it's NaN
+          }
+          currentKareegarIssueQty += parseFloat(issue_wt);
+          currentKareegarRecvQty += parseFloat(recv_wt);
+          currentKareegarLossQty += parseFloat(loss_wt);
+          currentKareegarBeadsIssueQty += parseFloat(beads_issue_wt);
+          currentKareegarBeadsRecvQty += parseFloat(beads_recv_wt);
+        });
+
+        let balance = parseFloat(currentKareegarIssueQty - currentKareegarRecvQty - currentKareegarLossQty).toFixed(2);
+        let beads_balance = parseFloat(currentKareegarBeadsIssueQty - currentKareegarBeadsRecvQty).toFixed(2);
+
         const data =  await getKareegarData(1, 100000000, token);
         const kareegarData = data.find(item => item._id === kareegarId);
-        let balance = parseFloat(kareegarData.balance)
-        let boxWt = parseFloat(kareegarData.boxWt)
-        if (((parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ) >= 0) && (closingWt >= boxWt)){
-        const kareegarBalanceData = {
-          '_id': kareegarId,
-          "balance": (parseFloat(closingWt) - parseFloat(boxWt)).toFixed(2)
-        }
-        await updateKareegarBalance(kareegarBalanceData, token);
+        let boxWt = parseFloat(kareegarData.boxWt);
 
         const backendData = {
           kareegar_id: kareegarId,
@@ -83,23 +123,20 @@ function KareegarClose({ kareegarId, handleOk}){
           // date: currentDate,
           description: `Closing Acc - Loss for ${getFormattedDate(currentDate)}`,
           recv_wt: (parseFloat(closingWt) - parseFloat(boxWt)).toFixed(2),
-          loss_wt: (parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ).toFixed(2),
-          beads_recv_wt: (parseFloat(kareegarData.beads_balance).toFixed(2))
+          loss_wt: (parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt)).toFixed(2),
+          beads_recv_wt: (parseFloat(beads_balance).toFixed(2))
         }
-
         const updatedData = await postKareegarBook(backendData, token);
-        console.log("updatedData",updatedData);
 
-          const lossData = {
-            "type": "Kareegar",
-            "date": date,
-            "lossWt": (parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt) ).toFixed(2),
-            "transactionId": updatedData.kareegarBook_id, 
-            "description": kareegarData.name + " Loss for " + getFormattedDate(date)
-          }
-          await postLossAcct(lossData, token)
+        const lossData = {
+          "type": "Kareegar",
+          "date": date,
+          "lossWt": (parseFloat(balance) + parseFloat(boxWt) - parseFloat(closingWt)).toFixed(2),
+          "transactionId": updatedData.kareegarBook_id, 
+          "description": kareegarData.name + " Loss for " + getFormattedDate(date)
+        }
+        await postLossAcct(lossData, token)
 
-        // const today = dayjs();
         const tomorrow = date.add(1, 'day');
 
         const backendData2 = {
@@ -108,11 +145,10 @@ function KareegarClose({ kareegarId, handleOk}){
           date: tomorrow,
           description: `Opening Balance - ${getFormattedDate(tomorrow)}`,
           issue_wt: (parseFloat(closingWt) - parseFloat(boxWt)).toFixed(2),
-          beads_issue_wt: (parseFloat(kareegarData.beads_balance).toFixed(2))
+          beads_issue_wt: (parseFloat(beads_balance).toFixed(2))
         }
 
         await postKareegarBook(backendData2, token);
-      }
 
 
     form.resetFields();
