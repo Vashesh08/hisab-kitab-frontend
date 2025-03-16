@@ -23,6 +23,8 @@ import KaareegarClose from "../components/KareegarClose.js";
 import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
 import KareegarBookUpdate from "../components/KareegarBookUpdate.js";
 import { Select } from 'antd';
+import { postKareegarBook } from "../api/kareegarBook.js";
+import { postLossAcct } from "../api/LossAcct.js";
 
 const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => {
   const screenWidth = window.innerWidth;
@@ -428,9 +430,74 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const enterCutoffDate = async () => {
     setIsLoading(true);
     const token = localStorage.getItem("token");
+    const today = dayjs();
+    
+    const data = [];
+    const deleted_data = [];
+    // console.log("data", data)
+
+    const allData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
+    const docs = allData.filter(item => item.is_editable_flag===true);
+    //console.log("filterData", docs);
+
+    for (let eachEntry in docs) {
+      if (docs[eachEntry].is_deleted_flag){
+        deleted_data.push(docs[eachEntry]);
+      }
+      else{
+        data.push(docs[eachEntry]);
+      }
+    }
+    let totalIssueQty = 0.0;
+    let totalRecvQty = 0.0;
+    let totalLossQty = 0.0;
+    let totalBeadsIssueQty = 0.0;
+    let totalBeadsRecvQty = 0.0;
+    data.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
+      // console.log(weight24k, receive22k, issue22k, loss22k);
+      if (isNaN(parseFloat(issue_wt))) {
+        issue_wt = 0; // Set it to zero if it's NaN
+      } 
+      if (isNaN(parseFloat(recv_wt))) {
+        recv_wt = 0; // Set it to zero if it's NaN
+      } 
+      if (isNaN(parseFloat(loss_wt))){
+        loss_wt = 0 // Set it to zero if it's NaN
+      }
+      if (isNaN(parseFloat(beads_issue_wt))){
+        beads_issue_wt = 0  // Set it to zero if it's NaN
+      }
+      if (isNaN(parseFloat(beads_recv_wt))){
+        beads_recv_wt = 0  // Set it to zero if it's NaN
+      }
+      totalIssueQty += parseFloat(issue_wt);
+      totalRecvQty += parseFloat(recv_wt);
+      totalLossQty += parseFloat(loss_wt);
+      totalBeadsIssueQty += parseFloat(beads_issue_wt);
+      totalBeadsRecvQty += parseFloat(beads_recv_wt);
+    });
+
+    const backendData = {
+      kareegar_id: kareegarId,
+      type: "Loss",
+      date: dayjs(today, "YYYY-MM-DD"),
+      // date: currentDate,
+      description: `Closing Monthly Acc - Loss, Beads Loss - ${parseFloat(totalBeadsIssueQty) - parseFloat(totalBeadsRecvQty)}`,
+      loss_wt: (parseFloat(totalIssueQty) - parseFloat(totalRecvQty) - parseFloat(totalLossQty)).toFixed(2),
+    }
+    const updatedData = await postKareegarBook(backendData, token);
+
+    const lossData = {
+      "type": "Kareegar",
+      "date": today,
+      "lossWt": (parseFloat(totalIssueQty) - parseFloat(totalRecvQty) - parseFloat(totalLossQty)).toFixed(2),
+      "transactionId": updatedData.kareegarBook_id, 
+      "description": kareegarName + " Monthly Loss - " + getFormattedDate(today)
+    }
+    await postLossAcct(lossData, token)
+
     const kareegarUtilityData =  await getKareegarData(page,itemsPerPage, token);
     const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
-    const today = dayjs();
     //console.log(kareegarUtilityData,kareegarData);
 
     const updatedKareegarDetail = {
@@ -438,7 +505,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       cutoffDateNumber: parseInt(kareegarData.kareegarCutoffDateNumber) + 1,
     }
     //console.log("updatedKareegarDetail",updatedKareegarDetail);
-    closeKareegarBook(updatedKareegarDetail, token);
+    await closeKareegarBook(updatedKareegarDetail, token);
     
     updateRows("today");
 
