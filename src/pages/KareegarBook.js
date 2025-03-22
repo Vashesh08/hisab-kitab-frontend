@@ -64,7 +64,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     if (!isNaN(parseFloat(value))){
       latestDateValueRef.current = value;
       setCurrentSelectedDate(value);
-      updateRows("all", value);
+      updateRows("all");
     }
   };
 
@@ -101,6 +101,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
 
     const allData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
     // const docs = allData.filter(item => item.is_editable_flag===true);
+    //console.log(allData, latestDateValueRef.current);
     const docs = allData.filter(item => 
       latestDateValueRef.current === dateSelectOption.length ? item.cutoffDateNumber === 0 : item.cutoffDateNumber === latestDateValueRef.current
     );
@@ -295,7 +296,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
 
           // const startDates = kareegarData.kareegarCutoffStartDate || [dayjs("2000-01-01")];
           // const endDates = kareegarData.kareegarCutoffEndDate || [];
-          endDates.push("")
+          endDates.push("");
+          // console.log(startDates,endDates);
           
           // Example
           // startDates = [2000, 2002, 2004, 2006]
@@ -307,6 +309,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
             combinedDates.push({ start: startDates[i], end: endDates[i] });
           }
           // currentSelectedDate[-1]
+          //console.log(combinedDates);
           setDateSelectOption(combinedDates);
 
           // console.log("combinedDates",combinedDates,kareegarData,startDates,endDates);
@@ -510,10 +513,22 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     updateRows("today");
 
     const newKareegarCutoffStartDate = [...kareegarData.kareegarCutoffStartDate];
-    newKareegarCutoffStartDate.push(today);
+    let startDateLength = newKareegarCutoffStartDate.length;
 
     const newKareegarCutoffEndDate = [...kareegarData.kareegarCutoffEndDate];
-    newKareegarCutoffEndDate.push(today);
+    let endDateLength = newKareegarCutoffStartDate.length;
+
+    if (startDateLength > 0){
+      newKareegarCutoffEndDate.push(today);
+    }else{
+      newKareegarCutoffStartDate.push(dayjs("2000-01-01"));
+      newKareegarCutoffEndDate.push(today);
+      newKareegarCutoffStartDate.push(today);
+    }
+
+    if (endDateLength > 0){
+      newKareegarCutoffStartDate.push(newKareegarCutoffEndDate[newKareegarCutoffEndDate.length - 1]);
+    }
     
     const kareegarBalanceData = {
       '_id': kareegarId,
