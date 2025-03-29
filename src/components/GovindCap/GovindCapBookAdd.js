@@ -19,7 +19,7 @@ function GovindCapBookAdd({handleOk}) {
       if (docs.length > 0){
         const lastEntry = docs[docs.length - 1];
         setLastDate(dayjs(lastEntry.date));
-        if (lastEntry.type == "Issue" || lastEntry.type == "Receive" || lastEntry.type === "Issue & Receive"){
+        if (lastEntry.type === "Issue" || lastEntry.type === "Receive" || lastEntry.type === "Issue & Receive"){
           setTransactionType(lastEntry.type);
         }
         // console.log(lastEntry, lastDate)
