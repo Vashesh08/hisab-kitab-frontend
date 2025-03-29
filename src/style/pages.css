@@ -156,3 +156,44 @@ th.ant-table-cell::before {
 .ant-table-row-selected >:last-child{
   border-right: solid 1.5px #0084f7 !important;
 } */
+
+@media print {
+  @page {
+    size: landscape; /* Changes page orientation */
+    margin: 30px;
+  }
+
+  .print-table {
+    width: max-content;
+    overflow: visible;
+  }
+
+  .print-only {
+    display: block !important; /* Show only in print/PDF */
+  }
+
+  .print-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    padding: 0px;
+  }
+  
+}
+
+@page {
+  @bottom-right {
+    content: "Page " counter(page) " of " counter(pages);
+  }
+}
+
+@media screen {
+  .print-only {
+    display: none !important; /* Hide on screen */
+  }
+  .print-footer {
+    display: none !important; /* Hide on screen */
+  }
+}

@@ -8,15 +8,16 @@ import {
   Input,
   Space,
 } from "antd";
-
+import { useReactToPrint } from "react-to-print";
 import Highlighter from 'react-highlight-words';
 import { fetchMasterStockList, deleteMasterStockList } from "../api/masterStock.js";
 import  ModelAdd from "../components/ModelAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
-import { DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined, PrinterOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
 import { getUtilityData, updateUtility } from "../api/utility.js";
+import dayjs from 'dayjs'; 
 
 const MasterStock = () => {
   const screenWidth = window.innerWidth;
@@ -30,6 +31,30 @@ const MasterStock = () => {
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
   const [openingBalance, setOpeningBalance] = useState(0);
   const [closingBalance, setClosingBalance] = useState(0);
+  const componentRef = useRef(null);
+  const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+    
+  useEffect(() => {
+    if (!isPaginationEnabled) {
+      handlePrintNow();
+    }
+  }, [isPaginationEnabled]); // Runs when `isPaginationEnabled` changes
+
+  // Handle Print Click
+  const handlePrint = () => {
+    setIsPaginationEnabled(false); // Disable pagination
+  };
+  
+  const handlePrintNow = useReactToPrint({
+    content: () => componentRef.current,
+    documentTitle: 'Master Stock - ' + dayjs().format("DD-MM-YYYY"),
+    // onBeforeGetContent: () => {
+    //   return new Promise((resolve) => {
+    //     setIsPaginationEnabled(false); // Disable pagination
+    //   });
+    // },
+    onAfterPrint: () => setIsPaginationEnabled(true),
+  });
   
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -648,14 +673,23 @@ const MasterStock = () => {
         {screenWidth > 800 ? (
           <>
             <div className="text-xl border-transparent flex justify-between items-center">
-              
+            
+            <div className="flex flex-col mt-5">
               <div style={{ 
               fontSize: '250%',
               fontWeight: 'bolder',
-              lineHeight: "3em",
-              marginTop: "-3rem",
+              lineHeight: "1em",
+              marginTop: "-1rem",
               }} className="text-center text-[#00203FFF]" >
                 Master Stock
+              </div>
+
+              <div className="text-left mt-5">
+              <Tooltip title="Print Table" placement="bottomLeft">
+                  <PrinterOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={handlePrint}/>
+              </Tooltip>
+              </div>
+
               </div>
 
               <div className="flex flex-col">
@@ -736,6 +770,15 @@ const MasterStock = () => {
         </div>
       </Modal>
       
+      {/* <div style={{ textAlign: 'right', marginBottom: 16 }}>
+      <Tooltip title="Print Table" placement="bottomLeft">
+          <PrinterOutlined style={{ fontSize: '175%', color:"#1f2937"}} className="text-right" onClick={handlePrint}/>
+      </Tooltip>
+      </div> */}
+      
+      <div ref={componentRef} className="print-table">
+      {!isPaginationEnabled && <div className="text-5xl text-center mb-8 print-only">Master Stock</div>}
+
       <Table
         rowSelection={rowSelection}
         columns={columns}
@@ -743,7 +786,15 @@ const MasterStock = () => {
         dataSource={rows}
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
-        pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100']}}
+        pagination={isPaginationEnabled ? 
+          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          false
+        }
+        footer={isPaginationEnabled ? false : () => (
+          <div className="print-footer">
+            Master Stock - {dayjs().format("DD-MMMM-YYYY")}
+          </div>
+        )}
         summary={() => {
           return (
             <>
@@ -769,6 +820,8 @@ const MasterStock = () => {
           );
         }}
       />
+      </div>
+
       <Divider />
 
     </div>

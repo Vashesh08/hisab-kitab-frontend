@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import "../style/Cards.css"
 import { getKareegarData} from "../api/kareegarDetail.js";
 import Loading from "../components/Loading.js";
@@ -6,6 +6,10 @@ import { Table } from "antd";
 import { getUtilityData } from "../api/utility.js";
 import { fetchLossAcctList } from "../api/LossAcct.js";
 import { fetchKareegarBookList } from "../api/kareegarBook.js";
+import { useReactToPrint } from "react-to-print";
+import { PrinterOutlined } from "@ant-design/icons";
+import dayjs from 'dayjs'; 
+import { Tooltip } from 'antd';
 
 export default function BalanceSheet() {
     const screenWidth = window.innerWidth;
@@ -18,6 +22,30 @@ export default function BalanceSheet() {
     const [factoryStock, setFactoryStock] = useState(0);
     const [remainingStock, setRemainingStock] = useState(0);
     const [totalLoss, setTotalLoss] = useState(0);
+    const componentRef = useRef(null);
+    const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+      
+    useEffect(() => {
+      if (!isPaginationEnabled) {
+        handlePrintNow();
+      }
+    }, [isPaginationEnabled]); // Runs when `isPaginationEnabled` changes
+
+    // Handle Print Click
+    const handlePrint = () => {
+      setIsPaginationEnabled(false); // Disable pagination
+    };
+    
+    const handlePrintNow = useReactToPrint({
+      content: () => componentRef.current,
+      documentTitle: 'Balance Sheet - ' + dayjs().format("DD-MM-YYYY"),
+      // onBeforeGetContent: () => {
+      //   return new Promise((resolve) => {
+      //     setIsPaginationEnabled(false); // Disable pagination
+      //   });
+      // },
+      onAfterPrint: () => setIsPaginationEnabled(true),
+    });
 
     useEffect(() => {
         (async () => {
@@ -163,13 +191,23 @@ const columns = [
 {screenWidth > 953 ? (
           <>
             <div className="text-xl border-transparent flex justify-between items-center">
+
+            <div className="flex flex-col mt-5">
             <div style={{ 
               fontSize: '250%',
               fontWeight: 'bolder',
-              lineHeight: "3em",
-              marginTop: "-3rem",
+              lineHeight: "1em",
+              marginTop: "-1rem",
               }} className="text-center text-[#00203FFF]" >
                 Balance Sheet
+              </div>
+
+              <div className="text-left mt-5">
+              <Tooltip title="Print Table" placement="bottomLeft">
+                  <PrinterOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={handlePrint}/>
+              </Tooltip>
+              </div>
+              
               </div>
 
               <div className="flex flex-col">
@@ -325,17 +363,31 @@ const columns = [
 
 
             <>
+
+      <div ref={componentRef} className="print-table">
+      {!isPaginationEnabled && <div className="text-5xl text-center mb-8 print-only">Balance Sheet</div>}
+
         <Table
         dataSource={rows}
         rowClassName={getRowClassName}
         columns={columns}
         scroll={{ x: 'calc(100vh - 4em)' }}
-        pagination={{ defaultPageSize: 100, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100']}}
+        pagination={isPaginationEnabled ? 
+          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          false
+        }
+        footer={isPaginationEnabled ? false : () => (
+          <div className="print-footer">
+            Balance Sheet - {dayjs().format("DD-MMMM-YYYY")}
+          </div>
+        )}
         summary={() => {
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
                 <Table.Summary.Cell index={0} className="" colSpan={2}>Total</Table.Summary.Cell>
               </Table.Summary.Row>
               }}/>
+
+      </div>
             </>
         
     

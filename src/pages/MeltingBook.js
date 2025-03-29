@@ -8,6 +8,7 @@ import {
   Input,
   Space, 
 } from "antd";
+import { useReactToPrint } from "react-to-print";
 import Highlighter from 'react-highlight-words';
 import { getUtilityData, updateUtility } from "../api/utility.js";
 import { fetchMeltingBookList, deleteMeltingBookList } from "../api/meltingBook.js";
@@ -15,9 +16,10 @@ import  MeltingBookAdd from "../components/MeltingBookAdd.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import MeltingBookUpdate from "../components/MeltingBookUpdate.js";
-import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined, PrinterOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
 import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
+import dayjs from 'dayjs'; 
 
 const MeltingBook = () => {
   const screenWidth = window.innerWidth;
@@ -38,6 +40,30 @@ const MeltingBook = () => {
   const [closing995Balance, setClosing995Balance] = useState(0);
   const [opening100Balance, setOpening100Balance] = useState(0);
   const [closing100Balance, setClosing100Balance] = useState(0);
+  const componentRef = useRef(null);
+  const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+    
+  useEffect(() => {
+    if (!isPaginationEnabled) {
+      handlePrintNow();
+    }
+  }, [isPaginationEnabled]); // Runs when `isPaginationEnabled` changes
+
+  // Handle Print Click
+  const handlePrint = () => {
+    setIsPaginationEnabled(false); // Disable pagination
+  };
+  
+  const handlePrintNow = useReactToPrint({
+    content: () => componentRef.current,
+    documentTitle: 'Melting Book - ' + dayjs().format("DD-MM-YYYY"),
+    // onBeforeGetContent: () => {
+    //   return new Promise((resolve) => {
+    //     setIsPaginationEnabled(false); // Disable pagination
+    //   });
+    // },
+    onAfterPrint: () => setIsPaginationEnabled(true),
+  });
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -721,13 +747,23 @@ const MeltingBook = () => {
         {screenWidth > 953 ? (
           <>
             <div className="text-xl border-transparent flex justify-between items-center">
+
+            <div className="flex flex-col mt-5">
             <div style={{ 
               fontSize: '250%',
               fontWeight: 'bolder',
-              lineHeight: "3em",
-              marginTop: "-3rem",
+              lineHeight: "1em",
+              marginTop: "-1rem",
               }} className="text-center text-[#00203FFF]" >
                 Melting Book
+              </div>
+
+              <div className="text-left mt-5">
+              <Tooltip title="Print Table" placement="bottomLeft">
+                  <PrinterOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={handlePrint}/>
+              </Tooltip>
+              </div>
+              
               </div>
 
               <div className="flex flex-col">
@@ -948,6 +984,9 @@ const MeltingBook = () => {
           />
       </Modal>
 
+      <div ref={componentRef} className="print-table">
+      {!isPaginationEnabled && <div className="text-5xl text-center mb-8 print-only">Melting Book</div>}
+
       <Table
         rowSelection={rowSelection}
         columns={columns}
@@ -955,7 +994,15 @@ const MeltingBook = () => {
         dataSource={rows}
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
-        pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100']}}
+        pagination={isPaginationEnabled ? 
+          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          false
+        }
+        footer={isPaginationEnabled ? false : () => (
+          <div className="print-footer">
+            Melting Book - {dayjs().format("DD-MMMM-YYYY")}
+          </div>
+        )}
         summary={() => {
           return (
             <>
@@ -990,6 +1037,8 @@ const MeltingBook = () => {
           );
         }}
       />
+      </div>
+      
       <Divider />
     </div>
   );
