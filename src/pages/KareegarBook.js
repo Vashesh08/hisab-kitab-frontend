@@ -1,5 +1,5 @@
 /* eslint-disable no-template-curly-in-string */
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import {
   Divider,
   Table,
@@ -8,13 +8,14 @@ import {
   Input,
   Space, 
 } from "antd";
+import { useReactToPrint } from "react-to-print";
 import dayjs from 'dayjs'; // Import Day.js
 import Highlighter from 'react-highlight-words';
 import { fetchKareegarBookList, deleteKareegarBookList } from "../api/kareegarBook.js";
 import KareegarAddItems from "../components/KareegarAddItems.js"
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
-import { EditOutlined, DeleteOutlined, LeftOutlined , PlusCircleOutlined, BarsOutlined, SearchOutlined, EnterOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, LeftOutlined, PrinterOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined, EnterOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
 import { closeKareegarBook } from "../api/kareegarBook.js";
 import { getKareegarData, updateKareegarBalance, updateKareegarDetail } from "../api/kareegarDetail.js";
@@ -45,6 +46,32 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const [currentSelectedDate, setCurrentSelectedDate] = useState(0);
   // const [closingBalance, setClosingBalance] = useState(0);
   const latestDateValueRef = useRef();
+  const componentRef = useRef(null);
+  const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const handlePrintNow = useReactToPrint({
+    content: () => componentRef.current,
+    documentTitle: kareegarName + ' Kareegar Book - ' + dayjs().format("DD-MM-YYYY"),
+    // onBeforeGetContent: () => {
+    //   return new Promise((resolve) => {
+    //     setIsPaginationEnabled(false); // Disable pagination
+    //   });
+    // },
+    onAfterPrint: () => setIsPaginationEnabled(true),
+  });
+
+  const handlePrintNowCallback = useCallback(handlePrintNow, [handlePrintNow]);
+    
+  useEffect(() => {
+    if (!isPaginationEnabled) {
+      handlePrintNowCallback();
+    }
+  }, [isPaginationEnabled, handlePrintNowCallback]); // Runs when `isPaginationEnabled` changes
+
+  // Handle Print Click
+  const handlePrint = () => {
+    setIsPaginationEnabled(false); // Disable pagination
+  };
 
   const getFormattedDate = (date) => {
     const dateEntry = date;
@@ -995,14 +1022,22 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         {screenWidth > 800 ? (
           <>
             <div className="text-xl border-transparent flex justify-between items-center">
+            <div className="flex flex-col mt-5">
             <div style={{ 
               fontSize: '250%',
               fontWeight: 'bolder',
-              lineHeight: "3em",
-              marginTop: "-3rem",
+              lineHeight: "1em",
+              marginTop: "-1rem",
               }} className="text-center text-[#00203FFF]" >
                 <LeftOutlined onClick={() => setKareegarDetailsPage(true)}/>
                 {kareegarName}
+              </div>
+              <div className="text-left mt-5">
+              <Tooltip title="Print Table" placement="bottomLeft">
+                  <PrinterOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={handlePrint}/>
+              </Tooltip>
+              </div>
+              
               </div>
 
               <div className="flex flex-col">
@@ -1183,6 +1218,9 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         </div>
       </Modal>
 
+      <div ref={componentRef} className="print-table">
+      {!isPaginationEnabled && <div className="text-5xl text-center mb-8 print-only">{kareegarName} Kareegar Book</div>}
+
       <Table
         rowSelection={rowSelection}
         columns={columns}
@@ -1190,7 +1228,15 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         dataSource={rows}
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
-        pagination={{ defaultPageSize: 100, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000', '10000']}}
+        pagination={isPaginationEnabled ? 
+          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          false
+        }
+        footer={isPaginationEnabled ? false : () => (
+          <div className="print-footer">
+            {kareegarName} Kareegar Book - {dayjs().format("DD-MMMM-YYYY")}
+          </div>
+        )}
         summary={() => {
           return (
             <>
@@ -1221,6 +1267,9 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           );
         }}
       />
+
+      </div>
+
       <Divider />
     </div>
   );

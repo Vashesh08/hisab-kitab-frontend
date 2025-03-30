@@ -1,5 +1,5 @@
 /* eslint-disable no-template-curly-in-string */
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import {
   Divider,
   Table,
@@ -34,18 +34,6 @@ const Tarpatta = () => {
   const [totalLossQuantity, setTotalLossQty] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
-    
-  useEffect(() => {
-    if (!isPaginationEnabled) {
-      handlePrintNow();
-    }
-  }, [isPaginationEnabled]); // Runs when `isPaginationEnabled` changes
-
-  // Handle Print Click
-  const handlePrint = () => {
-    setIsPaginationEnabled(false); // Disable pagination
-  };
-  
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
     documentTitle: 'Tarpatta Book - ' + dayjs().format("DD-MM-YYYY"),
@@ -56,6 +44,19 @@ const Tarpatta = () => {
     // },
     onAfterPrint: () => setIsPaginationEnabled(true),
   });
+
+  const handlePrintNowCallback = useCallback(handlePrintNow, [handlePrintNow]);
+    
+  useEffect(() => {
+    if (!isPaginationEnabled) {
+      handlePrintNowCallback();
+    }
+  }, [isPaginationEnabled, handlePrintNowCallback]); // Runs when `isPaginationEnabled` changes
+
+  // Handle Print Click
+  const handlePrint = () => {
+    setIsPaginationEnabled(false); // Disable pagination
+  };
 
   const getFormattedDate = (date) => {
     if (date === undefined){

@@ -1,5 +1,5 @@
 /* eslint-disable no-template-curly-in-string */
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import {
   Divider,
   Table,
@@ -8,10 +8,13 @@ import {
   Input,
   Space, 
 } from "antd";
+import { Tooltip } from 'antd';
+import { useReactToPrint } from "react-to-print";
+import dayjs from 'dayjs'; // Import Day.js
 import Highlighter from 'react-highlight-words';
 import '../../style/pages.css';
 import Loading from "../../components/Loading.js";
-import { EditOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
+import { EditOutlined, BarsOutlined, SearchOutlined, PrinterOutlined } from "@ant-design/icons";
 import { fetchGovindStockList } from "../../api/govindBook.js";
 import GovindMachine835BookUpdate from "../../components/Govind/GovindMachine835BookUpdate.js";
 
@@ -25,9 +28,35 @@ const GovindMachine835Book = () => {
   const [fullData, setFullData] = useState([]);
   const [issueBalance, setIssueBalance] = useState(0);
   const [receiveBalance, setReceiveBalance] = useState(0);
-  const [bhukaBalance, setBhukaBalance] = useState(0);
+  // const [bhukaBalance, setBhukaBalance] = useState(0);
   const [lossBalance, setLossBalance] = useState(0);
   const [tarpattaRecvBalance, setTarpattaRecvBalance] = useState(0);
+  const componentRef = useRef(null);
+  const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const handlePrintNow = useReactToPrint({
+    content: () => componentRef.current,
+    documentTitle: 'Govind Machine 835 Book - ' + dayjs().format("DD-MM-YYYY"),
+    // onBeforeGetContent: () => {
+    //   return new Promise((resolve) => {
+    //     setIsPaginationEnabled(false); // Disable pagination
+    //   });
+    // },
+    onAfterPrint: () => setIsPaginationEnabled(true),
+  });
+
+  const handlePrintNowCallback = useCallback(handlePrintNow, [handlePrintNow]);
+    
+  useEffect(() => {
+    if (!isPaginationEnabled) {
+      handlePrintNowCallback();
+    }
+  }, [isPaginationEnabled, handlePrintNowCallback]); // Runs when `isPaginationEnabled` changes
+
+  // Handle Print Click
+  const handlePrint = () => {
+    setIsPaginationEnabled(false); // Disable pagination
+  };
 
   const getFormattedDate = (date) => {
     if (date === undefined){
@@ -596,14 +625,24 @@ const GovindMachine835Book = () => {
     <div>
       {screenWidth > 953 ? (
           <div className="text-xl border-transparent flex justify-between items-center">
+            
+            <div className="flex flex-col mt-5">
             <div style={{ 
               fontSize: '250%',
               fontWeight: 'bolder',
-              lineHeight: "3em",
-              marginTop: "-3rem",
+              lineHeight: "1em",
+              marginTop: "-1rem",
               }} className="text-center text-[#00203FFF]" >
                 Govind Machine 83.5 Book
               </div>
+              <div className="text-left mt-5">
+              <Tooltip title="Print Table" placement="bottomLeft">
+                  <PrinterOutlined style={{ fontSize: '200%', color:"#1f2937"}} onClick={handlePrint}/>
+              </Tooltip>
+              </div>
+              
+              </div>
+
           </div>
           ) : screenWidth > 500 ? (
             <div style={{
@@ -632,6 +671,9 @@ const GovindMachine835Book = () => {
           />
       </Modal>
 
+      <div ref={componentRef} className="print-table">
+      {!isPaginationEnabled && <div className="text-5xl text-center mb-8 print-only">Govind Machine 835 Book</div>}
+
       <Table
         rowSelection={rowSelection}
         columns={columns}
@@ -639,7 +681,15 @@ const GovindMachine835Book = () => {
         dataSource={rows}
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
-        pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100']}}
+        pagination={isPaginationEnabled ? 
+          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          false
+        }
+        footer={isPaginationEnabled ? false : () => (
+          <div className="print-footer">
+            Govind Machine 835 Book - {dayjs().format("DD-MMMM-YYYY")}
+          </div>
+        )}
         summary={() => {
           return (
             <>
@@ -678,6 +728,7 @@ const GovindMachine835Book = () => {
           );
         }}
       />
+      </div>
       <Divider />
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import "../style/Cards.css"
 import { getKareegarData} from "../api/kareegarDetail.js";
 import Loading from "../components/Loading.js";
@@ -24,18 +24,7 @@ export default function BalanceSheet() {
     const [totalLoss, setTotalLoss] = useState(0);
     const componentRef = useRef(null);
     const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
-      
-    useEffect(() => {
-      if (!isPaginationEnabled) {
-        handlePrintNow();
-      }
-    }, [isPaginationEnabled]); // Runs when `isPaginationEnabled` changes
 
-    // Handle Print Click
-    const handlePrint = () => {
-      setIsPaginationEnabled(false); // Disable pagination
-    };
-    
     const handlePrintNow = useReactToPrint({
       content: () => componentRef.current,
       documentTitle: 'Balance Sheet - ' + dayjs().format("DD-MM-YYYY"),
@@ -46,6 +35,19 @@ export default function BalanceSheet() {
       // },
       onAfterPrint: () => setIsPaginationEnabled(true),
     });
+
+    const handlePrintNowCallback = useCallback(handlePrintNow, [handlePrintNow]);
+      
+    useEffect(() => {
+      if (!isPaginationEnabled) {
+        handlePrintNowCallback();
+      }
+    }, [isPaginationEnabled, handlePrintNowCallback]); // Runs when `isPaginationEnabled` changes
+
+    // Handle Print Click
+    const handlePrint = () => {
+      setIsPaginationEnabled(false); // Disable pagination
+    };
 
     useEffect(() => {
         (async () => {
