@@ -16,9 +16,9 @@ import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import { DeleteOutlined, PlusCircleOutlined, EnterOutlined, BarsOutlined, SearchOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
-import { fetchPolishList, deletePolishList, postPolishStock } from "../api/polishBook.js";
+import { fetchPolishList, deletePolishList } from "../api/polishBook.js";
 import { getUtilityData, updateUtility } from "../api/utility.js";
-import { deleteLossAcctList, fetchLossAcctList, postLossAcct } from "../api/LossAcct.js";
+import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
 import PolishClose from "../components/PolishClose.js";
 
 const Polish = () => {
@@ -28,7 +28,7 @@ const Polish = () => {
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
-  const [totalWeightQuantity, setTotalWeight] = useState(0);
+  // const [totalWeightQuantity, setTotalWeight] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
   const [totalFineQuantity, setTotalFineQty] = useState(0);

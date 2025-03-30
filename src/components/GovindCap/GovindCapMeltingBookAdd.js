@@ -10,7 +10,7 @@ function GovindCapMeltingBookAdd({handleOk, setClosingBalance, setClosing995Bala
   const [isLoading, setIsLoading] = useState(false);
   const [categoryType, setCategoryType] = useState(["Gold", "Gold", "Gold", "Gold", "Gold"]);
   const [numberOfItems, setNumberOfItems] = useState(1);
-  const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
+  // const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
   const [meltingIssueWt, setMeltingIssueWt] = useState(0);
   const [formWeightValues, setFormWeightValues] = useState([0, 0, 0, 0, 0]);
   const [formPurityValues, setFormPurityValues] = useState([0, 0, 0, 0, 0]);

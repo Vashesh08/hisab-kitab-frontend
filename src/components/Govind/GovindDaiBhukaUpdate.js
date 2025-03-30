@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { updateGovindBook } from "../../api/govindBook.js";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "../Loading.js";
-import { Button, Form, InputNumber, Input, DatePicker, Select } from "antd";
-import { postLossAcct, updateLossBook } from "../../api/LossAcct.js";
+import { Button, Form, InputNumber, Input, DatePicker } from "antd";
+import { updateLossBook } from "../../api/LossAcct.js";
 
 
 function GovindDaiBhukaUpdate({handleOk, textData}) {
@@ -13,7 +13,8 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
     const [numberOfBhukaItems, setNumberOfBhukaItems] = useState(textData.daiBhukaBhuka.length || 1);
     const [daiItems, setDaiItems] = useState(textData.daiBhukaDai || [0, 0, 0, 0, 0]);
     const [bhukaItems, setBhukaItems] = useState(textData.daiBhukaBhuka || [0, 0, 0, 0, 0]);
-    const [lastDate, setDate] = useState(dayjs());
+    // const [lastDate, setDate] = useState(dayjs());
+    const lastDate = dayjs();
 
     const disabledDate = (current) => {
       // Disable dates after the current date

@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import React from "react";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "./Loading.js";
-import { Button, Form, Input, InputNumber, DatePicker } from "antd";
-import { fetchPolishList, postPolishStock } from "../api/polishBook.js";
+import { Button, Form, InputNumber, DatePicker } from "antd";
+import { postPolishStock } from "../api/polishBook.js";
 import { getUtilityData, updateUtility } from "../api/utility.js";
 import { postLossAcct } from "../api/LossAcct.js";
 
 function PolishClose({handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
-  const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
+  // const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
+  const currentDate = dayjs(); // Initialize with Day.js
   // const [lastDate, setLastDate] = useState(dayjs());
   // const [forceUpdate, setForceUpdate] = useState(0);
 

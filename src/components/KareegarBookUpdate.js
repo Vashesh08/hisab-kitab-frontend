@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { updateKareegarBook } from "../api/kareegarBook.js";
 import Loading from "./Loading.js";
 import { Button, Form, InputNumber } from "antd";
-import { postLossAcct } from "../api/LossAcct.js";
-import dayjs from 'dayjs';
+// import { postLossAcct } from "../api/LossAcct.js";
+// import dayjs from 'dayjs';
 import { getKareegarData, updateKareegarBalance } from "../api/kareegarDetail.js";
 
 function KareegarBookUpdate({handleOk, textData, kareegarId}) {

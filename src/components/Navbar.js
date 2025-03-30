@@ -6,14 +6,10 @@ import { Disclosure } from '@headlessui/react';
 // import Sidebar from "./Sidebar.js";
 import { HomeFilled, LogoutOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
-  Divider,
-  Table,
   Button,
   Modal,
-  Input,
-  Space,
 } from "antd";
 import { deleteUtilityList } from '../api/utility';
 

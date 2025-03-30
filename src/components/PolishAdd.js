@@ -9,7 +9,7 @@ import { getUtilityData, updateUtility } from "../api/utility.js";
 function PolishAdd({handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
-  const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
+  // const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
   const [lastDate, setLastDate] = useState(dayjs());
   const [forceUpdate, setForceUpdate] = useState(0);
   

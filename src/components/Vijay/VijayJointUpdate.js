@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { updateVijayBook } from "../../api/vijayBook.js";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "../Loading.js";
-import { Button, Form, InputNumber, Input, DatePicker, Select } from "antd";
+import { Button, Form, InputNumber, Input, DatePicker } from "antd";
 
 function VijayJointUpdate({handleOk, textData}) {
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
-    const [lastDate, setDate] = useState(dayjs());
+    // const [lastDate, setDate] = useState(dayjs());
+    const lastDate = dayjs();
 
     const disabledDate = (current) => {
       // Disable dates after the current date

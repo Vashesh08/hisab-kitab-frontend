@@ -25,7 +25,7 @@ const GovindMachineBook = () => {
   const [fullData, setFullData] = useState([]);
   const [issueBalance, setIssueBalance] = useState(0);
   const [receiveBalance, setReceiveBalance] = useState(0);
-  const [bhukaBalance, setBhukaBalance] = useState(0);
+  // const [bhukaBalance, setBhukaBalance] = useState(0);
   const [lossBalance, setLossBalance] = useState(0);
   const [tarpattaRecvBalance, setTarpattaRecvBalance] = useState(0);
 

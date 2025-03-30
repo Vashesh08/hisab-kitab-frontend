@@ -10,7 +10,7 @@ function ModelAdd({handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [transactionType, setTransactionType] = useState("receive");
-  const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
+  // const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
   const [lastDate, setLastDate] = useState(dayjs());
   const [forceUpdate, setForceUpdate] = useState(0);
   
@@ -92,7 +92,7 @@ function ModelAdd({handleOk}) {
     const {
       date,
       description,
-      goodsType,
+      // goodsType,
       issueReceive,
       issuerName,
       receiverName,
