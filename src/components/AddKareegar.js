@@ -1,7 +1,7 @@
 import { useState } from "react";
 import React from "react";
 import Loading from "./Loading";
-import { Button, Form, Input, InputNumber, Select, DatePicker } from "antd";
+import { Button, Form, Input, DatePicker } from "antd";
 import dayjs from 'dayjs'; // Import Day.js
 import { postKareegarData } from "../api/kareegarDetail";
 

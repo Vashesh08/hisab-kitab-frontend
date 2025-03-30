@@ -3,7 +3,6 @@ import { updateMeltingBook } from "../api/meltingBook.js";
 import Loading from "./Loading.js";
 import { Button, Form, InputNumber } from "antd";
 import { postLossAcct } from "../api/LossAcct.js";
-import dayjs from 'dayjs';
 
 function MeltingBookUpdate({handleOk, textData}) {
     const [form] = Form.useForm();

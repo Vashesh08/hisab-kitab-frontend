@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { updateGovindBook } from "../../api/govindBook.js";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "../Loading.js";
-import { Button, Form, InputNumber, Input, DatePicker, Select } from "antd";
-import { postLossAcct, updateLossBook } from "../../api/LossAcct.js";
+import { Button, Form, InputNumber, Input, DatePicker } from "antd";
+import { updateLossBook } from "../../api/LossAcct.js";
 
 
 function GovindMachineBookUpdate({handleOk, textData}) {
@@ -11,7 +11,8 @@ function GovindMachineBookUpdate({handleOk, textData}) {
     const [isLoading, setIsLoading] = useState(false);
     const [numberOfIssueItems, setNumberOfIssueItems] = useState(textData.machineIssue.length || 1);
     const [issueItems, setIssueItems] = useState(textData.machineIssue || [0, 0, 0, 0, 0]);
-    const [lastDate, setDate] = useState(dayjs());
+    // const [lastDate, setDate] = useState(dayjs());
+    const lastDate = dayjs();
   
     const disabledDate = (current) => {
       // Disable dates after the current date

@@ -15,7 +15,8 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
     const [issueItems, setIssueItems] = useState(textData.tarpattaIssue || [0, 0, 0, 0, 0]);
     const [receiveItems, setReceiveItems] = useState(textData.tarpattaReceive || [0, 0, 0, 0, 0]);
     const [bhukaItems, setBhukaItems] = useState(textData.tarpattaBhuka || [0, 0, 0, 0, 0]);
-    const [lastDate, setDate] = useState(dayjs());
+    // const [lastDate, setDate] = useState(dayjs());
+    const lastDate = dayjs();
   
     const disabledDate = (current) => {
       // Disable dates after the current date
