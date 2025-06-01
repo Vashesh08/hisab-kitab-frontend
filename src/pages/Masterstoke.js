@@ -21,11 +21,12 @@ import dayjs from 'dayjs';
 
 const MasterStock = () => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show all
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("valid");
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [fullData, setFullData] = useState([]);
   const [totalWeightQuantity, setTotalWeight] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
@@ -33,6 +34,11 @@ const MasterStock = () => {
   const [closingBalance, setClosingBalance] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
   
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
@@ -70,85 +76,44 @@ const MasterStock = () => {
 
     return formattedDate
   }
-
-  // const handleOpeningChange = (event) => {
-  //   // console.log(event.target.value, isNaN(event.target.value))
-  //   if (!isNaN(parseFloat(event.target.value))){
-  //     // console.log(event.target.value, parseFloat(event.target.value))
-  //     setOpeningBalance(parseFloat(event.target.value));
-  //     // console.log(openingBalance);
-  //     setClosingBalance((parseFloat(event.target.value) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
-  //     // console.log((parseFloat(openingBalance) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
-  //     // console.log(openingBalance, closingBalance);
-  //   }
-  //   else{
-  //     setOpeningBalance(0);
-  //     setClosingBalance((parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
-  //   }
-  // };
   
   async function updateRows (dataType){
-
+    if (searchText !== ""){
+      return;
+    };
     setIsLoading(true);
     const token = localStorage.getItem("token");
+
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);
     // send request to check authenticated
-    const data = [];
-    const deleted_data = [];
-    // console.log("data", data)
 
     const balanceData = await getUtilityData(token);
     setOpeningBalance(parseFloat(balanceData[0]["masterStockOpeningBalance"]).toFixed(2));
     setClosingBalance(parseFloat(balanceData[0]["masterStockClosingBalance"]).toFixed(2));
 
-    const docs = await fetchMasterStockList(page, itemsPerPage, token);
-    // console.log(docs);
-    setFullData(docs);
-    for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
-        data.push(docs[eachEntry]);
-      }
-    }
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-    }
-    else if (dataType === "valid"){
-      data.reverse();
-      setRows(data);
-    }
-    else{
-      deleted_data.reverse();
-      setRows(deleted_data);
-    }
-    
+    const masterStockData = await fetchMasterStockList(page, itemsPerPage, token, dataType);
 
-    let totalWeight = 0.0;
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    data.forEach(({ weight, receive22k, issue22k }) => {
-      if (isNaN(parseFloat(receive22k))) {
-        receive22k = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(issue22k))) {
-        issue22k = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(weight))){
-        weight = 0;  // Set it to zero if it's NaN
-      }    
-      totalWeight += parseFloat(weight);
-      totalRecvQty += parseFloat(receive22k);
-      totalIssueQty += parseFloat(issue22k);
-    });
-    setTotalWeight(totalWeight.toFixed(2));
-    setTotalRecvQty(totalRecvQty.toFixed(2));
-    setTotalIssueQty(totalIssueQty.toFixed(2));
-    // setClosingBalance((openingBalance + totalWeight - (2 * totalIssueQty)).toFixed(2));
+    const docs = masterStockData["data"];
+    const count = masterStockData["count"];
+    const totalQty = masterStockData["totalQty"];
+    setTotalCount(count);
+
+    setRows(docs);
+    setTotalWeight(totalQty[0]["weight"].toFixed(2));
+    setTotalRecvQty(totalQty[0]["receive22k"].toFixed(2));
+    setTotalIssueQty(totalQty[0]["issue22k"].toFixed(2));
     setIsLoading(false);
   };
-
+ 
+  useEffect(() => {
+    (async () => {
+      updateRows(dataState);
+    })();
+  }, [page, itemsPerPage]);
+  
     useEffect(() => {
         const handleKeyDown = (event) => {
             // Check if the specific key combination is pressed
@@ -162,51 +127,30 @@ const MasterStock = () => {
         window.addEventListener('keydown', handleKeyDown);
 
         (async () => {
+          if (searchText !== ""){
+            return;
+          };      
 
         setIsLoading(true);
             const token = localStorage.getItem("token");
         // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        // console.log("data", data)
 
         const balanceData = await getUtilityData(token);
         setOpeningBalance(parseFloat(balanceData[0]["masterStockOpeningBalance"]).toFixed(2));
         setClosingBalance(parseFloat(balanceData[0]["masterStockClosingBalance"]).toFixed(2));
 
-        const docs = await fetchMasterStockList(page, itemsPerPage, token);
-        setFullData(docs);
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag){
-            deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            data.push(docs[eachEntry]);
-          }
-        }
-        data.reverse();
-        setRows(data);
+        const masterStockData = await fetchMasterStockList(page, itemsPerPage, token, dataState);
+
+        const docs = masterStockData["data"];
+        const count = masterStockData["count"];
+        const totalQty = masterStockData["totalQty"];
+        setTotalCount(count);
         
-        let totalWeight = 0.0;
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        data.forEach(({ weight, receive22k, issue22k }) => {
-          if (isNaN(parseFloat(receive22k))) {
-            receive22k = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(issue22k))) {
-            issue22k = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(weight))){
-            weight = 0;  // Set it to zero if it's NaN
-          }    
-          totalWeight += parseFloat(weight);
-          totalRecvQty += parseFloat(receive22k);
-          totalIssueQty += parseFloat(issue22k);
-        });
-        setTotalWeight(totalWeight.toFixed(2));
-        setTotalRecvQty(totalRecvQty.toFixed(2));
-        setTotalIssueQty(totalIssueQty.toFixed(2));
+        setRows(docs);
+        
+        setTotalWeight(totalQty[0]["weight"].toFixed(2));
+        setTotalRecvQty(totalQty[0]["receive22k"].toFixed(2));
+        setTotalIssueQty(totalQty[0]["issue22k"].toFixed(2));
         // setClosingBalance((openingBalance + totalWeight - (2 * totalIssueQty)).toFixed(2));
         setIsLoading(false);
 
@@ -217,11 +161,9 @@ const MasterStock = () => {
         window.removeEventListener('keydown', handleKeyDown);
     };
   
-    }, [page, itemsPerPage]);
-
+    }, []);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -253,7 +195,10 @@ const MasterStock = () => {
     let curMeltingBookOpening100Balance = parseFloat(balanceData[0]["meltingBookOpening100Balance"]);
     let curMeltingBookClosing100Balance = parseFloat(balanceData[0]["meltingBookClosing100Balance"]);
     
-    const docs = await fetchMasterStockList(page, itemsPerPage, token);
+    const masterStockData = await fetchMasterStockList(page, itemsPerPage, token, "valid");
+    const docs = masterStockData["data"];
+    const count = masterStockData["count"];
+    setTotalCount(count);
 
     selectedRowKeys.map((item, index) => {
       for (let i = 0; i < docs.length; i++) {
@@ -349,14 +294,22 @@ const MasterStock = () => {
     setIsDeleteModalOpen(false);  
   }
 
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
+    setIsLoading(true);
+    // confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+    let array = [];
 
-    // updateRows("valid");
-    const array = [];
+    const token = localStorage.getItem("token");
+
+    let allData = await fetchMasterStockList(1, Number.MAX_SAFE_INTEGER, token, "all");
+    let fullData = allData["data"];
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
@@ -372,17 +325,22 @@ const MasterStock = () => {
         }
     }
     });
-    array.reverse();
-    setRows(array);
-    // confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-    close()
+    setRows([...array].reverse());
+    setTotalCount(array.length);
+
+    // await sleep(100); // sleeps for 100 milli seconds
+
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
+
   const handleReset = (clearFilters, close) => {
     clearFilters();
-    updateRows("valid");
     setSearchText('');
+    setItemsPerPage(20);
+    updateRows("valid");
     close();
   };
 
@@ -607,16 +565,17 @@ const MasterStock = () => {
     setSelectedRowKeys();
   }
 
-  const SelectAll = () => {
-    const array = [];
+  const SelectAll = async() => {
+    setIsLoading(true);
+    const token = localStorage.getItem("token");
 
-    rows.forEach( function(number){
-      if (number.is_deleted_flag === false){
-        array.push(number._id);
-      }
-    }
-    )
+    const masterStockData = await fetchMasterStockList(1, Number.MAX_SAFE_INTEGER, token, "valid");
+    const docs = masterStockData["data"];
+
+    const array = docs.map(({ _id }) => _id);
+
     setSelectedRowKeys(array);
+    setIsLoading(false);
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -789,7 +748,11 @@ const MasterStock = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount, 
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (
