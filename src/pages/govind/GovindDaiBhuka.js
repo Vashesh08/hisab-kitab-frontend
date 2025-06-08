@@ -132,9 +132,9 @@ const GovindDaiBhuka = () => {
       totalmachineIssueQty += parseFloat(sumOfMachineIssue);
        
     });
-    setMachineIssueBalance(totalmachineIssueQty);
-    setDaiBhukaDaiBalance(totalDaiBhukaDaiQty);
-    setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty);
+    setMachineIssueBalance(totalmachineIssueQty.toFixed(2));
+    setDaiBhukaDaiBalance(totalDaiBhukaDaiQty.toFixed(2));
+    setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty.toFixed(2));
 
     // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
@@ -191,9 +191,9 @@ const GovindDaiBhuka = () => {
           totalmachineIssueQty += parseFloat(sumOfMachineIssue);
            
         });
-        setMachineIssueBalance(totalmachineIssueQty);
-        setDaiBhukaDaiBalance(totalDaiBhukaDaiQty);
-        setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty);
+        setMachineIssueBalance(totalmachineIssueQty.toFixed(2));
+        setDaiBhukaDaiBalance(totalDaiBhukaDaiQty.toFixed(2));
+        setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty.toFixed(2));
     
         setIsLoading(false);
     })();
@@ -680,8 +680,6 @@ const GovindDaiBhuka = () => {
             <>
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
                 <Table.Summary.Cell index={0} className="" colSpan={1}>Total</Table.Summary.Cell> 
-                {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
-                {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={1}>
                   {machineIssueBalance}
                 </Table.Summary.Cell>
@@ -690,23 +688,12 @@ const GovindDaiBhuka = () => {
                 <Table.Summary.Cell index={3}>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={4}>
-                  {/* {totalWeightQuantity} */}
                   {daiBhukaDaiBalance}
                   </Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={5}>
-                  {totalIssueQuantity}
-                </Table.Summary.Cell> */}
                   <Table.Summary.Cell index={5}>
                   {daiBhukaBhukaBalance}
                 </Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={6}>
-                {bhukaBalance}
-                </Table.Summary.Cell> */}
-                {/* <Table.Summary.Cell index={7}>
-                  {lossBalance}
-                </Table.Summary.Cell> */}
                 <Table.Summary.Cell index={8}></Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={9}></Table.Summary.Cell> */}
                 
               </Table.Summary.Row>
             </>
