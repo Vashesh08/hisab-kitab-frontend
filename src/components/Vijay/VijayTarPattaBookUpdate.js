@@ -179,7 +179,7 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
           for (let index = 0; index < numberOfBhukaItems; index++) {
             totalBhukaQty += bhukaWeightValues[index];
           }
-          totalLossQty += totalIssueQty - totalReceiveQty - totalBhukaQty;
+          totalLossQty += Math.round((totalIssueQty - totalReceiveQty - totalBhukaQty) * 100) / 100;
           
           if (totalLossQty >= 0){
             const backendData = {
@@ -220,7 +220,7 @@ function VijayTarPattaBookUpdate({handleOk, textData}) {
           for (let index = 0; index < numberOfBhukaItems; index++) {
             totalBhukaQty += bhukaWeightValues[index];
           }
-          totalLossQty += totalIssueQty - totalReceiveQty - totalBhukaQty;
+          totalLossQty += Math.round((totalIssueQty - totalReceiveQty - totalBhukaQty) * 100) / 100;
           
           if (totalLossQty >= 0){
             const backendData = {

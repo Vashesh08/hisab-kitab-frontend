@@ -92,7 +92,7 @@ function GovindCapBookClose({handleOk}){
                 totalReceiveQty += parseFloat(docs[eachEntry].capAcctLoss)
             }
         }
-        let totalLossQty = totalIssueQty - totalReceiveQty;
+        let totalLossQty = Math.round(((totalIssueQty - totalReceiveQty) * 100) / 100);
         // console.log("final Qty", totalIssueQty,totalReceiveQty,totalLossQty);
 
         if (totalLossQty > 0){

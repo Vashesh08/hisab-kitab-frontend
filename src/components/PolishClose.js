@@ -86,7 +86,7 @@ function PolishClose({handleOk}) {
     const polishLoss = utilityData[0]["polishLoss"]
     const polishFineLoss = utilityData[0]["polishFineLoss"]
     
-    console.log("Vashesh",polishChatkaLoss, polishFineLoss, polishLoss);
+    // console.log("Vashesh",polishChatkaLoss, polishFineLoss, polishLoss);
     const data = {
       date: dayjs(date, "YYYY-MM-DD"),
       goods: "Acct Closing For Day " + getFormattedDate(dayjs(date, "YYYY-MM-DD")),

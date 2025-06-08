@@ -110,8 +110,8 @@ function GovindMachineBookUpdate({handleOk, textData}) {
           }
           let totalReceiveQty = parseFloat(textData.machineReceive);
           let totalLossQty = 0;
-          totalLossQty += totalIssueQty - totalReceiveQty;
-          
+          totalLossQty += Math.round((totalIssueQty - totalReceiveQty) * 100) / 100;
+
           if (totalLossQty >= 0){
             const backendData = {
               _id: textData._id,

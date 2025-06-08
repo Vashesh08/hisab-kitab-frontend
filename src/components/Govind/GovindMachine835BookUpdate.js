@@ -109,7 +109,7 @@ function GovindMachine835BookUpdate({handleOk, textData}) {
           }
           let totalReceiveQty = parseFloat(textData.machine835Receive);
           let totalLossQty = 0;
-          totalLossQty += totalIssueQty - totalReceiveQty;
+          totalLossQty += Math.round((totalIssueQty - totalReceiveQty) * 100) / 100;
           
           if (totalLossQty >= 0){
             const backendData = {

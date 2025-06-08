@@ -186,7 +186,7 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
           for (let index = 0; index < numberOfBhukaItems; index++) {
             totalBhukaQty += isNaN(parseFloat(bhukaWeightValues[index])) ? 0 : parseFloat(bhukaWeightValues[index]);
           }
-          totalLossQty += totalIssueQty - totalReceiveQty - totalBhukaQty;
+          totalLossQty += Math.round((totalIssueQty - totalReceiveQty - totalBhukaQty) * 100) / 100;
           
           if (totalLossQty >= 0){
             const backendData = {
@@ -227,7 +227,7 @@ function GovindTarPattaBookUpdate({handleOk, textData}) {
           for (let index = 0; index < numberOfBhukaItems; index++) {
             totalBhukaQty += isNaN(parseFloat(bhukaWeightValues[index])) ? 0 : parseFloat(bhukaWeightValues[index]);
           }
-          totalLossQty += totalIssueQty - totalReceiveQty - totalBhukaQty;
+          totalLossQty += Math.round((totalIssueQty - totalReceiveQty - totalBhukaQty) * 100) / 100;
           
           if (totalLossQty >= 0){
             const backendData = {

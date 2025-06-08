@@ -124,7 +124,7 @@ function GovindDaiBhuka835Update({handleOk, textData}) {
         const daiBhuka835BhukaWeightKeys = [...Array(numberOfBhuka835Items)].map((_, index) => `daiBhuka835BhukaWeight${index}`);
         const daiBhuka835BhukaWeightValues = daiBhuka835BhukaWeightKeys.map((key) => user[key]);
 
-        console.log(daiBhuka835BhukaWeightValues, daiBhuka835DaiWeightValues);
+        // console.log(daiBhuka835BhukaWeightValues, daiBhuka835DaiWeightValues);
         let totalIssueQty = 0.0;
         for (let index = 0; index < textData.machine835Issue.length; index++) {
           totalIssueQty += parseFloat(textData.machine835Issue[index]);
@@ -138,9 +138,9 @@ function GovindDaiBhuka835Update({handleOk, textData}) {
         for (let index = 0; index < numberOfBhuka835Items; index++) {
           totalReceiveQty += isNaN(parseFloat(daiBhuka835BhukaWeightValues[index])) ? 0 : parseFloat(daiBhuka835BhukaWeightValues[index]);
         }
-        totalLossQty += totalIssueQty - totalReceiveQty;
+        totalLossQty += Math.round((totalIssueQty - totalReceiveQty) * 100) / 100;
         
-        console.log(totalLossQty,totalIssueQty, totalReceiveQty);
+        // console.log(totalLossQty,totalIssueQty, totalReceiveQty);
         if (totalLossQty >= 0){
           const backendData = {
             _id: textData._id,

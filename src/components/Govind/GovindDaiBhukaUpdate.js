@@ -137,9 +137,9 @@ function GovindDaiBhukaUpdate({handleOk, textData}) {
         for (let index = 0; index < numberOfBhukaItems; index++) {
           totalReceiveQty += isNaN(parseFloat(daiBhukaBhukaWeightValues[index])) ? 0 : parseFloat(daiBhukaBhukaWeightValues[index]);
         }
-        totalLossQty += totalIssueQty - totalReceiveQty;
+        totalLossQty += Math.round((totalIssueQty - totalReceiveQty) * 100) / 100;
         
-        console.log(totalLossQty,totalIssueQty, totalReceiveQty);
+        // console.log(totalLossQty,totalIssueQty, totalReceiveQty);
         if (totalLossQty >= 0){
           const backendData = {
             _id: textData._id,

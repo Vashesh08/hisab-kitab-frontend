@@ -154,7 +154,6 @@ function VijayKareegarBookUpdate({handleOk, textData}) {
         const bhukaWeightKeys = [...Array(numberOfBhukaItems)].map((_, index) => `bhukaWeight${index}`);
         const bhukaWeightValues = bhukaWeightKeys.map((key) => user[key]);
 
-        //console.log("Vashesh", issueWeightValues, receiveWeightValues, bhukaWeightValues, textData);
         if (textData.vijayIssue.length === 0){
           const backendData = {
             _id: textData._id,
@@ -178,7 +177,7 @@ function VijayKareegarBookUpdate({handleOk, textData}) {
           for (let index = 0; index < numberOfBhukaItems; index++) {
             totalBhukaQty += bhukaWeightValues[index];
           }
-          totalLossQty += totalIssueQty - totalReceiveQty - totalBhukaQty;
+          totalLossQty += Math.round((totalIssueQty - totalReceiveQty - totalBhukaQty) * 100) / 100;
           
           // const temp = Array(numberOfReceiveItems).fill("-1");
           if (totalLossQty >= 0){
@@ -220,8 +219,8 @@ function VijayKareegarBookUpdate({handleOk, textData}) {
           for (let index = 0; index < numberOfBhukaItems; index++) {
             totalBhukaQty += bhukaWeightValues[index];
           }
-          totalLossQty += totalIssueQty - totalReceiveQty - totalBhukaQty;
-          
+          totalLossQty += Math.round((totalIssueQty - totalReceiveQty - totalBhukaQty) * 100) / 100;
+
           // const temp = Array(numberOfReceiveItems).fill("-1");
           
           if (totalLossQty >= 0){
