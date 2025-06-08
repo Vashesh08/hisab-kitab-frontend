@@ -23,8 +23,10 @@ import { fetchBabuMeltingStockList, deleteBabuMeltingStockList } from "../../api
 
 const BabuMelting = () => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show all
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("valid");
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [updateData, setUpdateData] = useState([]);
@@ -42,6 +44,11 @@ const BabuMelting = () => {
   const [closing100Balance, setClosing100Balance] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
 
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
@@ -82,8 +89,16 @@ const BabuMelting = () => {
 
   async function updateRows (dataType){
 
+    if (searchText !== ""){
+      return;
+    };
     setIsLoading(true);
     const token = localStorage.getItem("token");
+
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);
     // send request to check authenticated
     const data = [];
     const deleted_data = [];
@@ -97,70 +112,28 @@ const BabuMelting = () => {
     setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
     setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
 
-    const docs = await fetchBabuMeltingStockList(page, itemsPerPage, token);
-    setFullData(docs);
+    const babuBookData = await fetchBabuMeltingStockList(page, itemsPerPage, token, dataType);
 
-    for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
-        data.push(docs[eachEntry]);
-      }
-    }
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-    }
-    else if (dataType === "valid"){
-      data.reverse();
-      setRows(data);
-    }
-    else{
-      deleted_data.reverse();
-      setRows(deleted_data);
-    }
+    const docs = babuBookData["data"];
+    const count = babuBookData["count"];
+    const totalQty = babuBookData["totalQty"];
+    setTotalCount(count);
+    setRows(docs);
 
-    let totalWeight = 0.000;
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    let totalLossQty = 0.0;
-    let totalIssueActualQty = 0.0;
-    data.forEach(({ meltingWeight, meltingReceive, meltingIssue, meltingIssueActual, meltingLoss}) => {
-      // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-      if (isNaN(parseFloat(meltingReceive))) {
-        meltingReceive = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(meltingIssue))) {
-        meltingIssue = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(meltingWeight))){
-        meltingWeight = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(meltingLoss))){
-        meltingLoss = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(meltingIssueActual))){
-        meltingIssueActual = 0; // Set it to zero if it's NaN
-      }
-      const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-      // console.log(sumOfWeights);
-      totalWeight += parseFloat(sumOfWeights);
-      totalRecvQty += parseFloat(meltingReceive);
-      totalIssueQty += parseFloat(meltingIssue);
-      totalIssueActualQty += parseFloat(meltingIssueActual);
-      totalLossQty += parseFloat(meltingLoss);
-    });
-    // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-    setTotalWeight(totalWeight.toFixed(2));
-    setTotalRecvQty(totalRecvQty.toFixed(2));
-    setTotalIssueQty(totalIssueQty.toFixed(2));
-    setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
-    setTotalLossQty(totalLossQty.toFixed(2));
+    setTotalWeight(totalQty[0]["meltingWeight"][0]["meltingWeight"].toFixed(2));
+    setTotalRecvQty(totalQty[0]["meltingReceive"][0]["meltingReceive"].toFixed(2));
+    setTotalIssueActualQty(totalQty[0]["meltingIssueActual"][0]["meltingIssueActual"].toFixed(2));
+    setTotalLossQty(totalQty[0]["meltingLoss"][0]["meltingLoss"].toFixed(2));
     
     // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    (async () => {
+      updateRows(dataState);
+    })();
+  }, [page, itemsPerPage]);
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -174,84 +147,12 @@ const BabuMelting = () => {
         // Add event listener for keydown event
         window.addEventListener('keydown', handleKeyDown);
 
-        (async () => {
-
-        setIsLoading(true);
-            const token = localStorage.getItem("token");
-        // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        // console.log("data", data)
-
-        const balanceData = await getUtilityData(token);
-        setOpeningBalance(parseFloat(balanceData[0]["meltingBookOpeningBalance"]).toFixed(2));
-        setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2))
-        setOpening995Balance(parseFloat(balanceData[0]["meltingBookOpening995Balance"]).toFixed(2));
-        setClosing995Balance(parseFloat(balanceData[0]["meltingBookClosing995Balance"]).toFixed(2));
-        setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
-        setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
-    
-        const docs = await fetchBabuMeltingStockList(page, itemsPerPage, token);
-        setFullData(docs);
-        // console.log("data", docs);
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag){
-            deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            data.push(docs[eachEntry]);
-          }
-        }
-        data.reverse();
-        setRows(data);
-
-        let totalWeight = 0.000;
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        let totalLossQty = 0.0;
-        let totalIssueActualQty = 0.0;
-        data.forEach(({ meltingWeight, meltingReceive, meltingIssue, meltingIssueActual, meltingLoss}) => {
-          // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-          if (isNaN(parseFloat(meltingReceive))) {
-            meltingReceive = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(meltingIssue))) {
-            meltingIssue = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(meltingWeight))){
-            meltingWeight = 0 // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(meltingLoss))){
-            meltingLoss = 0  // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(meltingIssueActual))){
-            meltingIssueActual = 0; // Set it to zero if it's NaN
-          }
-          const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-          // console.log(sumOfWeights);
-          totalWeight += parseFloat(sumOfWeights);
-          totalRecvQty += parseFloat(meltingReceive);
-          totalIssueQty += parseFloat(meltingIssue);
-          totalIssueActualQty += parseFloat(meltingIssueActual);
-          totalLossQty += parseFloat(meltingLoss);
-        });
-        // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-        setTotalWeight(totalWeight.toFixed(2));
-        setTotalRecvQty(totalRecvQty.toFixed(2));
-        setTotalIssueQty(totalIssueQty.toFixed(2));
-        setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
-        setTotalLossQty(totalLossQty.toFixed(2));
-        // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
-
-        setIsLoading(false);
-    })();
-
     // Clean up the event listener on component unmount
     return () => {
         window.removeEventListener('keydown', handleKeyDown);
     };
   
-    }, [page, itemsPerPage]);
+    }, []);
 
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -289,7 +190,10 @@ const BabuMelting = () => {
     let currMeltingBookClosing995Balance = parseFloat(balanceData[0]["meltingBookClosing995Balance"])
     let currMeltingBookClosing100Balance = parseFloat(balanceData[0]["meltingBookClosing100Balance"])
 
-    const docs = await fetchBabuMeltingStockList(page, itemsPerPage, token);
+    const babuBookData = await fetchBabuMeltingStockList(1, Number.MAX_SAFE_INTEGER, token, "valid");
+    const docs = babuBookData["data"];
+    const count = babuBookData["count"];
+    setTotalCount(count);
 
     // console.log(selectedRowKeys, rows);
     selectedRowKeys.map((item, index) => {
@@ -362,11 +266,19 @@ const BabuMelting = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
     // console.log(selectedKeys, confirm, dataIndex)
+    setIsLoading(true);
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
 
     // updateRows("valid");
-    const array = [];
+    let array = [];
+
+    const token = localStorage.getItem("token");
+
+    let allData = await fetchBabuMeltingStockList(1, Number.MAX_SAFE_INTEGER, token, dataState);
+    let fullData = allData["data"];
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
@@ -382,17 +294,22 @@ const BabuMelting = () => {
         }
     }
     });
-    array.reverse();
     setRows(array);
+    setTotalCount(array.length);
+
     // confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-    close()
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
   const handleReset = (clearFilters, close) => {
     clearFilters();
     updateRows("valid");
     setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 
@@ -475,27 +392,98 @@ const BabuMelting = () => {
           getFormattedDate(text)
         )
       ) : dataIndex === "meltingWeight" ?(
-          text && text.map((eachText) => (
+        searchedColumn === "meltingWeight" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+            <div><Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={eachText}
+          />
+          </div>
+        ) : (
             <div style={{textAlign:"right"}}>{eachText}</div>
           )
           )
-        // )
-      ) : dataIndex === "meltingPurity" ?(
+        )
+      )): (
         text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+        <div style={{textAlign:"right"}}>{eachText}</div>
         )
+      ))
+    ) :dataIndex === "meltingPurity" ?(
+        searchedColumn === "meltingPurity" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+            <div><Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={eachText}
+          />
+          </div>
+        ) : (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )
         )
-      ) : dataIndex === "meltingConversion" ?(
+      )): (
         text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+        <div style={{textAlign:"right"}}>{eachText}</div>
         )
+      ))
+    ) :dataIndex === "meltingConversion" ?(
+        searchedColumn === "meltingConversion" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+            <div><Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={eachText}
+          />
+          </div>
+        ) : (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )
         )
-      ) : dataIndex === "meltingCategory" ?(
+      )): (
         text && text.map((eachText) => (
-          <div style={{textAlign:"left"}}>{eachText}</div>
+        <div style={{textAlign:"right"}}>{eachText}</div>
         )
+      ))
+    ) :dataIndex === "meltingCategory" ?(
+        searchedColumn === "meltingCategory" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+            <div><Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={eachText}
+          />
+          </div>
+        ) : (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )
         )
-      ): (
+      )): (
+        text && text.map((eachText) => (
+        <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+      ))
+    ) : (
       searchedColumn === dataIndex ? (
         <Highlighter
           highlightStyle={{
@@ -657,16 +645,15 @@ const BabuMelting = () => {
     setSelectedRowKeys();
   }
 
-  const SelectAll = () => {
-    const array = [];
+  const SelectAll = async() => {
+    setIsLoading(true);
+    const token = localStorage.getItem("token");
+    const babuBookData = await fetchBabuMeltingStockList(1, Number.MAX_SAFE_INTEGER, token, "valid");
+    const docs = babuBookData["data"];
+    const array = docs.map(({ _id }) => _id);
 
-    rows.forEach( function(number){
-      if (number.is_deleted_flag === false){
-        array.push(number._id);
-      }
-    }
-    )
     setSelectedRowKeys(array);
+    setIsLoading(false);
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -973,7 +960,11 @@ const BabuMelting = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount, 
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (

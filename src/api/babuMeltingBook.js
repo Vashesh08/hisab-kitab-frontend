@@ -19,8 +19,8 @@ export async function getBabuMeltingStock(token) {
     return body;
 }
 
-export async function fetchBabuMeltingStockList(page, itemsPerPage, token) {
-    const response = await fetch(`${config.API_URL}/admin/babuMeltingAcctBook-list?page=${page}&itemsPerPage=${itemsPerPage}`, {
+export async function fetchBabuMeltingStockList(page, itemsPerPage, token, isDeleted) {
+    const response = await fetch(`${config.API_URL}/admin/babuMeltingAcctBook-list?page=${page}&itemsPerPage=${itemsPerPage}&state=${isDeleted}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
