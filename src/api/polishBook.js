@@ -2,8 +2,8 @@
 import convertObjectToFormData from "../utils/convertObjectToFormData";
 import config from '../config';
 
-export async function fetchPolishList(page, itemsPerPage, token) {
-    const response = await fetch(`${config.API_URL}/admin/polish-list?page=${page}&itemsPerPage=${itemsPerPage}`, {
+export async function fetchPolishList(page, itemsPerPage, token, isDeleted) {
+    const response = await fetch(`${config.API_URL}/admin/polish-list?page=${page}&itemsPerPage=${itemsPerPage}&state=${isDeleted}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,

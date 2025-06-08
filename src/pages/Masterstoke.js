@@ -293,7 +293,7 @@ const MasterStock = () => {
         }
     }
     });
-    setRows([...array].reverse());
+    setRows(array);
     setTotalCount(array.length);
 
     // await sleep(100); // sleeps for 100 milli seconds

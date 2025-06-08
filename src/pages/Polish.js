@@ -23,8 +23,10 @@ import PolishClose from "../components/PolishClose.js";
 
 const Polish = () => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show all
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("today");  
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
@@ -37,6 +39,11 @@ const Polish = () => {
   const [totalChillQuantity, setTotalChillQty] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
 
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
@@ -77,92 +84,57 @@ const Polish = () => {
 
   async function updateRows (dataType){
 
+    if (searchText !== ""){
+      return;
+    };
+
     setIsLoading(true);
     const token = localStorage.getItem("token");
     // send request to check authenticated
-    const data = [];
-    const deleted_data = [];
+
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);
+
     const currentDateData = [];
     const today = dayjs();
     
-    // console.log("data", data)
+    const allPolishData = await fetchPolishList(page, itemsPerPage, token, dataState);
+    const docs = allPolishData["data"];
+    const count = allPolishData["count"];
+    const totalQty = allPolishData["totalQty"];
+    setTotalCount(count);
 
+    setTotalIssueQty(totalQty[0]["issueWeight"].toFixed(2));
+    setTotalRecvQty(totalQty[0]["recvWeight"].toFixed(2));
+    setTotalLossQty(totalQty[0]["lossWeight"].toFixed(2));
+    setTotalFineQty(totalQty[0]["fine"].toFixed(2));
+    setTotalChillQty(totalQty[0]["chill"].toFixed(2));
+    setTotalChatkaQty(totalQty[0]["chatka"].toFixed(2));
 
-    const docs = await fetchPolishList(page, itemsPerPage, token);
-    // console.log(docs);
     setFullData(docs);
     for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
         if (today.isSame(dayjs(docs[eachEntry].date), 'day')){
             currentDateData.push(docs[eachEntry]);
         }
-        data.push(docs[eachEntry]);
-      }
     }
 
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-    }
-    else if (dataType === "valid"){
-      data.reverse();
-      setRows(data);
-    }
-    else if (dataType === "today"){
-      currentDateData.reverse();
+    if (dataType === "today"){
       setRows(currentDateData);
     }
     else{
-      deleted_data.reverse();
-      setRows(deleted_data);
+      setRows(docs);
     }
-    
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    let totalLossQty = 0.0;
-    let totalFineQty = 0.0;
-    let totalChillQty = 0.0;
-    let totalChatkaQty = 0.0;
-    
-    data.forEach(({ issueWeight, recvWeight, lossWeight, chill, fine, chatka }) => {
-      if (isNaN(parseFloat(issueWeight))) {
-        issueWeight = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(recvWeight))) {
-        recvWeight = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(lossWeight))){
-        lossWeight = 0;  // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(chill))){
-        chill = 0;  // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(fine))){
-        fine = 0;  // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(chatka))){
-        chatka = 0;  // Set it to zero if it's NaN
-      }
-      totalIssueQty += parseFloat(issueWeight);
-      totalRecvQty += parseFloat(recvWeight);
-      totalLossQty += parseFloat(lossWeight);
-      totalFineQty += parseFloat(fine);
-      totalChillQty += parseFloat(chill);
-      totalChatkaQty += parseFloat(chatka);
-    });
-    
-    setTotalIssueQty(totalIssueQty.toFixed(2));
-    setTotalRecvQty(totalRecvQty.toFixed(2));
-    setTotalLossQty(totalLossQty.toFixed(2));
-    setTotalFineQty(totalFineQty.toFixed(2));
-    setTotalChillQty(totalChillQty.toFixed(2));
-    setTotalChatkaQty(totalChatkaQty.toFixed(2));
-    
+        
     setIsLoading(false);
   };
+
+   useEffect(() => {
+    (async () => {
+      updateRows(dataState);
+    })();
+  }, [page, itemsPerPage]);
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -176,85 +148,12 @@ const Polish = () => {
         // Add event listener for keydown event
         window.addEventListener('keydown', handleKeyDown);
 
-        (async () => {
-
-        setIsLoading(true);
-            const token = localStorage.getItem("token");
-        // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        const currentDateData = [];
-        const today = dayjs();
-        // console.log("data", data)
-
-
-        const docs = await fetchPolishList(page, itemsPerPage, token);
-        setFullData(docs);
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag){
-            deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            if (today.isSame(dayjs(docs[eachEntry].date), 'day')){
-              currentDateData.push(docs[eachEntry]);
-              }
-              data.push(docs[eachEntry]);
-            }
-        }
-        currentDateData.reverse();
-        setRows(currentDateData);
-        
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        let totalLossQty = 0.0;
-        let totalFineQty = 0.0;
-        let totalChillQty = 0.0;
-        let totalChatkaQty = 0.0;
-        
-        data.forEach(({ issueWeight, recvWeight, lossWeight, chill, fine, chatka }) => {
-        if (isNaN(parseFloat(issueWeight))) {
-            issueWeight = 0; // Set it to zero if it's NaN
-        } 
-        if (isNaN(parseFloat(recvWeight))) {
-            recvWeight = 0; // Set it to zero if it's NaN
-        } 
-        if (isNaN(parseFloat(lossWeight))){
-            lossWeight = 0;  // Set it to zero if it's NaN
-        } 
-        if (isNaN(parseFloat(chill))){
-            chill = 0;  // Set it to zero if it's NaN
-        } 
-        if (isNaN(parseFloat(fine))){
-            fine = 0;  // Set it to zero if it's NaN
-        }
-        if (isNaN(parseFloat(chatka))){
-            chatka = 0;  // Set it to zero if it's NaN
-        }
-        totalIssueQty += parseFloat(issueWeight);
-        totalRecvQty += parseFloat(recvWeight);
-        totalLossQty += parseFloat(lossWeight);
-        totalFineQty += parseFloat(fine);
-        totalChillQty += parseFloat(chill);
-        totalChatkaQty += parseFloat(chatka);
-        });
-        
-        setTotalIssueQty(totalIssueQty.toFixed(2));
-        setTotalRecvQty(totalRecvQty.toFixed(2));
-        setTotalLossQty(totalLossQty.toFixed(2));
-        setTotalFineQty(totalFineQty.toFixed(2));
-        setTotalChillQty(totalChillQty.toFixed(2));
-        setTotalChatkaQty(totalChatkaQty.toFixed(2));
-        
-        setIsLoading(false);
-
-    })();
-
     // Clean up the event listener on component unmount
     return () => {
         window.removeEventListener('keydown', handleKeyDown);
     };
   
-    }, [page, itemsPerPage]);
+    }, []);
 
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -289,7 +188,10 @@ const Polish = () => {
     let curPolishChatkaLoss = parseFloat(balanceData[0]["polishChatkaLoss"])
     let curPolishFineLoss = parseFloat(balanceData[0]["polishFineLoss"])
 
-    const docs = await fetchPolishList(page, itemsPerPage, token);
+    const allPolishData = await fetchPolishList(page, itemsPerPage, token, dataState);
+    const docs = allPolishData["data"];
+    const count = allPolishData["count"];
+    setTotalCount(count);
     const lossAcctData = await fetchLossAcctList(page, itemsPerPage, token);
     
     // TODO: Remove Rows From Loss Book
@@ -375,11 +277,17 @@ const Polish = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
+    setIsLoading(true);
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
 
-    // updateRows("valid");
-    const array = [];
+    let array = [];
+
+    const token = localStorage.getItem("token");
+
+    let allPolishData = await fetchPolishList(1, Number.MAX_SAFE_INTEGER, token, "all");
+    let fullData = allPolishData["data"];
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
@@ -395,17 +303,23 @@ const Polish = () => {
         }
     }
     });
-    array.reverse();
     setRows(array);
-    // confirm();
+
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
-    close()
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
+  
   const handleReset = (clearFilters, close) => {
     clearFilters();
     updateRows("valid");
     setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 
@@ -609,8 +523,14 @@ const Polish = () => {
     setSelectedRowKeys();
   }
 
-  const SelectAll = () => {
-    const array = [];
+  const SelectAll = async() => {
+    setIsLoading(true);
+    const token = localStorage.getItem("token");
+
+    const allPolishData = await fetchPolishList(1, Number.MAX_SAFE_INTEGER, token, "valid");
+    const docs = allPolishData["data"];
+
+    const array = docs.map(({ _id }) => _id);
 
     rows.forEach( function(number){
       if (number.is_deleted_flag === false){
@@ -619,6 +539,7 @@ const Polish = () => {
     }
     )
     setSelectedRowKeys(array);
+    setIsLoading(false);
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -794,7 +715,11 @@ const Polish = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount, 
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (

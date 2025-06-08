@@ -177,7 +177,7 @@ const Tarpatta = () => {
     }
     });
 
-    setRows([...array].reverse());
+    setRows(array);
     setTotalCount(array.length);
     setPage(1);
     setItemsPerPage(array.length);
@@ -482,16 +482,18 @@ const Tarpatta = () => {
     setSelectedRowKeys();
   }
 
-  const SelectAll = () => {
-    const array = [];
+  const SelectAll = async() => {
+    setIsLoading(true);
 
-    rows.forEach( function(number){
-      if (number.is_deleted_flag === false){
-        array.push(number._id);
-      }
-    }
-    )
+    const token = localStorage.getItem("token");
+
+    const meltingBookData = await fetchMeltingBookList(1, Number.MAX_SAFE_INTEGER, token, "valid");
+    const docs = meltingBookData["data"];
+
+    const array = docs.map(({ _id }) => _id);
+    
     setSelectedRowKeys(array);
+    setIsLoading(false);
   }
 
   const onSelectChange = (newSelectedRowKeys) => {

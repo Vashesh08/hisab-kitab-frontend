@@ -97,7 +97,6 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         const kareegarData = data.find(item => item._id === selectedKareegarId);
         let balance = parseFloat(kareegarData["balance"]);
         let beads_balance = parseFloat(kareegarData["beads_balance"]);
-        // console.log(kareegarData, balance);
         
         const lossAcctData = await fetchLossAcctList(1, 100000000, token);
         const lossIds = [];
@@ -105,7 +104,6 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
 
         for (let i = 0; i < docs.length; i++) {
             if (!docs[i]["is_deleted_flag"]){
-            //   console.log("row", docs[i]);
                 selectedIds.push(docs[i]["_id"]);
               if (docs[i]["type"] === "Issue"){
                   balance -= parseFloat(docs[i]["issue_wt"]);
