@@ -100,7 +100,7 @@ const Polish = () => {
     const currentDateData = [];
     const today = dayjs();
     
-    const allPolishData = await fetchPolishList(page, itemsPerPage, token, dataState);
+    const allPolishData = await fetchPolishList(page, itemsPerPage, token, dataType);
     const docs = allPolishData["data"];
     const count = allPolishData["count"];
     const totalQty = allPolishData["totalQty"];
@@ -532,12 +532,6 @@ const Polish = () => {
 
     const array = docs.map(({ _id }) => _id);
 
-    rows.forEach( function(number){
-      if (number.is_deleted_flag === false){
-        array.push(number._id);
-      }
-    }
-    )
     setSelectedRowKeys(array);
     setIsLoading(false);
   }
