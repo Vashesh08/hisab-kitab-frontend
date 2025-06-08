@@ -21,12 +21,13 @@ import { Tooltip } from 'antd';
 
 const Tarpatta = () => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show all
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("valid");
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [updateData, setUpdateData] = useState([]);
-  const [fullData, setFullData] = useState([]);
   const [totalMeltingReceiveQty, setTotalMeltingReceiveQty] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
@@ -34,6 +35,12 @@ const Tarpatta = () => {
   const [totalLossQuantity, setTotalLossQty] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
+  
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
     documentTitle: 'Tarpatta Book - ' + dayjs().format("DD-MM-YYYY"),
@@ -76,155 +83,45 @@ const Tarpatta = () => {
 
   async function updateRows (dataType){
 
+    if (searchText !== ""){
+      return;
+    };
+    
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);
+
     setIsLoading(true);
     const token = localStorage.getItem("token");
     // send request to check authenticated
-    const data = [];
-    const deleted_data = [];
-    // console.log("data", data)
         
-    const docs = await fetchMeltingBookList(page, itemsPerPage, token);
-    setFullData(docs);
+    const meltingBookData = await fetchMeltingBookList(page, itemsPerPage, token, dataType);
+    const docs = meltingBookData["data"].filter(item =>
+        item.receive22k !== undefined &&
+        item.receive22k !== ""
+    );
+    const count = meltingBookData["count"];
+    const totalQty = meltingBookData["totalQty"];
+    setTotalCount(count);
 
-    for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
-        data.push(docs[eachEntry]);
-      }
-    }
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-    }
-    else if (dataType === "valid"){
-      data.reverse();
-      setRows(data);
-    }
-    else{
-      deleted_data.reverse();
-      setRows(deleted_data);
-    }
+    setRows(docs);
 
-
-    let totalBhukaQty = 0.000;
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    let totalLossQty = 0.0;
-    let totalMeltingRecvQty = 0.0;
-    data.forEach(({ receive22k, tarpattaIssue, tarpattaReceive, tarpattaBhuka, tarpattaLoss}) => {
-      // console.log(weight24k, receive22k, issue22k, loss22k);
-      if (isNaN(parseFloat(tarpattaIssue))) {
-        tarpattaIssue = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(receive22k))) {
-        receive22k = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(tarpattaReceive))) {
-        tarpattaReceive = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(tarpattaLoss))){
-        tarpattaLoss = 0 // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(tarpattaBhuka))){
-        tarpattaBhuka = [0]  // Set it to zero if it's NaN
-      }
-      const totalIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const totalReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const totalBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
-      
-      totalMeltingRecvQty += parseFloat(receive22k);
-      totalIssueQty += parseFloat(totalIssue);
-      totalRecvQty += parseFloat(totalReceive);
-      totalBhukaQty += parseFloat(totalBhuka);
-      totalLossQty += parseFloat(tarpattaLoss);
-
-      // console.log(sumOfWeights);
-    });
-    // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-    setTotalRecvQty(totalRecvQty.toFixed(2));
-    setTotalIssueQty(totalIssueQty.toFixed(2));
-    setTotalLossQty(totalLossQty.toFixed(2));
-    setTotalBhukaQty(totalBhukaQty.toFixed(2));
-    setTotalMeltingReceiveQty(totalMeltingRecvQty.toFixed(2));
-    // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+    setTotalRecvQty(totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"].toFixed(2));
+    setTotalIssueQty(totalQty[0]["tarpattaIssue"][0]["tarpattaIssue"].toFixed(2));
+    setTotalLossQty(totalQty[0]["tarpattaLoss"][0]["tarpattaLoss"].toFixed(2));
+    setTotalBhukaQty(totalQty[0]["tarpattaBhuka"][0]["tarpattaBhuka"].toFixed(2));
+    setTotalMeltingReceiveQty(totalQty[0]["receive22k"][0]["receive22k"].toFixed(2));
 
     setIsLoading(false);
   };
 
-    useEffect(() => {
-        (async () => {
-
-        setIsLoading(true);
-            const token = localStorage.getItem("token");
-        // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        // console.log("data", data)
-
-        const docs = await fetchMeltingBookList(page, itemsPerPage, token);
-        setFullData(docs);
-        // console.log("data", docs);
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag){
-            deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            data.push(docs[eachEntry]);
-          }
-        }
-        data.reverse();
-        setRows(data);
-
-        let totalBhukaQty = 0.000;
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        let totalLossQty = 0.0;
-        let totalMeltingRecvQty = 0.0;
-        data.forEach(({ receive22k, tarpattaIssue, tarpattaReceive, tarpattaBhuka, tarpattaLoss}) => {
-          // console.log(weight24k, receive22k, issue22k, loss22k);
-          if (isNaN(parseFloat(tarpattaIssue))) {
-            tarpattaIssue = [0]; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(receive22k))) {
-            receive22k = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(tarpattaReceive))) {
-            tarpattaReceive = [0]; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(tarpattaLoss))){
-            tarpattaLoss = 0 // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(tarpattaBhuka))){
-            tarpattaBhuka = [0]  // Set it to zero if it's NaN
-          }
-          const totalIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const totalReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const totalBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
-          
-          totalMeltingRecvQty += parseFloat(receive22k);
-          totalIssueQty += parseFloat(totalIssue);
-          totalRecvQty += parseFloat(totalReceive);
-          totalBhukaQty += parseFloat(totalBhuka);
-          totalLossQty += parseFloat(tarpattaLoss);
-
-          // console.log(sumOfWeights);
-        });
-        // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-        setTotalRecvQty(totalRecvQty.toFixed(2));
-        setTotalIssueQty(totalIssueQty.toFixed(2));
-        setTotalLossQty(totalLossQty.toFixed(2));
-        setTotalBhukaQty(totalBhukaQty.toFixed(2));
-        setTotalMeltingReceiveQty(totalMeltingRecvQty.toFixed(2));
-        // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
-
-        setIsLoading(false);
+  useEffect(() => {
+    (async () => {
+      updateRows(dataState);
     })();
+  }, [page, itemsPerPage]);
   
-    }, [page, itemsPerPage]);
-
-
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);  
@@ -250,11 +147,20 @@ const Tarpatta = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
+    setIsLoading(true);
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
 
-    // updateRows("valid");
-    const array = [];
+    let array = [];
+
+    const token = localStorage.getItem("token");
+
+    let allData = await fetchMeltingBookList(1, Number.MAX_SAFE_INTEGER, token, dataState);
+    const fullData = allData["data"].filter(item =>
+        item.receive22k !== undefined &&
+        item.receive22k !== ""
+    );
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
@@ -270,17 +176,22 @@ const Tarpatta = () => {
         }
     }
     });
-    array.reverse();
-    setRows(array);
-    // confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-    close()
+
+    setRows([...array].reverse());
+    setTotalCount(array.length);
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
+
   const handleReset = (clearFilters, close) => {
     clearFilters();
     updateRows("valid");
     setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 
@@ -362,39 +273,75 @@ const Tarpatta = () => {
         ) : (
           getFormattedDate(text)
         )
-      ) : dataIndex === "weight24k" ?(
-        // searchedColumn === dataIndex ? (<Highlighter
-        //   highlightStyle={{
-        //     backgroundColor: '#ffc069',
-        //     padding: 0,
-        //   }}
-        //   searchWords={[searchText]}
-        //   autoEscape
-        //   textToHighlight={text ? (
-        //     text.join("\n")
-        //   ) : ''}
-        //   />
-        // ) : (
-          text && text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
-          )
-          )
-        // )
-      ) : dataIndex === "tarpattaBhuka" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
       ) : dataIndex === "tarpattaIssue" ?(
-        text && text.map((eachText) => (
+        searchedColumn === "tarpattaIssue" ? (text && text.map((eachText) => (
+          (eachText.toString().includes(searchText)? (
+          <div><Highlighter
+        highlightStyle={{
+          backgroundColor: '#ffc069',
+          padding: 0,
+        }}
+        searchWords={[searchText]}
+        autoEscape
+        textToHighlight={eachText}
+        />
+        </div>
+      ) : (
           <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
+      )
+    )): (
+      text && text.map((eachText) => (
+      <div style={{textAlign:"right"}}>{eachText}</div>
+      )
+    ))
+    ) : dataIndex === "tarpattaBhuka" ?(
+        searchedColumn === "tarpattaBhuka" ? (text && text.map((eachText) => (
+          (eachText.toString().includes(searchText)? (
+          <div><Highlighter
+        highlightStyle={{
+          backgroundColor: '#ffc069',
+          padding: 0,
+        }}
+        searchWords={[searchText]}
+        autoEscape
+        textToHighlight={eachText}
+        />
+        </div>
+      ) : (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+        )
+      )
+    )): (
+      text && text.map((eachText) => (
+      <div style={{textAlign:"right"}}>{eachText}</div>
+      )
+    ))
       ) : dataIndex === "tarpattaReceive" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"left"}}>{eachText}</div>
+        searchedColumn === "tarpattaReceive" ? (text && text.map((eachText) => (
+          (eachText.toString().includes(searchText)? (
+          <div><Highlighter
+        highlightStyle={{
+          backgroundColor: '#ffc069',
+          padding: 0,
+        }}
+        searchWords={[searchText]}
+        autoEscape
+        textToHighlight={eachText}
+        />
+        </div>
+      ) : (
+          <div style={{textAlign:"right"}}>{eachText}</div>
         )
         )
+      )
+    )): (
+      text && text.map((eachText) => (
+      <div style={{textAlign:"right"}}>{eachText}</div>
+      )
+    ))
       ): dataIndex === "tarpattaDescription" ?(
           <div style={{textAlign:"left"}}>{text}</div>
       ): dataIndex === "tarpattaLoss" ?(
@@ -670,7 +617,11 @@ const Tarpatta = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount,
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (

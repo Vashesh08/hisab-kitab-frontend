@@ -112,7 +112,8 @@ function KareegarClose({ kareegarId, handleOk}){
         let balance = parseFloat(currentKareegarIssueQty - currentKareegarRecvQty - currentKareegarLossQty).toFixed(2);
         let beads_balance = parseFloat(currentKareegarBeadsIssueQty - currentKareegarBeadsRecvQty).toFixed(2);
 
-        const data =  await getKareegarData(1, 100000000, token);
+        const allKareegarDetails = await getKareegarData(1, 100000000, token);
+        const data = allKareegarDetails["data"];
         const kareegarData = data.find(item => item._id === kareegarId);
         let boxWt = parseFloat(kareegarData.boxWt);
 

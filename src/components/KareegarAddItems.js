@@ -37,7 +37,9 @@ function KareegarAddItems({ kareegarId, handleOk}) {
       if (docs.length > 0){
         const lastEntry = docs[docs.length - 1];
         setLastDate(dayjs(lastEntry.date));
-        setTransactionType(lastEntry.type);
+        if (lastEntry.type !== "Loss"){
+          setTransactionType(lastEntry.type);
+        };
         // console.log(lastEntry, lastDate)
       }
       setForceUpdate(1);
@@ -96,7 +98,8 @@ function KareegarAddItems({ kareegarId, handleOk}) {
       beads_recv_wt,
     } = user;
 
-    const data =  await getKareegarData(1,100000000,token);
+    const allKareegarDetails = await getKareegarData(1, 100000000, token);
+    const data = allKareegarDetails["data"];
     const kareegarData = data.find(item => item._id === kareegarId);
     
     if (issueReceive === "Issue"){

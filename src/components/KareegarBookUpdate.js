@@ -40,7 +40,9 @@ function KareegarBookUpdate({handleOk, textData, kareegarId}) {
         setIsLoading(true);
         // console.log(user);
         
-        const data =  await getKareegarData(1,100000000,token);
+        const allKareegarDetails = await getKareegarData(1, 100000000, token);
+        const data = allKareegarDetails["data"];
+        
         const kareegarData = data.find(item => item._id === kareegarId);
         let balance = (parseFloat(kareegarData.balance));
         let beads_balance_last = (parseFloat(kareegarData.beads_balance));

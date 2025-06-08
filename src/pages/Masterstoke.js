@@ -126,36 +126,6 @@ const MasterStock = () => {
         // Add event listener for keydown event
         window.addEventListener('keydown', handleKeyDown);
 
-        (async () => {
-          if (searchText !== ""){
-            return;
-          };      
-
-        setIsLoading(true);
-            const token = localStorage.getItem("token");
-        // send request to check authenticated
-
-        const balanceData = await getUtilityData(token);
-        setOpeningBalance(parseFloat(balanceData[0]["masterStockOpeningBalance"]).toFixed(2));
-        setClosingBalance(parseFloat(balanceData[0]["masterStockClosingBalance"]).toFixed(2));
-
-        const masterStockData = await fetchMasterStockList(page, itemsPerPage, token, dataState);
-
-        const docs = masterStockData["data"];
-        const count = masterStockData["count"];
-        const totalQty = masterStockData["totalQty"];
-        setTotalCount(count);
-        
-        setRows(docs);
-        
-        setTotalWeight(totalQty[0]["weight"].toFixed(2));
-        setTotalRecvQty(totalQty[0]["receive22k"].toFixed(2));
-        setTotalIssueQty(totalQty[0]["issue22k"].toFixed(2));
-        // setClosingBalance((openingBalance + totalWeight - (2 * totalIssueQty)).toFixed(2));
-        setIsLoading(false);
-
-    })();
-
     // Clean up the event listener on component unmount
     return () => {
         window.removeEventListener('keydown', handleKeyDown);
@@ -195,7 +165,7 @@ const MasterStock = () => {
     let curMeltingBookOpening100Balance = parseFloat(balanceData[0]["meltingBookOpening100Balance"]);
     let curMeltingBookClosing100Balance = parseFloat(balanceData[0]["meltingBookClosing100Balance"]);
     
-    const masterStockData = await fetchMasterStockList(page, itemsPerPage, token, "valid");
+    const masterStockData = await fetchMasterStockList(1, Number.MAX_SAFE_INTEGER, token, "valid");
     const docs = masterStockData["data"];
     const count = masterStockData["count"];
     setTotalCount(count);
@@ -294,8 +264,6 @@ const MasterStock = () => {
     setIsDeleteModalOpen(false);  
   }
 
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
@@ -308,7 +276,7 @@ const MasterStock = () => {
 
     const token = localStorage.getItem("token");
 
-    let allData = await fetchMasterStockList(1, Number.MAX_SAFE_INTEGER, token, "all");
+    let allData = await fetchMasterStockList(1, Number.MAX_SAFE_INTEGER, token, dataState);
     let fullData = allData["data"];
 
     fullData.forEach(function (user){
@@ -338,9 +306,11 @@ const MasterStock = () => {
 
   const handleReset = (clearFilters, close) => {
     clearFilters();
-    setSearchText('');
-    setItemsPerPage(20);
     updateRows("valid");
+    setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 

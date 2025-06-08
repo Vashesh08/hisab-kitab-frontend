@@ -12,14 +12,14 @@ import { useReactToPrint } from "react-to-print";
 import dayjs from 'dayjs'; // Import Day.js
 import Highlighter from 'react-highlight-words';
 import { fetchKareegarBookList, deleteKareegarBookList } from "../api/kareegarBook.js";
-import KareegarAddItems from "../components/KareegarAddItems.js"
+import KareegarAddItems from "../components/KareegarAddItems.js";
 import '../style/pages.css';
 import Loading from "../components/Loading.js";
 import { EditOutlined, DeleteOutlined, LeftOutlined, PrinterOutlined, PlusCircleOutlined, BarsOutlined, SearchOutlined, EnterOutlined } from "@ant-design/icons";
 import { Tooltip } from 'antd';
 import { closeKareegarBook } from "../api/kareegarBook.js";
 import { getKareegarData, updateKareegarBalance, updateKareegarDetail } from "../api/kareegarDetail.js";
-import KaareegarChangeBoxWt from "../components/KareegarChangeBoxWt.js"
+import KaareegarChangeBoxWt from "../components/KareegarChangeBoxWt.js";
 import KaareegarClose from "../components/KareegarClose.js";
 import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
 import KareegarBookUpdate from "../components/KareegarBookUpdate.js";
@@ -115,7 +115,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
 
     setIsLoading(true);
     const token = localStorage.getItem("token");
-    const kareegarUtilityData =  await getKareegarData(page,itemsPerPage, token);
+    const kareegarDetails =  await getKareegarData(page,itemsPerPage, token);
+    const kareegarUtilityData = kareegarDetails["data"];
     const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
     setBoxWt(kareegarData["boxWt"]);
 
@@ -306,7 +307,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         setIsLoading(true);
           
           const token = localStorage.getItem("token");
-          const kareegarUtilityData =  await getKareegarData(page, itemsPerPage, token);
+          const kareegarDetails =  await getKareegarData(page,itemsPerPage, token);
+          const kareegarUtilityData = kareegarDetails["data"];
           //console.log("kareegarUtilityData",kareegarUtilityData);
           const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
           //console.log(kareegarId, kareegarData);
@@ -526,7 +528,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     }
     await postLossAcct(lossData, token)
 
-    const kareegarUtilityData =  await getKareegarData(page,itemsPerPage, token);
+    const kareegarDetails =  await getKareegarData(page,itemsPerPage, token);
+    const kareegarUtilityData = kareegarDetails["data"];
     const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
     //console.log(kareegarUtilityData,kareegarData);
 
@@ -573,7 +576,8 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const deleteModal = async () => {
     setIsLoading(true);
     const token = localStorage.getItem("token");
-    const data =  await getKareegarData(page, itemsPerPage, token);
+    const kareegarDetails =  await getKareegarData(page,itemsPerPage, token);
+    const data = kareegarDetails["data"];
     const kareegarData = data.find(item => item._id === kareegarId);
     let balance = parseFloat(kareegarData["balance"]);
     let beads_balance = parseFloat(kareegarData["beads_balance"]);

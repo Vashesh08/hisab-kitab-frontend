@@ -23,8 +23,10 @@ import dayjs from 'dayjs';
 
 const MeltingBook = () => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show all
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("valid");
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [updateData, setUpdateData] = useState([]);
@@ -43,6 +45,11 @@ const MeltingBook = () => {
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
 
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
+  
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
     documentTitle: 'Melting Book - ' + dayjs().format("DD-MM-YYYY"),
@@ -82,13 +89,19 @@ const MeltingBook = () => {
 
   async function updateRows (dataType){
 
+    if (searchText !== ""){
+      return;
+    };
+
     setIsLoading(true);
     const token = localStorage.getItem("token");
     // send request to check authenticated
-    const data = [];
-    const deleted_data = [];
-    // console.log("data", data)
     
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);
+        
     const balanceData = await getUtilityData(token);
     setOpeningBalance(parseFloat(balanceData[0]["meltingBookOpeningBalance"]).toFixed(2));
     setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2));
@@ -97,71 +110,30 @@ const MeltingBook = () => {
     setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
     setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
 
-    const docs = await fetchMeltingBookList(page, itemsPerPage, token);
-    setFullData(docs);
+    const meltingBookData = await fetchMeltingBookList(page, itemsPerPage, token, dataType);
+    const docs = meltingBookData["data"];
+    const count = meltingBookData["count"];
+    const totalQty = meltingBookData["totalQty"];
+    setTotalCount(count);
 
-    for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
-        data.push(docs[eachEntry]);
-      }
-    }
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-    }
-    else if (dataType === "valid"){
-      data.reverse();
-      setRows(data);
-    }
-    else{
-      deleted_data.reverse();
-      setRows(deleted_data);
-    }
+    setRows(docs);
 
-    let totalWeight = 0.000;
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    let totalLossQty = 0.0;
-    let totalIssueActualQty = 0.0;
-    data.forEach(({ weight24k, receive22k, issue22k, issue22kActual, loss22k}) => {
-      // console.log(weight24k, receive22k, issue22k, loss22k);
-      if (isNaN(parseFloat(receive22k))) {
-        receive22k = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(issue22k))) {
-        issue22k = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(weight24k))){
-        weight24k = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(loss22k))){
-        loss22k = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(issue22kActual))){
-        issue22kActual = 0; // Set it to zero if it's NaN
-      }
-      const sumOfWeights = weight24k.map(Number).reduce((acc, curr) => acc + curr, 0);
-      // console.log(sumOfWeights);
-      totalWeight += parseFloat(sumOfWeights);
-      totalRecvQty += parseFloat(receive22k);
-      totalIssueQty += parseFloat(issue22k);
-      totalIssueActualQty += parseFloat(issue22kActual);
-      totalLossQty += parseFloat(loss22k);
-    });
-    // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-    setTotalWeight(totalWeight.toFixed(2));
-    setTotalRecvQty(totalRecvQty.toFixed(2));
-    setTotalIssueQty(totalIssueQty.toFixed(2));
-    setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
-    setTotalLossQty(totalLossQty.toFixed(2));
+    setTotalWeight(totalQty[0]["weight24k"][0]["weight24k"].toFixed(2));
+    setTotalIssueQty(totalQty[0]["issue22k"][0]["issue22k"].toFixed(2));
+    setTotalIssueActualQty(totalQty[0]["issue22kActual"][0]["issue22kActual"].toFixed(2));
+    setTotalRecvQty(totalQty[0]["receive22k"][0]["receive22k"].toFixed(2));
+    setTotalLossQty(totalQty[0]["loss22k"][0]["loss22k"].toFixed(2));
     
     // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    (async () => {
+      updateRows(dataState);
+    })();
+  }, [page, itemsPerPage]);
+  
     useEffect(() => {
         const handleKeyDown = (event) => {
             // Check if the specific key combination is pressed
@@ -174,88 +146,14 @@ const MeltingBook = () => {
         // Add event listener for keydown event
         window.addEventListener('keydown', handleKeyDown);
 
-        (async () => {
-
-        setIsLoading(true);
-            const token = localStorage.getItem("token");
-        // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        // console.log("data", data)
-
-        const balanceData = await getUtilityData(token);
-        setOpeningBalance(parseFloat(balanceData[0]["meltingBookOpeningBalance"]).toFixed(2));
-        setClosingBalance(parseFloat(balanceData[0]["meltingBookClosingBalance"]).toFixed(2))
-        setOpening995Balance(parseFloat(balanceData[0]["meltingBookOpening995Balance"]).toFixed(2));
-        setClosing995Balance(parseFloat(balanceData[0]["meltingBookClosing995Balance"]).toFixed(2));
-        setOpening100Balance(parseFloat(balanceData[0]["meltingBookOpening100Balance"]).toFixed(2));
-        setClosing100Balance(parseFloat(balanceData[0]["meltingBookClosing100Balance"]).toFixed(2));
-    
-        const docs = await fetchMeltingBookList(page, itemsPerPage, token);
-        setFullData(docs);
-        // console.log("data", docs);
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag){
-            deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            data.push(docs[eachEntry]);
-          }
-        }
-        data.reverse();
-        setRows(data);
-
-        let totalWeight = 0.000;
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        let totalLossQty = 0.0;
-        let totalIssueActualQty = 0.0;
-        data.forEach(({ weight24k, receive22k, issue22k, issue22kActual, loss22k}) => {
-          // console.log(weight24k, receive22k, issue22k, loss22k);
-          if (isNaN(parseFloat(receive22k))) {
-            receive22k = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(issue22k))) {
-            issue22k = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(weight24k))){
-            weight24k = 0 // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(loss22k))){
-            loss22k = 0  // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(issue22kActual))){
-            issue22kActual = 0; // Set it to zero if it's NaN
-          }
-          const sumOfWeights = weight24k.map(Number).reduce((acc, curr) => acc + curr, 0);
-          // console.log(sumOfWeights);
-          totalWeight += parseFloat(sumOfWeights);
-          totalRecvQty += parseFloat(receive22k);
-          totalIssueQty += parseFloat(issue22k);
-          totalIssueActualQty += parseFloat(issue22kActual);
-          totalLossQty += parseFloat(loss22k);
-        });
-        // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-        setTotalWeight(totalWeight.toFixed(2));
-        setTotalRecvQty(totalRecvQty.toFixed(2));
-        setTotalIssueQty(totalIssueQty.toFixed(2));
-        setTotalIssueActualQty(totalIssueActualQty.toFixed(2));
-        setTotalLossQty(totalLossQty.toFixed(2));
-        // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
-
-        setIsLoading(false);
-    })();
-
     // Clean up the event listener on component unmount
     return () => {
         window.removeEventListener('keydown', handleKeyDown);
     };
   
-    }, [page, itemsPerPage]);
-
+    }, []);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -289,7 +187,10 @@ const MeltingBook = () => {
     let currMeltingBookClosing995Balance = parseFloat(balanceData[0]["meltingBookClosing995Balance"])
     let currMeltingBookClosing100Balance = parseFloat(balanceData[0]["meltingBookClosing100Balance"])
 
-    const docs = await fetchMeltingBookList(page, itemsPerPage, token);
+    const meltingBookData = await fetchMeltingBookList(1, Number.MAX_SAFE_INTEGER, token, "valid");
+    const docs = meltingBookData["data"];
+    const count = meltingBookData["count"];
+    setTotalCount(count);
 
     // console.log(selectedRowKeys, rows);
     selectedRowKeys.map((item, index) => {
@@ -362,11 +263,16 @@ const MeltingBook = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
+    setIsLoading(true);
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+    let array = [];
 
-    // updateRows("valid");
-    const array = [];
+    const token = localStorage.getItem("token");
+
+    let allData = await fetchMeltingBookList(1, Number.MAX_SAFE_INTEGER, token, dataState);
+    let fullData = allData["data"];
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
@@ -382,17 +288,22 @@ const MeltingBook = () => {
         }
     }
     });
-    array.reverse();
-    setRows(array);
-    // confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-    close()
+    
+    setRows([...array].reverse());
+    setTotalCount(array.length);
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
+
   const handleReset = (clearFilters, close) => {
     clearFilters();
     updateRows("valid");
     setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 
@@ -475,39 +386,98 @@ const MeltingBook = () => {
           getFormattedDate(text)
         )
       ) : dataIndex === "weight24k" ?(
-        // searchedColumn === dataIndex ? (<Highlighter
-        //   highlightStyle={{
-        //     backgroundColor: '#ffc069',
-        //     padding: 0,
-        //   }}
-        //   searchWords={[searchText]}
-        //   autoEscape
-        //   textToHighlight={text ? (
-        //     text.join("\n")
-        //   ) : ''}
-        //   />
-        // ) : (
-          text && text.map((eachText) => (
+        searchedColumn === "weight24k" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+            <div><Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={eachText}
+          />
+          </div>
+        ) : (
             <div style={{textAlign:"right"}}>{eachText}</div>
           )
           )
-        // )
-      ) : dataIndex === "purity" ?(
+        )
+      )): (
         text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+        <div style={{textAlign:"right"}}>{eachText}</div>
         )
+      ))
+    ) : dataIndex === "purity" ?(
+      searchedColumn === "purity" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+            <div><Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={eachText}
+          />
+          </div>
+        ) : (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )
         )
-      ) : dataIndex === "conversion" ?(
+      )): (
         text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+        <div style={{textAlign:"right"}}>{eachText}</div>
         )
+      ))
+    ) : dataIndex === "conversion" ?(
+      searchedColumn === "conversion" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+            <div><Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={eachText}
+          />
+          </div>
+        ) : (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )
         )
+      )): (
+        text && text.map((eachText) => (
+        <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+      ))
       ) : dataIndex === "category" ?(
+        searchedColumn === "category" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+              <div><Highlighter
+              highlightStyle={{
+                backgroundColor: '#ffc069',
+                padding: 0,
+              }}
+              searchWords={[searchText]}
+              autoEscape
+              textToHighlight={eachText}
+              />
+              </div>
+            ) : (
+              <div style={{textAlign:"right"}}>{eachText}</div>
+            )
+          )
+        )
+      )): (
         text && text.map((eachText) => (
-          <div style={{textAlign:"left"}}>{eachText}</div>
+        <div style={{textAlign:"right"}}>{eachText}</div>
         )
-        )
-      ): (
+      ))
+    ): (
       searchedColumn === dataIndex ? (
         <Highlighter
           highlightStyle={{
@@ -997,7 +967,11 @@ const MeltingBook = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount,
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (

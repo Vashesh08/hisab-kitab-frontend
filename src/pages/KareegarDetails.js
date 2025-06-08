@@ -10,8 +10,6 @@ import { deleteKareegarBookList, fetchKareegarBookList } from "../api/kareegarBo
 
 export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage, setKareegarName }) {
     const { Meta } = Card;
-    const [page] = useState(1);
-    const [itemsPerPage] = useState(100000000); 
     const [allKareegarDetails, setAllKareegarDetails] = useState([])
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,9 +21,41 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         setIsLoading(true);
 
         const token = localStorage.getItem("token");
-        const data = await getKareegarData(1, 100000000, token);
-        const filteredData = data.filter(item => item.is_deleted_flag === false && item.is_hidden_flag === false);
-        setAllKareegarDetails(filteredData);
+        const allKareegarDetails = await getKareegarData(1, 100000000, token);
+        const data = allKareegarDetails["data"];
+        const KareegarBalanceDetails = allKareegarDetails["totalQty"];
+        let kareegarDetails = [];
+
+        for (const item of data) {
+          let foundMatch = false;
+          for (const eachKareegarDetail of KareegarBalanceDetails){
+            if (item["_id"] === eachKareegarDetail["_id"]){
+            kareegarDetails.push({
+              "_id": item._id,
+              "name": item.name, 
+              "category": item.category,
+              "balance": parseFloat(eachKareegarDetail.balance).toFixed(2),
+              "beads_balance": parseFloat(eachKareegarDetail.beads_balance).toFixed(2)
+            });
+            foundMatch = true;
+            break;
+          };
+          }
+
+          // If after checking all KareegarBalanceDetails, no match was found
+          if (!foundMatch) {
+              kareegarDetails.push({
+                  "_id": item._id,
+                  "name": item.name,
+                  "category": item.category,
+                  "balance": parseFloat("0").toFixed(2),
+                  "beads_balance": parseFloat("0").toFixed(2)
+              });
+          }
+
+        };
+        
+        setAllKareegarDetails(kareegarDetails);
 
         setIsLoading(false);
     }
@@ -59,9 +89,11 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
             "kareegarIds": selectedKareegarId
         }
 
-        await deleteKareegarData(kareegarDataId, token);
         const docs = await fetchKareegarBookList(1, 100000000, selectedKareegarId, token);
-        const data =  await getKareegarData(1, 100000000, token);
+        const allKareegarDetails = await getKareegarData(1, 100000000, token);
+        await deleteKareegarData(kareegarDataId, token);
+        const data = allKareegarDetails["data"];
+
         const kareegarData = data.find(item => item._id === selectedKareegarId);
         let balance = parseFloat(kareegarData["balance"]);
         let beads_balance = parseFloat(kareegarData["beads_balance"]);
@@ -94,10 +126,8 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
                   lossIds.push(matchedData._id);  
                 }
               }
-              //console.log("balance", balance, beads_balance);
             }
           }
-          //console.log("lossIds",lossIds);
         
           const deleteFromLossAcct = {
             lossId: lossIds,
@@ -116,72 +146,41 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
             "kareegarBookId": selectedIds
           }
           
-          // console.log(meltingBookId);
           await deleteKareegarBookList(kareegarBookId, token);
-      
-      
-      
-        // console.log(kareegarId, "Delete ICon clicked");
-        const kareegar_data = await getKareegarData(page, itemsPerPage, token);
-        const filteredData = kareegar_data.filter(item => item.is_deleted_flag === false && item.is_hidden_flag === false);
 
-        const allKareegarIds = filteredData.map(item => item._id);
-        let kareegarDetails = [];
+          const fullKareegarDetails = await getKareegarData(1, 100000000, token);
+          const fullKareegarDetailsData = fullKareegarDetails["data"];
+          const KareegarBalanceDetails = fullKareegarDetails["totalQty"];
+          let kareegarDetails = [];
 
-        for (const item of filteredData) {
-          
-          const allData = await fetchKareegarBookList(page, itemsPerPage, item._id, token);
-          
-          let currentKareegarData = [];
+            for (const item of fullKareegarDetailsData) {
+              let foundMatch = false;
+              for (const eachKareegarDetail of KareegarBalanceDetails){
+                if (item["_id"] === eachKareegarDetail["_id"]){
+                kareegarDetails.push({
+                  "_id": item._id,
+                  "name": item.name, 
+                  "category": item.category,
+                  "balance": parseFloat(eachKareegarDetail.balance).toFixed(2),
+                  "beads_balance": parseFloat(eachKareegarDetail.beads_balance).toFixed(2)
+                });
+                foundMatch = true;
+                break;
+              };
+              }
 
-          for (let eachEntry in allData) {
-            // console.log(allData[eachEntry].is_editable_flag);
-            if (allData[eachEntry].is_deleted_flag === false && (allData[eachEntry].is_editable_flag === true)){
-              currentKareegarData.push(allData[eachEntry]);
-            }
-          }
+              // If after checking all KareegarBalanceDetails, no match was found
+              if (!foundMatch) {
+                  kareegarDetails.push({
+                      "_id": item._id,
+                      "name": item.name,
+                      "category": item.category,
+                      "balance": parseFloat("0").toFixed(2),
+                      "beads_balance": parseFloat("0").toFixed(2)
+                  });
+              }
 
-          // console.log(allData, "currentKareegarData", currentKareegarData);
-
-          let currentKareegarIssueQty = 0.0;
-          let currentKareegarRecvQty = 0.0;
-          let currentKareegarLossQty = 0.0;
-          let currentKareegarBeadsIssueQty = 0.0;
-          let currentKareegarBeadsRecvQty = 0.0;
-          currentKareegarData.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
-            // console.log(weight24k, receive22k, issue22k, loss22k);
-            if (isNaN(parseFloat(issue_wt))) {
-              issue_wt = 0.0; // Set it to zero if it's NaN
-            } 
-            if (isNaN(parseFloat(recv_wt))) {
-              recv_wt = 0.0; // Set it to zero if it's NaN
-            } 
-            if (isNaN(parseFloat(loss_wt))){
-              loss_wt = 0.0; // Set it to zero if it's NaN
-            }
-            if (isNaN(parseFloat(beads_issue_wt))){
-              beads_issue_wt = 0.0;  // Set it to zero if it's NaN
-            }
-            if (isNaN(parseFloat(beads_recv_wt))){
-              beads_recv_wt = 0.0; // Set it to zero if it's NaN
-            }
-            currentKareegarIssueQty += parseFloat(issue_wt);
-            currentKareegarRecvQty += parseFloat(recv_wt);
-            currentKareegarLossQty += parseFloat(loss_wt);
-            currentKareegarBeadsIssueQty += parseFloat(beads_issue_wt);
-            currentKareegarBeadsRecvQty += parseFloat(beads_recv_wt);
-          });
-
-
-          kareegarDetails.push({
-            "_id": item._id,
-            "name": item.name, 
-            "category": item.category,
-            "balance": parseFloat(currentKareegarIssueQty - currentKareegarRecvQty - currentKareegarLossQty).toFixed(2),
-            "bead balance": parseFloat(currentKareegarBeadsIssueQty - currentKareegarBeadsRecvQty).toFixed(2)
-          });
-
-        };
+            };
         
         setAllKareegarDetails(kareegarDetails);
        
@@ -200,67 +199,39 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         (async () => {
             setIsLoading(true);
             const token = localStorage.getItem("token");
-            const data = await getKareegarData(1, 100000000, token);
-            const filteredData = data.filter(item => item.is_deleted_flag === false && item.is_hidden_flag === false);
-            // console.log(data, filteredData)
-            const allKareegarIds = filteredData.map(item => item._id);
+            const allKareegarDetails = await getKareegarData(1, 100000000, token);
+            const data = allKareegarDetails["data"];
+            const KareegarBalanceDetails = allKareegarDetails["totalQty"];
             let kareegarDetails = [];
 
-            for (const item of filteredData) {
-              
-              const allData = await fetchKareegarBookList(page, itemsPerPage, item._id, token);
-              
-              let currentKareegarData = [];
-
-              for (let eachEntry in allData) {
-                if (allData[eachEntry].is_deleted_flag === false && (allData[eachEntry].is_editable_flag === true)){
-                  currentKareegarData.push(allData[eachEntry]);
-                }
+            for (const item of data) {
+              let foundMatch = false;
+              for (const eachKareegarDetail of KareegarBalanceDetails){
+                if (item["_id"] === eachKareegarDetail["_id"]){
+                kareegarDetails.push({
+                  "_id": item._id,
+                  "name": item.name, 
+                  "category": item.category,
+                  "balance": parseFloat(eachKareegarDetail.balance).toFixed(2),
+                  "beads_balance": parseFloat(eachKareegarDetail.beads_balance).toFixed(2)
+                });
+                foundMatch = true;
+                break;
+              };
               }
-              // console.log("currentKareegarData",currentKareegarData, item._id,item.name,item.category);
+              
+              // If after checking all KareegarBalanceDetails, no match was found
+              if (!foundMatch) {
 
-              // console.log(allData, "currentKareegarData", currentKareegarData);
+                  kareegarDetails.push({
+                      "_id": item._id,
+                      "name": item.name,
+                      "category": item.category,
+                      "balance": parseFloat("0").toFixed(2),
+                      "beads_balance": parseFloat("0").toFixed(2)
+                  });
+              }
 
-              let currentKareegarIssueQty = 0.0;
-              let currentKareegarRecvQty = 0.0;
-              let currentKareegarLossQty = 0.0;
-              let currentKareegarBeadsIssueQty = 0.0;
-              let currentKareegarBeadsRecvQty = 0.0;
-              currentKareegarData.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
-                // console.log(weight24k, receive22k, issue22k, loss22k);
-                if (isNaN(parseFloat(issue_wt))) {
-                  issue_wt = 0.0; // Set it to zero if it's NaN
-                } 
-                if (isNaN(parseFloat(recv_wt))) {
-                  recv_wt = 0.0; // Set it to zero if it's NaN
-                } 
-                if (isNaN(parseFloat(loss_wt))){
-                  loss_wt = 0.0; // Set it to zero if it's NaN
-                }
-                if (isNaN(parseFloat(beads_issue_wt))){
-                  beads_issue_wt = 0.0;  // Set it to zero if it's NaN
-                }
-                if (isNaN(parseFloat(beads_recv_wt))){
-                  beads_recv_wt = 0.0;  // Set it to zero if it's NaN
-                }
-                currentKareegarIssueQty += parseFloat(issue_wt);
-                currentKareegarRecvQty += parseFloat(recv_wt);
-                currentKareegarLossQty += parseFloat(loss_wt);
-                currentKareegarBeadsIssueQty += parseFloat(beads_issue_wt);
-                currentKareegarBeadsRecvQty += parseFloat(beads_recv_wt);
-              });
-
-
-              kareegarDetails.push({
-                "_id": item._id,
-                "name": item.name, 
-                "category": item.category,
-                "balance": parseFloat(currentKareegarIssueQty - currentKareegarRecvQty - currentKareegarLossQty).toFixed(2),
-                "beads_balance": parseFloat(currentKareegarBeadsIssueQty - currentKareegarBeadsRecvQty).toFixed(2)
-              });
-              // console.log(parseFloat(currentKareegarIssueQty - currentKareegarRecvQty - currentKareegarLossQty).toFixed(2));
-
-              //console.log(parseFloat(currentKareegarBeadsIssueQty - currentKareegarBeadsRecvQty).toFixed(2));
             };
             
             setAllKareegarDetails(kareegarDetails);
