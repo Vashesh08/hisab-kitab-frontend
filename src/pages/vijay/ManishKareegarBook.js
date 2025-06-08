@@ -88,7 +88,7 @@ const ManishKareegarBook = () => {
     setFullData(docs);
 
     for (let eachEntry in docs) {
-      if (docs[eachEntry].is_melting_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
+      if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
         deleted_data.push(docs[eachEntry]);
       }
       else{
@@ -169,7 +169,7 @@ const ManishKareegarBook = () => {
         setFullData(docs);
         // console.log("data", docs);
         for (let eachEntry in docs) {
-          if (docs[eachEntry].is_melting_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
+          if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
               deleted_data.push(docs[eachEntry]);
           }
           else{
@@ -581,7 +581,7 @@ const ManishKareegarBook = () => {
     const array = [];
 
     rows.forEach( function(number){
-      if (number.is_melting_deleted_flag === false){
+      if (number.is_deleted_flag === false){
         array.push(number._id);
       }
     }
@@ -598,7 +598,7 @@ const ManishKareegarBook = () => {
     selectedRowKeys,
     onChange: onSelectChange,
     getCheckboxProps: (record) => ({
-      disabled: record.is_melting_deleted_flag === true,
+      disabled: record.is_deleted_flag === true,
     }),
     selections: [
       {
@@ -634,7 +634,7 @@ const ManishKareegarBook = () => {
 
   const getRowClassName = (record, i) => {
     // console.log(i, record, record._id)
-    return record.is_melting_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
+    return record.is_deleted_flag ? 'striked-row delete' : i % 2 ? "odd" : "even";
   };
 
   if (isLoading){
