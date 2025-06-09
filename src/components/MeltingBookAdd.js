@@ -138,7 +138,8 @@ function MeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance, setC
     setIssueActualWt(totalRoundedNumber.toFixed(2));
     (async () => {
       const token = localStorage.getItem("token");
-      const docs = await fetchMeltingBookList(1, 100000000, token);
+      const meltingBookData = await fetchMeltingBookList(1, 1, token, "valid");
+      const docs = meltingBookData["data"];
       // console.log(docs)
       if (docs.length > 0){
         const lastEntry = docs[docs.length - 1];

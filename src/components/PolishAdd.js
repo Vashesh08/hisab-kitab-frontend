@@ -46,7 +46,8 @@ function PolishAdd({handleOk}) {
     useEffect(() => {
       (async () => {
         const token = localStorage.getItem("token");
-        const docs = await fetchPolishList(1, 100000000, token);
+        const babuBookData = await fetchPolishList(1, 1, token, "valid");
+        const docs = babuBookData["data"];
         // console.log(docs)
         if (docs.length > 0){
           const lastEntry = docs[docs.length - 1];

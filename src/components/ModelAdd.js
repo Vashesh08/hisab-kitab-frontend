@@ -66,7 +66,8 @@ function ModelAdd({handleOk}) {
   useEffect(() => {
     (async () => {
       const token = localStorage.getItem("token");
-      const docs = await fetchMasterStockList(1, 100000000, token);
+      const masterStockData = await fetchMasterStockList(1, 1, token, "valid");
+      const docs = masterStockData["data"];      
       // console.log(docs)
       if (docs.length > 0){
         const lastEntry = docs[docs.length - 1];
