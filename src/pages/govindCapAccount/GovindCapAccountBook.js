@@ -23,8 +23,10 @@ import GovindCapBookClose from "../../components/GovindCap/GovindCapBookClose.js
 
 const GovindCapAccountBook = () => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show all
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("valid");
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [updateData, setUpdateData] = useState([]);
@@ -34,6 +36,11 @@ const GovindCapAccountBook = () => {
   const [totalLossQuantity, setTotalLossQty] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
 
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
@@ -74,66 +81,42 @@ const GovindCapAccountBook = () => {
 
   async function updateRows (dataType){
 
+    if (searchText !== ""){
+      return;
+    };
+
     setIsLoading(true);
     const token = localStorage.getItem("token");
     // send request to check authenticated
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);
     const data = [];
     const deleted_data = [];
     // console.log("data", data)
     
-    const docs = await fetchGovindCapStockList(page, itemsPerPage, token);
-    setFullData(docs);
+    const allGovindCapData = await fetchGovindCapStockList(page, itemsPerPage, token, dataType);
+    const docs = allGovindCapData["data"];
+    const count = allGovindCapData["count"];
+    const totalQty = allGovindCapData["totalQty"];
+    setTotalCount(count);
 
-    for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
-        data.push(docs[eachEntry]);
-      }
-    }
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-    }
-    else if (dataType === "valid"){
-      data.reverse();
-      setRows(data);
-    }
-    else{
-      deleted_data.reverse();
-      setRows(deleted_data);
-    }
-
+    setRows(docs);
     
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    let totalLossQty = 0.0;
-    data.forEach(({ capAcctIssue, capAcctReceive, capAcctLoss}) => {
-      // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-      if (isNaN(parseFloat(capAcctIssue))) {
-        capAcctIssue = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(capAcctReceive))) {
-        capAcctReceive = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(capAcctLoss))){
-        capAcctLoss = 0 // Set it to zero if it's NaN
-      }
-      // console.log(sumOfWeights);
-      totalIssueQty += parseFloat(capAcctIssue);
-      totalRecvQty += parseFloat(capAcctReceive);
-      totalLossQty += parseFloat(capAcctLoss);
-    });
-    // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-    setTotalRecvQty(totalRecvQty.toFixed(2));
-    setTotalIssueQty(totalIssueQty.toFixed(2));
-    setTotalLossQty(totalLossQty.toFixed(2));
+    setTotalRecvQty(totalQty[0]["capAcctReceive"].toFixed(2));
+    setTotalIssueQty(totalQty[0]["capAcctIssue"].toFixed(2));
+    setTotalLossQty(totalQty[0]["capAcctLoss"].toFixed(2));
 
-    // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    (async () => {
+      updateRows(dataState);
+    })();
+  }, [page, itemsPerPage]);
+  
     useEffect(() => {
         const handleKeyDown = (event) => {
             // Check if the specific key combination is pressed
@@ -146,67 +129,15 @@ const GovindCapAccountBook = () => {
         // Add event listener for keydown event
         window.addEventListener('keydown', handleKeyDown);
 
-        (async () => {
-
-        setIsLoading(true);
-            const token = localStorage.getItem("token");
-        // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        // console.log("data", data)
-
-        const docs = await fetchGovindCapStockList(page, itemsPerPage, token);
-        setFullData(docs);
-        // console.log("data", docs);
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag){
-            deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            data.push(docs[eachEntry]);
-          }
-        }
-        data.reverse();
-        setRows(data);
-
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        let totalLossQty = 0.0;
-        data.forEach(({ capAcctIssue, capAcctReceive, capAcctLoss}) => {
-          // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-          if (isNaN(parseFloat(capAcctIssue))) {
-            capAcctIssue = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(capAcctReceive))) {
-            capAcctReceive = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(capAcctLoss))){
-            capAcctLoss = 0 // Set it to zero if it's NaN
-          }
-          // console.log(sumOfWeights);
-          totalIssueQty += parseFloat(capAcctIssue);
-          totalRecvQty += parseFloat(capAcctReceive);
-          totalLossQty += parseFloat(capAcctLoss);
-        });
-        // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-        setTotalRecvQty(totalRecvQty.toFixed(2));
-        setTotalIssueQty(totalIssueQty.toFixed(2));
-        setTotalLossQty(totalLossQty.toFixed(2));
-        // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
-
-        setIsLoading(false);
-    })();
-
     // Clean up the event listener on component unmount
     return () => {
         window.removeEventListener('keydown', handleKeyDown);
     };
   
-    }, [page, itemsPerPage]);
+    }, []);
 
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -245,7 +176,11 @@ const GovindCapAccountBook = () => {
     const lossAcctData = await fetchLossAcctList(page, itemsPerPage, token);
     const lossIds = [];
     
-    const docs = await fetchGovindCapStockList(page, itemsPerPage, token);
+    const allGovindCapMeltingData = await fetchGovindCapStockList(page, itemsPerPage, token, dataState);
+    const docs = allGovindCapMeltingData["data"];
+    const count = allGovindCapMeltingData["count"];
+    const totalQty = allGovindCapMeltingData["totalQty"];
+    setTotalCount(count);
     
     // console.log(selectedRowKeys, rows);
     selectedRowKeys.map((item, index) => {
@@ -293,11 +228,16 @@ const GovindCapAccountBook = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
+    setIsLoading(true);
 
-    // updateRows("valid");
-    const array = [];
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+    let array = [];
+    const token = localStorage.getItem("token");
+
+    let allData = await fetchGovindCapStockList(1, Number.MAX_SAFE_INTEGER, token, "all");
+    let fullData = allData["data"];
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
@@ -313,17 +253,21 @@ const GovindCapAccountBook = () => {
         }
     }
     });
-    array.reverse();
     setRows(array);
-    // confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-    close()
+    setTotalCount(array.length);
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
+
   const handleReset = (clearFilters, close) => {
     clearFilters();
     updateRows("valid");
     setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 
@@ -405,17 +349,7 @@ const GovindCapAccountBook = () => {
         ) : (
           getFormattedDate(text)
         )
-      ) : dataIndex === "capAcctType" ?(
-            <div style={{textAlign:"right"}}>{text}</div>
-      ) : dataIndex === "capAcctDescription" ?(
-        <div style={{textAlign:"right"}}>{text}</div>
-      ) : dataIndex === "capAcctIssue" ?(
-        <div style={{textAlign:"right"}}>{text}</div>
-      ) : dataIndex === "capAcctReceive" ?(
-        <div style={{textAlign:"right"}}>{text}</div>
-      ):  dataIndex === "capAcctLoss" ?(
-        <div style={{textAlign:"right"}}>{text}</div>
-      ): (
+      ) :(
       searchedColumn === dataIndex ? (
         <Highlighter
           highlightStyle={{
@@ -516,16 +450,18 @@ const GovindCapAccountBook = () => {
     setSelectedRowKeys();
   }
 
-  const SelectAll = () => {
-    const array = [];
+  const SelectAll = async() => {
+    setIsLoading(true);
 
-    rows.forEach( function(number){
-      if (number.is_deleted_flag === false){
-        array.push(number._id);
-      }
-    }
-    )
+    const token = localStorage.getItem("token");
+
+    const govindCapData = await fetchGovindCapStockList(1, Number.MAX_SAFE_INTEGER, token, "valid");
+    const docs = govindCapData["data"];
+
+    const array = docs.map(({ _id }) => _id);
+
     setSelectedRowKeys(array);
+    setIsLoading(false);
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -709,7 +645,11 @@ const GovindCapAccountBook = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount,
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (

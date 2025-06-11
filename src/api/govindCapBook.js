@@ -19,8 +19,8 @@ export async function getGovindCapStock(token) {
     return body;
 }
 
-export async function fetchGovindCapStockList(page, itemsPerPage, token) {
-    const response = await fetch(`${config.API_URL}/admin/govindCapAcctBook-list?page=${page}&itemsPerPage=${itemsPerPage}`, {
+export async function fetchGovindCapStockList(page, itemsPerPage, token, isDeleted) {
+    const response = await fetch(`${config.API_URL}/admin/govindCapAcctBook-list?page=${page}&itemsPerPage=${itemsPerPage}&state=${isDeleted}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
