@@ -15,7 +15,8 @@ function GovindCapBookAdd({handleOk}) {
   useEffect(() => {
     (async () => {
       const token = localStorage.getItem("token");
-      const docs =  await fetchGovindCapStockList(1,100000000, token);
+      const GovindCapData =  await fetchGovindCapStockList(1, 1, token, "valid");
+      const docs = GovindCapData["data"];
       if (docs.length > 0){
         const lastEntry = docs[docs.length - 1];
         setLastDate(dayjs(lastEntry.date));

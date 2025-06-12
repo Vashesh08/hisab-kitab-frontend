@@ -138,7 +138,9 @@ function GovindCapMeltingBookAdd({handleOk, setClosingBalance, setClosing995Bala
     setIssueActualWt(totalRoundedNumber.toFixed(2));
     (async () => {
       const token = localStorage.getItem("token");
-      const docs = await fetchGovindCapMeltingStockList(1, 100000000, token);
+      const allGovindCapMeltingData = await fetchGovindCapMeltingStockList(1, 1, token, "valid");
+      const docs = allGovindCapMeltingData["data"];
+      
       // console.log(docs)
       if (docs.length > 0){
         const lastEntry = docs[docs.length - 1];

@@ -176,10 +176,10 @@ const GovindCapAccountBook = () => {
     const lossAcctData = await fetchLossAcctList(page, itemsPerPage, token);
     const lossIds = [];
     
-    const allGovindCapMeltingData = await fetchGovindCapStockList(page, itemsPerPage, token, dataState);
-    const docs = allGovindCapMeltingData["data"];
-    const count = allGovindCapMeltingData["count"];
-    const totalQty = allGovindCapMeltingData["totalQty"];
+    const allGovindCapData = await fetchGovindCapStockList(page, itemsPerPage, token, dataState);
+    const docs = allGovindCapData["data"];
+    const count = allGovindCapData["count"];
+    const totalQty = allGovindCapData["totalQty"];
     setTotalCount(count);
     
     // console.log(selectedRowKeys, rows);

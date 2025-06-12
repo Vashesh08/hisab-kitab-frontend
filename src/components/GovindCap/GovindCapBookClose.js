@@ -49,7 +49,8 @@ function GovindCapBookClose({handleOk}){
       useEffect(() => {
         (async () => {
           const token = localStorage.getItem("token");
-          const docs =  await fetchGovindCapStockList(1,100000000, token);
+          const GovindCapData =  await fetchGovindCapStockList(1, 1, token, "valid");
+          const docs = GovindCapData["data"];    
           if (docs.length > 0){
             const lastEntry = docs[docs.length - 1];
             setCurrentDate(dayjs(lastEntry.date));
@@ -77,23 +78,14 @@ function GovindCapBookClose({handleOk}){
             closingWt
         } = user;
 
-        const data = await fetchGovindCapStockList(1, 100000000, token);
-        const docs = data.filter(item => item.is_deleted_flag === false);        let totalIssueQty = 0.0;
-        let totalReceiveQty = parseFloat(closingWt);
-        
-        for (let eachEntry in docs) {
-            if (!isNaN(parseFloat(docs[eachEntry].capAcctIssue))){
-                totalIssueQty += parseFloat(docs[eachEntry].capAcctIssue)
-            }
-            if (!isNaN(parseFloat(docs[eachEntry].capAcctReceive))){
-                totalReceiveQty += parseFloat(docs[eachEntry].capAcctReceive)
-            }
-            if (!isNaN(parseFloat(docs[eachEntry].capAcctLoss))){
-                totalReceiveQty += parseFloat(docs[eachEntry].capAcctLoss)
-            }
-        }
-        let totalLossQty = Math.round(((totalIssueQty - totalReceiveQty) * 100) / 100);
-        // console.log("final Qty", totalIssueQty,totalReceiveQty,totalLossQty);
+        const allGovindCapMeltingData = await fetchGovindCapStockList(1, Number.MAX_SAFE_INTEGER, token, "valid");
+        const totalQty = allGovindCapMeltingData["totalQty"];
+
+        let totalIssueQty = totalQty[0]["capAcctIssue"];
+        let totalReceiveQty = totalQty[0]["capAcctReceive"];
+        let totalLossPrevQty = totalQty[0]["capAcctLoss"];
+
+        let totalLossQty = Math.round(((totalIssueQty - totalReceiveQty - totalLossPrevQty) * 100) / 100);
 
         if (totalLossQty > 0){
             const backendData = {
