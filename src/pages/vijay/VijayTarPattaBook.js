@@ -20,8 +20,10 @@ import VijayTarPattaBookUpdate from "../../components/Vijay/VijayTarPattaBookUpd
 
 const VijayTarPattaBook = () => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show all
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("valid");
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [editModalData, setEditModalData] = useState([]);
@@ -33,6 +35,11 @@ const VijayTarPattaBook = () => {
   const [meltingWtBalance, setMeltingWtBalance] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
 
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
@@ -76,155 +83,41 @@ const VijayTarPattaBook = () => {
 
   async function updateRows (dataType){
 
+    if (searchText !== ""){
+      return;
+    };
+
     setIsLoading(true);
     const token = localStorage.getItem("token");
     // send request to check authenticated
-    const data = [];
-    const deleted_data = [];
-    // console.log("data", data)
-    
-    const docs = await fetchVijayStockList(page, itemsPerPage, token);
-    setFullData(docs);
 
-    for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
-        data.push(docs[eachEntry]);
-      }
-    }
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-    }
-    else if (dataType === "valid"){
-      data.reverse();
-      setRows(data);
-    }
-    else{
-      deleted_data.reverse();
-      setRows(deleted_data);
-    }
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);    
 
-    let totalMeltingWeight = 0.000;
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    let totalLossQty = 0.0;
-    let totalBhukaQty = 0.0;
-    data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
-      // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-      if (isNaN(parseFloat(tarpattaReceive))) {
-        tarpattaReceive = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(tarpattaIssue))) {
-        tarpattaIssue = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(meltingReceive))){
-        meltingReceive = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(tarpattaLoss))){
-        tarpattaLoss = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(tarpattaBhuka))){
-        tarpattaBhuka = [0]; // Set it to zero if it's NaN
-      }
-      // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-      // console.log(sumOfWeights);
-      const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
-      
-      totalMeltingWeight += parseFloat(meltingReceive);
-      totalRecvQty += parseFloat(sumOfTarpattaReceive);
-      totalIssueQty += parseFloat(sumOfTarpattaIssue);
-      totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
-      totalLossQty += parseFloat(tarpattaLoss);
-    });
-    // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-    setMeltingWtBalance(totalMeltingWeight.toFixed(2));
-    setReceiveBalance(totalRecvQty.toFixed(2));
-    setIssueBalance(totalIssueQty.toFixed(2));
-    setBhukaBalance(totalBhukaQty.toFixed(2));
-    setLossBalance(totalLossQty.toFixed(2));
+    const vijayStockData = await fetchVijayStockList(page, itemsPerPage, token, dataType);
+    const docs = vijayStockData["data"];
+    const count = vijayStockData["count"];
+    const totalQty = vijayStockData["totalQty"];
+    setTotalCount(count);
+
+    setRows(docs);
     
-    // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+    setMeltingWtBalance(totalQty[0]["meltingReceive"][0]["meltingReceive"].toFixed(2));
+    setReceiveBalance(totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"].toFixed(2));
+    setIssueBalance(totalQty[0]["tarpattaIssue"][0]["tarpattaIssue"].toFixed(2));
+    setBhukaBalance(totalQty[0]["tarpattaBhuka"][0]["tarpattaBhuka"].toFixed(2));
+    setLossBalance(totalQty[0]["tarpattaLoss"][0]["tarpattaLoss"].toFixed(2));
+    
     setIsLoading(false);
   };
 
-    useEffect(() => {
-        (async () => {
-
-        setIsLoading(true);
-            const token = localStorage.getItem("token");
-        // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        // console.log("data", data)
-        
-        const docs = await fetchVijayStockList(page, itemsPerPage, token);
-        setFullData(docs);
-        // console.log("data", docs);
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
-              deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            data.push(docs[eachEntry]);
-          }
-        }
-        data.reverse();
-        setRows(data);
-
-        let totalMeltingWeight = 0.000;
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        let totalLossQty = 0.0;
-        let totalBhukaQty = 0.0;
-        data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
-          // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-          // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
-          if (isNaN(parseFloat(tarpattaReceive))) {
-            tarpattaReceive = [0]; // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(tarpattaIssue))) {
-            tarpattaIssue = [0]; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(meltingReceive))){
-            meltingReceive = 0 // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(tarpattaLoss))){
-            tarpattaLoss = 0  // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(tarpattaBhuka))){
-            tarpattaBhuka = [0]; // Set it to zero if it's NaN
-          }
-          // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-          // console.log(sumOfWeights);
-          const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
-          
-          totalMeltingWeight += parseFloat(meltingReceive);
-          totalRecvQty += parseFloat(sumOfTarpattaReceive);
-          totalIssueQty += parseFloat(sumOfTarpattaIssue);
-          totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
-          totalLossQty += parseFloat(tarpattaLoss);
-              
-        });
-        // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-        setMeltingWtBalance(totalMeltingWeight.toFixed(2));
-        setReceiveBalance(totalRecvQty.toFixed(2));
-        setIssueBalance(totalIssueQty.toFixed(2));
-        setBhukaBalance(totalBhukaQty.toFixed(2));
-        setLossBalance(totalLossQty.toFixed(2));
-        // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
-
-        setIsLoading(false);
+  useEffect(() => {
+    (async () => {
+      updateRows(dataState);
     })();
-  
-    }, [page, itemsPerPage]);
-
+  }, [page, itemsPerPage]);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -251,11 +144,16 @@ const VijayTarPattaBook = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
+    setIsLoading(true);
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+    let array = [];
 
-    // updateRows("valid");
-    const array = [];
+    const token = localStorage.getItem("token");
+
+    let allData = await fetchVijayStockList(1, Number.MAX_SAFE_INTEGER, token, dataState);
+    let fullData = allData["data"];
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
@@ -271,17 +169,22 @@ const VijayTarPattaBook = () => {
         }
     }
     });
-    array.reverse();
+
     setRows(array);
-    // confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-    close()
+    setTotalCount(array.length);
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
+
   const handleReset = (clearFilters, close) => {
     clearFilters();
     updateRows("valid");
     setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 
@@ -363,54 +266,75 @@ const VijayTarPattaBook = () => {
         ) : (
           getFormattedDate(text)
         )
-      ) : dataIndex === "tarpattaWeight" ?(
-        // searchedColumn === dataIndex ? (<Highlighter
-        //   highlightStyle={{
-        //     backgroundColor: '#ffc069',
-        //     padding: 0,
-        //   }}
-        //   searchWords={[searchText]}
-        //   autoEscape
-        //   textToHighlight={text ? (
-        //     text.join("\n")
-        //   ) : ''}
-        //   />
-        // ) : (
-          text && text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
+      ) : dataIndex === "tarpattaIssue" ?(
+          searchedColumn === "tarpattaIssue" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+            <div><Highlighter
+            highlightStyle={{
+              backgroundColor: '#ffc069',
+              padding: 0,
+            }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={eachText}
+            />
+            </div>
+          ) : (
+              <div style={{textAlign:"right"}}>{eachText}</div>
+            )
+            )
           )
-          )
-        // )
-      ) : dataIndex === "tarpattaPurity" ?(
+      )): (
         text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+        <div style={{textAlign:"right"}}>{eachText}</div>
         )
-        )
-      ) : dataIndex === "tarpattaConversion" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ) : dataIndex === "tarpattaCategory" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"left"}}>{eachText}</div>
-        )
-        )
-      ): dataIndex === "tarpattaIssue" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
+      ))
       ): dataIndex === "tarpattaReceive" ?(
+          searchedColumn === "tarpattaReceive" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+            <div><Highlighter
+            highlightStyle={{
+              backgroundColor: '#ffc069',
+              padding: 0,
+            }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={eachText}
+            />
+            </div>
+          ) : (
+              <div style={{textAlign:"right"}}>{eachText}</div>
+            )
+            )
+          )
+      )): (
         text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+        <div style={{textAlign:"right"}}>{eachText}</div>
         )
-        )
+      ))
       ): dataIndex === "tarpattaBhuka" ?(
+          searchedColumn === "tarpattaBhuka" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+            <div><Highlighter
+            highlightStyle={{
+              backgroundColor: '#ffc069',
+              padding: 0,
+            }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={eachText}
+            />
+            </div>
+          ) : (
+              <div style={{textAlign:"right"}}>{eachText}</div>
+            )
+            )
+          )
+      )): (
         text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
+        <div style={{textAlign:"right"}}>{eachText}</div>
         )
-        )
+      ))
       ):(
       searchedColumn === dataIndex ? (
         <Highlighter
@@ -511,17 +435,6 @@ const VijayTarPattaBook = () => {
       ...getColumnSearchProps('tarpattaBhuka'),
       align: 'right',
     },
-    // {
-    //   title: "Issue Wt (F)",
-    //   dataIndex: "meltingIssue",
-    //   render: text => (
-    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   ...getColumnSearchProps('meltingIssue'),
-    // },
     {
       title: "Loss",
       dataIndex: "tarpattaLoss",
@@ -567,16 +480,18 @@ const VijayTarPattaBook = () => {
     setSelectedRowKeys();
   }
 
-  const SelectAll = () => {
-    const array = [];
+  const SelectAll = async() => {
+    setIsLoading(true);
 
-    rows.forEach( function(number){
-      if (number.is_deleted_flag === false){
-        array.push(number._id);
-      }
-    }
-    )
+    const token = localStorage.getItem("token");
+
+    const vijayStockData = await fetchVijayStockList(1, Number.MAX_SAFE_INTEGER, token, "valid");
+    const docs = vijayStockData["data"];
+
+    const array = docs.map(({ _id }) => _id);
+
     setSelectedRowKeys(array);
+    setIsLoading(false);
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -692,7 +607,11 @@ const VijayTarPattaBook = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount,
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (

@@ -20,8 +20,10 @@ import VijayJointUpdate from "../../components/Vijay/VijayJointUpdate.js";
 
 const Joint = () => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show all
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("valid");
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [editModalData, setEditModalData] = useState([]);
@@ -34,6 +36,11 @@ const Joint = () => {
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
 
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
+  
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
     documentTitle: 'Vijay Joint Book - ' + dayjs().format("DD-MM-YYYY"),
@@ -76,185 +83,34 @@ const Joint = () => {
 
   async function updateRows (dataType){
 
+    if (searchText !== ""){
+      return;
+    };
+
     setIsLoading(true);
     const token = localStorage.getItem("token");
     // send request to check authenticated
-    const data = [];
-    const deleted_data = [];
-    // console.log("data", data)
-    
-    const originaldata = await fetchVijayStockList(page, itemsPerPage, token);
-    const filteredData = originaldata.flatMap(item => {
-      // If item has tags1 array
-      if (item.solderChainReceive && item.solderChainReceive.length > 0) {
-        //console.log("Issue", item.solderChainReceive);
-        return item.solderChainReceive.map((tag, index) => ({
-          ...item,
-          solderChainReceive: tag,
-          index: index
-        }));
-      }
-      // If neither exists, return the item as is
-      return [];
-    });
-    const docs = filteredData.filter((item) => item.solderChainReceive !== "-1");
-    //console.log("Vashesh", docs);
-    setFullData(docs);
 
-    for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
-        data.push(docs[eachEntry]);
-      }
-    }
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-    }
-    else if (dataType === "valid"){
-      data.reverse();
-      setRows(data);
-    }
-    else{
-      deleted_data.reverse();
-      setRows(deleted_data);
-    }
-
-    let totalMeltingWeight = 0.000;
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    let totalLossQty = 0.0;
-    let totalBhukaQty = 0.0;
-    data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
-      // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-      if (isNaN(parseFloat(tarpattaReceive))) {
-        tarpattaReceive = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(tarpattaIssue))) {
-        tarpattaIssue = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(meltingReceive))){
-        meltingReceive = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(tarpattaLoss))){
-        tarpattaLoss = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(tarpattaBhuka))){
-        tarpattaBhuka = [0]; // Set it to zero if it's NaN
-      }
-      // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-      // console.log(sumOfWeights);
-      const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
-      
-      totalMeltingWeight += parseFloat(meltingReceive);
-      totalRecvQty += parseFloat(sumOfTarpattaReceive);
-      totalIssueQty += parseFloat(sumOfTarpattaIssue);
-      totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
-      totalLossQty += parseFloat(tarpattaLoss);
-    });
-    // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-    setMeltingWtBalance(totalMeltingWeight.toFixed(2));
-    setReceiveBalance(totalRecvQty.toFixed(2));
-    setIssueBalance(totalIssueQty.toFixed(2));
-    setBhukaBalance(totalBhukaQty.toFixed(2));
-    setLossBalance(totalLossQty.toFixed(2));
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);
     
-    // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+    const vijayStockData = await fetchVijayStockList(page, itemsPerPage, token, dataType, "all", "false", "true");
+    const docs = vijayStockData["data"];
+    const count = vijayStockData["count"];
+
+    setRows(docs);
+    setTotalCount(count);
+
     setIsLoading(false);
   };
 
-    useEffect(() => {
-        (async () => {
-
-        setIsLoading(true);
-        const token = localStorage.getItem("token");
-        // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        // console.log("data", data)
-
-        const originaldata = await fetchVijayStockList(page, itemsPerPage, token);
-        const filteredData = originaldata.flatMap(item => {
-          // If item has tags1 array
-          if (item.solderChainReceive && item.solderChainReceive.length > 0) {
-            // console.log("Issue", item.jointChainIssue);
-            return item.solderChainReceive.map((tag, index) => ({
-              ...item,
-              solderChainReceive: tag,
-              index: index
-            }));
-          }
-          // If neither exists, return the item as is
-          return [];
-        });
-        const docs = filteredData.filter((item) => item.solderChainReceive !== "-1");
-        //console.log("Vashesh", docs);
-        setFullData(docs);
-        
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
-              deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            data.push(docs[eachEntry]);
-          }
-        }
-        data.reverse();
-        setRows(data);
-
-        let totalMeltingWeight = 0.000;
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        let totalLossQty = 0.0;
-        let totalBhukaQty = 0.0;
-        data.forEach(({ meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss}) => {
-          // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-          // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
-          if (isNaN(parseFloat(tarpattaReceive))) {
-            tarpattaReceive = [0]; // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(tarpattaIssue))) {
-            tarpattaIssue = [0]; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(meltingReceive))){
-            meltingReceive = 0 // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(tarpattaLoss))){
-            tarpattaLoss = 0  // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(tarpattaBhuka))){
-            tarpattaBhuka = [0]; // Set it to zero if it's NaN
-          }
-          // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-          // console.log(sumOfWeights);
-          const sumOfTarpattaIssue = tarpattaIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfTarpattaBhuka = tarpattaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
-          
-          totalMeltingWeight += parseFloat(meltingReceive);
-          totalRecvQty += parseFloat(sumOfTarpattaReceive);
-          totalIssueQty += parseFloat(sumOfTarpattaIssue);
-          totalBhukaQty += parseFloat(sumOfTarpattaBhuka);
-          totalLossQty += parseFloat(tarpattaLoss);
-              
-        });
-        // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-        setMeltingWtBalance(totalMeltingWeight.toFixed(2));
-        setReceiveBalance(totalRecvQty.toFixed(2));
-        setIssueBalance(totalIssueQty.toFixed(2));
-        setBhukaBalance(totalBhukaQty.toFixed(2));
-        setLossBalance(totalLossQty.toFixed(2));
-        // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
-
-        setIsLoading(false);
+  useEffect(() => {
+    (async () => {
+      updateRows(dataState);
     })();
-  
-    }, [page, itemsPerPage]);
-
+  }, [page, itemsPerPage]);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -281,13 +137,19 @@ const Joint = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
+    setIsLoading(true);
 
-    // updateRows("valid");
-    const array = [];
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+    let array = [];
 
-    fullData.forEach(function (user){
+    const token = localStorage.getItem("token");
+
+    let allData = await fetchVijayStockList(1, Number.MAX_SAFE_INTEGER, token, dataState, "all", "false", "true");
+    let docs = allData["data"];
+
+    docs.forEach(function (user){
       if (user[dataIndex]){
         if (dataIndex === "jointDate"){
           if (getFormattedDate(user[dataIndex]).toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
@@ -295,23 +157,31 @@ const Joint = () => {
           }
         }
         else{
-          if (user[dataIndex].toString().toLowerCase().includes(selectedKeys[0].toString().toLowerCase())){
-            array.push(user);
-          }
-        }
-    }
+          const value = user[dataIndex];
+          if(Array.isArray(value)
+              ? value[user["index"]] !== "-1" && value[user["index"]].toString().toLowerCase().includes(selectedKeys[0].toLowerCase())
+              : value !== "-1" && value.toString().toLowerCase().includes(selectedKeys[0].toLowerCase())
+            ){
+              array.push(user);
+            }
+        }}
     });
-    array.reverse();
+
     setRows(array);
-    // confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-    close()
+    setTotalCount(array.length);
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
+
   const handleReset = (clearFilters, close) => {
     clearFilters();
     updateRows("valid");
     setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 
@@ -391,74 +261,260 @@ const Joint = () => {
           textToHighlight={getFormattedDate(text[record.index]) ? getFormattedDate(text[record.index]).toString() : ''}
         />
         ) : (
-
-          text[record.index] === "2000-12-31T18:30:00.000Z" ?(
-            <div style={{textAlign:"right"}}></div>
-          ):(
             <div style={{textAlign:"right"}}>{getFormattedDate(text[record.index])}</div>
-          )
       )) : dataIndex === "solderChainReceive" ?(
+          (text === "-1" || text === undefined) ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+            searchedColumn === "solderChainReceive" ? (
+              (text).toString().includes(searchText)? (
+                <div>
+                  <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text}
+                />
+                </div>
+              ) : (
             <div style={{textAlign:"right"}}>{text}</div>
+                  )
+                ):(
+            <div style={{textAlign:"right"}}>{text}</div>
+                ))
       ) : dataIndex === "jointLotNo" ?(
-          text[record.index] === "-1" ?(
+          (text[record.index] === "-1" || text[record.index] === undefined) ?(
             <div style={{textAlign:"right"}}></div>
           ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
-        )
+            searchedColumn === "jointLotNo" ? (
+              (text[record.index]).toString().includes(searchText)? (
+                <div>
+                  <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text[record.index]}
+                />
+                </div>
+              ) : (
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                  )
+                ):(
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                ))
       ) : dataIndex === "jointChainIssue" ?(
-        text[record.index] === "-1" ?(
-          <div style={{textAlign:"right"}}></div>
-        ):(
-        <div style={{textAlign:"right"}}>{text[record.index]}</div>
-      )
+          (text[record.index] === "-1" || text[record.index] === undefined) ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+            searchedColumn === "jointChainIssue" ? (
+              (text[record.index]).toString().includes(searchText)? (
+                <div>
+                  <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text[record.index]}
+                />
+                </div>
+              ) : (
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                  )
+                ):(
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                ))
     ) : dataIndex === "jointItem" ?(
-        text[record.index] === "-1" ?(
-          <div style={{textAlign:"right"}}></div>
-        ):(
-        <div style={{textAlign:"right"}}>{text[record.index]}</div>
-        )
+          (text[record.index] === "-1" || text[record.index] === undefined) ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+            searchedColumn === "jointItem" ? (
+              (text[record.index]).toString().includes(searchText)? (
+                <div>
+                  <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text[record.index]}
+                />
+                </div>
+              ) : (
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                  )
+                ):(
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                ))
       ) : dataIndex === "jointMelting" ?(
-        text[record.index] === "-1" ?(
-          <div style={{textAlign:"right"}}></div>
-        ):(
-        <div style={{textAlign:"right"}}>{text[record.index]}</div>
-        )
+          (text[record.index] === "-1" || text[record.index] === undefined) ?(
+            <div style={{textAlign:"right"}}></div>
+          ):(
+            searchedColumn === "jointMelting" ? (
+              (text[record.index]).toString().includes(searchText)? (
+                <div>
+                  <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text[record.index]}
+                />
+                </div>
+              ) : (
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                  )
+                ):(
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                ))
       ): dataIndex === "jointChainReceive" ?(
-          text[record.index] === "-1" ?(
+          (text[record.index] === "-1" || text[record.index] === undefined) ?(
             <div style={{textAlign:"right"}}></div>
           ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
-        )
+            searchedColumn === "jointChainReceive" ? (
+              (text[record.index]).toString().includes(searchText)? (
+                <div>
+                  <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text[record.index]}
+                />
+                </div>
+              ) : (
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                  )
+                ):(
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                ))
       ): dataIndex === "jointBhuka" ?(
-          text[record.index] === "-1" ?(
+          (text[record.index] === "-1" || text[record.index] === undefined) ?(
             <div style={{textAlign:"right"}}></div>
           ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
-        )
+            searchedColumn === "jointBhuka" ? (
+              (text[record.index]).toString().includes(searchText)? (
+                <div>
+                  <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text[record.index]}
+                />
+                </div>
+              ) : (
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                  )
+                ):(
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                ))
       ): dataIndex === "jointTotal" ?(
-          text[record.index] === "-1" ?(
+          (text[record.index] === "-1" || text[record.index] === undefined) ?(
             <div style={{textAlign:"right"}}></div>
           ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
-        )
+            searchedColumn === "jointTotal" ? (
+              (text[record.index]).toString().includes(searchText)? (
+                <div>
+                  <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text[record.index]}
+                />
+                </div>
+              ) : (
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                  )
+                ):(
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                ))
       ): dataIndex === "jointPowder" ?(
-          text[record.index] === "-1" ?(
+          (text[record.index] === "-1" || text[record.index] === undefined) ?(
             <div style={{textAlign:"right"}}></div>
           ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
-        )
+            searchedColumn === "jointPowder" ? (
+              (text[record.index]).toString().includes(searchText)? (
+                <div>
+                  <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text[record.index]}
+                />
+                </div>
+              ) : (
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                  )
+                ):(
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                ))
       ): dataIndex === "jointR1" ?(
-        text[record.index] === "-1" ?(
+          (text[record.index] === "-1" || text[record.index] === undefined) ?(
             <div style={{textAlign:"right"}}></div>
           ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
-        )
+            searchedColumn === "jointR1" ? (
+              (text[record.index]).toString().includes(searchText)? (
+                <div>
+                  <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text[record.index]}
+                />
+                </div>
+              ) : (
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                  )
+                ):(
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                ))
       ): dataIndex === "jointR2" ?(
-          text[record.index] === "-1" ?(
+          (text[record.index] === "-1" || text[record.index] === undefined) ?(
             <div style={{textAlign:"right"}}></div>
           ):(
-          <div style={{textAlign:"right"}}>{text[record.index]}</div>
-        )
+            searchedColumn === "jointR2" ? (
+              (text[record.index]).toString().includes(searchText)? (
+                <div>
+                  <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[searchText]}
+                autoEscape
+                textToHighlight={text[record.index]}
+                />
+                </div>
+              ) : (
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                  )
+                ):(
+            <div style={{textAlign:"right"}}>{text[record.index]}</div>
+                ))
       ):(
       searchedColumn === dataIndex ? (
         <Highlighter
@@ -664,16 +720,18 @@ const Joint = () => {
     setSelectedRowKeys();
   }
 
-  const SelectAll = () => {
-    const array = [];
+  const SelectAll = async() => {
+    setIsLoading(true);
 
-    rows.forEach( function(number){
-      if (number.is_deleted_flag === false){
-        array.push(number._id);
-      }
-    }
-    )
+    const token = localStorage.getItem("token");
+
+    const vijayStockData = await fetchVijayStockList(1, Number.MAX_SAFE_INTEGER, token, "valid", "all", "false", "true");
+    const docs = vijayStockData["data"];
+
+    const array = docs.map(({ _id }) => _id);
+
     setSelectedRowKeys(array);
+    setIsLoading(false);
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -789,7 +847,11 @@ const Joint = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount,
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (
@@ -797,48 +859,6 @@ const Joint = () => {
             Vijay Joint Book - {dayjs().format("DD-MMMM-YYYY")}
           </div>
         )}
-        // summary={() => {
-        //   return (
-        //     <>
-        //       <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
-        //         <Table.Summary.Cell index={0} className="" colSpan={1}>Total</Table.Summary.Cell> 
-        //         {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
-        //         {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
-        //         <Table.Summary.Cell index={1}>
-        //           {meltingWtBalance}
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={2}>
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={3}>
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={4}>
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={5}>
-        //           {/* {totalWeightQuantity} */}
-        //           {issueBalance}
-        //           </Table.Summary.Cell>
-        //         {/* <Table.Summary.Cell index={5}>
-        //           {totalIssueQuantity}
-        //         </Table.Summary.Cell> */}
-        //           <Table.Summary.Cell index={6}>
-        //           {receiveBalance}
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={7}>
-        //         {bhukaBalance}
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={8}>
-        //           {lossBalance}
-        //         </Table.Summary.Cell>
-        //         <Table.Summary.Cell index={9}></Table.Summary.Cell>
-        //         <Table.Summary.Cell index={10}></Table.Summary.Cell>
-        //         <Table.Summary.Cell index={11}></Table.Summary.Cell>
-        //         <Table.Summary.Cell index={12}></Table.Summary.Cell>
-        //         <Table.Summary.Cell index={13}></Table.Summary.Cell>
-                
-        //       </Table.Summary.Row>
-        //     </>
-        //   );
-        // }}
       />
 
       </div>

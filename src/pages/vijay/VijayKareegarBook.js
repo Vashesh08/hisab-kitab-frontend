@@ -20,8 +20,11 @@ import VijayKareegarBookUpdate from "../../components/Vijay/VijayKareegarBookUpd
 
 const VijayKareegarBook = () => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show all
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("valid");
+  const [issue_to_kareegar] = useState("Vijay");
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [editModalData, setEditModalData] = useState([]);
@@ -33,6 +36,11 @@ const VijayKareegarBook = () => {
   const [tarpattaRecvBalance, setTarpattaRecvBalance] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
 
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
@@ -76,158 +84,41 @@ const VijayKareegarBook = () => {
 
   async function updateRows (dataType){
 
+    if (searchText !== ""){
+      return;
+    };
+
     setIsLoading(true);
     const token = localStorage.getItem("token");
     // send request to check authenticated
-    const data = [];
-    const deleted_data = [];
-    // console.log("data", data)
-    
-    const allData = await fetchVijayStockList(page, itemsPerPage, token);
-    const docs = allData.filter(item => item.issue_to_kareegar === "Vijay");
-    setFullData(docs);
 
-    for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
-        data.push(docs[eachEntry]);
-      }
-    }
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-    }
-    else if (dataType === "valid"){
-      data.reverse();
-      setRows(data);
-    }
-    else{
-      deleted_data.reverse();
-      setRows(deleted_data);
-    }
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);
 
-    let totalTarpattaRecv = 0.000;
-    let totalRecvQty = 0.0;
-    let totalIssueQty = 0.0;
-    let totalLossQty = 0.0;
-    let totalBhukaQty = 0.0;
-    data.forEach(({ tarpattaReceive, vijayReceive, vijayIssue, vijayBhuka, vijayLoss}) => {
-      // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-      if (isNaN(parseFloat(tarpattaReceive))) {
-        tarpattaReceive = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(vijayIssue))) {
-        vijayIssue = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(vijayReceive))){
-        vijayReceive = [0]; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(vijayLoss))){
-        vijayLoss = 0; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(vijayBhuka))){
-        vijayBhuka = [0]; // Set it to zero if it's NaN
-      }
-      // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-      // console.log(sumOfWeights);
-      const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfVijayIssue = vijayIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfVijayReceive = vijayReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-      const sumOfVijayBhuka = vijayBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
-      
-      totalTarpattaRecv += parseFloat(sumOfTarpattaReceive);
-      totalRecvQty += parseFloat(sumOfVijayReceive);
-      totalIssueQty += parseFloat(sumOfVijayIssue);
-      totalBhukaQty += parseFloat(sumOfVijayBhuka);
-      totalLossQty += parseFloat(vijayLoss);
-    });
-    // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-    setTarpattaRecvBalance(totalTarpattaRecv.toFixed(2));
-    setReceiveBalance(totalRecvQty.toFixed(2));
-    setIssueBalance(totalIssueQty.toFixed(2));
-    setBhukaBalance(totalBhukaQty.toFixed(2));
-    setLossBalance(totalLossQty.toFixed(2));
+    const vijayStockData = await fetchVijayStockList(page, itemsPerPage, token, dataType, issue_to_kareegar);
+    const docs = vijayStockData["data"];
+    const count = vijayStockData["count"];
+    const totalQty = vijayStockData["totalQty"];
+    setTotalCount(count);
+
+    setRows(docs);
+
+    setTarpattaRecvBalance(totalQty[0]["vijayTarpattaReceive"][0]["vijayTarpattaReceive"].toFixed(2));
+    setReceiveBalance(totalQty[0]["vijayReceive"][0]["vijayReceive"].toFixed(2));
+    setIssueBalance(totalQty[0]["vijayIssue"][0]["vijayIssue"].toFixed(2));
+    setBhukaBalance(totalQty[0]["vijayBhuka"][0]["vijayBhuka"].toFixed(2));
+    setLossBalance(totalQty[0]["vijayLoss"][0]["vijayLoss"].toFixed(2));
     
-    // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
-
-    useEffect(() => {
-        (async () => {
-
-        setIsLoading(true);
-            const token = localStorage.getItem("token");
-        // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        // console.log("data", data)
-        
-        const allData = await fetchVijayStockList(page, itemsPerPage, token);
-        const docs = allData.filter(item => item.issue_to_kareegar === "Vijay");
-        setFullData(docs);
-        // console.log("data", docs);
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
-              deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            data.push(docs[eachEntry]);
-          }
-        }
-        data.reverse();
-        setRows(data);
-
-        let totalTarpattaRecv = 0.000;
-        let totalRecvQty = 0.0;
-        let totalIssueQty = 0.0;
-        let totalLossQty = 0.0;
-        let totalBhukaQty = 0.0;
-        data.forEach(({ tarpattaReceive, vijayReceive, vijayIssue, vijayBhuka, vijayLoss}) => {
-          // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-          if (isNaN(parseFloat(tarpattaReceive))) {
-            tarpattaReceive = [0]; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(vijayIssue))) {
-            vijayIssue = [0]; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(vijayReceive))){
-            vijayReceive = [0]; // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(vijayLoss))){
-            vijayLoss = 0; // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(vijayBhuka))){
-            vijayBhuka = [0]; // Set it to zero if it's NaN
-          }
-          // const sumOfWeights = meltingWeight.map(Number).reduce((acc, curr) => acc + curr, 0);
-          // console.log(sumOfWeights);
-          // console.log(vijayReceive);
-          const sumOfTarpattaReceive = tarpattaReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfVijayIssue = vijayIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfVijayReceive = vijayReceive.map(Number).reduce((acc, curr) => acc + curr, 0);
-          const sumOfVijayBhuka = vijayBhuka.map(Number).reduce((acc, curr) => acc + curr, 0);
-          
-          totalTarpattaRecv += parseFloat(sumOfTarpattaReceive);
-          totalRecvQty += parseFloat(sumOfVijayReceive);
-          totalIssueQty += parseFloat(sumOfVijayIssue);
-          totalBhukaQty += parseFloat(sumOfVijayBhuka);
-          totalLossQty += parseFloat(vijayLoss);
-        });
-        // console.log("sum", totalWeight, totalRecvQty, totalIssueQty, totalIssueQty,  totalLossQty)
-        setTarpattaRecvBalance(totalTarpattaRecv.toFixed(2));
-        setReceiveBalance(totalRecvQty.toFixed(2));
-        setIssueBalance(totalIssueQty.toFixed(2));
-        setBhukaBalance(totalBhukaQty.toFixed(2));
-        setLossBalance(totalLossQty.toFixed(2));
-        // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
-
-        setIsLoading(false);
-    })();
   
+    useEffect(() => {
+      (async () => {
+        updateRows(dataState);
+      })();
     }, [page, itemsPerPage]);
-
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -254,11 +145,17 @@ const VijayKareegarBook = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
+    setIsLoading(true);
 
-    // updateRows("valid");
-    const array = [];
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+    let array = [];
+
+    const token = localStorage.getItem("token");
+
+    let allData = await fetchVijayStockList(1, Number.MAX_SAFE_INTEGER, token, dataState, issue_to_kareegar);
+    let fullData = allData["data"];
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
@@ -274,17 +171,21 @@ const VijayKareegarBook = () => {
         }
     }
     });
-    array.reverse();
     setRows(array);
-    // confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-    close()
+    setTotalCount(array.length);
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
+
   const handleReset = (clearFilters, close) => {
     clearFilters();
     updateRows("valid");
     setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 
@@ -366,59 +267,98 @@ const VijayKareegarBook = () => {
         ) : (
           getFormattedDate(text)
         )
-      ) : dataIndex === "vijayWeight" ?(
-        // searchedColumn === dataIndex ? (<Highlighter
-        //   highlightStyle={{
-        //     backgroundColor: '#ffc069',
-        //     padding: 0,
-        //   }}
-        //   searchWords={[searchText]}
-        //   autoEscape
-        //   textToHighlight={text ? (
-        //     text.join("\n")
-        //   ) : ''}
-        //   />
-        // ) : (
-          text && text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
-          )
-          )
-        // )
-      ) : dataIndex === "vijayPurity" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ) : dataIndex === "vijayConversion" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ) : dataIndex === "vijayCategory" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"left"}}>{eachText}</div>
-        )
-        )
       ): dataIndex === "vijayIssue" ?(
-        text && text.map((eachText) => (
+        searchedColumn === "vijayIssue" ? (text && text.map((eachText) => (
+              (eachText.toString().includes(searchText)? (
+              <div><Highlighter
+              highlightStyle={{
+                backgroundColor: '#ffc069',
+                padding: 0,
+              }}
+              searchWords={[searchText]}
+              autoEscape
+              textToHighlight={eachText}
+              />
+              </div>
+            ) : (
+                <div style={{textAlign:"right"}}>{eachText}</div>
+              )
+              )
+            )
+        )): (
+          text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ): dataIndex === "tarpattaReceive" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
+          )
+        ))
       ): dataIndex === "vijayReceive" ?(
-        text && text.map((eachText) => (
+        searchedColumn === "vijayReceive" ? (text && text.map((eachText) => (
+              (eachText.toString().includes(searchText)? (
+              <div><Highlighter
+              highlightStyle={{
+                backgroundColor: '#ffc069',
+                padding: 0,
+              }}
+              searchWords={[searchText]}
+              autoEscape
+              textToHighlight={eachText}
+              />
+              </div>
+            ) : (
+                <div style={{textAlign:"right"}}>{eachText}</div>
+              )
+              )
+            )
+        )): (
+          text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
+          )
+        ))
       ): dataIndex === "vijayBhuka" ?(
-        text && text.map((eachText) => (
+        searchedColumn === "vijayBhuka" ? (text && text.map((eachText) => (
+              (eachText.toString().includes(searchText)? (
+              <div><Highlighter
+              highlightStyle={{
+                backgroundColor: '#ffc069',
+                padding: 0,
+              }}
+              searchWords={[searchText]}
+              autoEscape
+              textToHighlight={eachText}
+              />
+              </div>
+            ) : (
+                <div style={{textAlign:"right"}}>{eachText}</div>
+              )
+              )
+            )
+        )): (
+          text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
+          )
+        ))
+      ): dataIndex === "tarpattaReceive" ?(
+        searchedColumn === "tarpattaReceive" ? (text && text.map((eachText) => (
+              (eachText.toString().includes(searchText)? (
+              <div><Highlighter
+              highlightStyle={{
+                backgroundColor: '#ffc069',
+                padding: 0,
+              }}
+              searchWords={[searchText]}
+              autoEscape
+              textToHighlight={eachText}
+              />
+              </div>
+            ) : (
+                <div style={{textAlign:"right"}}>{eachText}</div>
+              )
+              )
+            )
+        )): (
+          text && text.map((eachText) => (
+          <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+        ))
       ):(
       searchedColumn === dataIndex ? (
         <Highlighter
@@ -521,17 +461,6 @@ const VijayKareegarBook = () => {
       ...getColumnSearchProps('vijayBhuka'),
       align: 'right',
     },
-    // {
-    //   title: "Issue Wt (F)",
-    //   dataIndex: "meltingIssue",
-    //   render: text => (
-    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   ...getColumnSearchProps('meltingIssue'),
-    // },
     {
       title: "Loss",
       dataIndex: "vijayLoss",
@@ -544,18 +473,6 @@ const VijayKareegarBook = () => {
       ...getColumnSearchProps('vijayLoss'),
       align: 'right',
     },
-    // {
-    //   title: "Assigned To",
-    //   dataIndex: "issue_to_kareegar",
-    //   render: text => (
-    //     <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   align: 'center',
-    //   ...getColumnSearchProps('issue_to_kareegar'),
-    // },
     {
       title: "Action",
       key: "action",
@@ -577,16 +494,18 @@ const VijayKareegarBook = () => {
     setSelectedRowKeys();
   }
 
-  const SelectAll = () => {
-    const array = [];
+  const SelectAll = async() => {
+    setIsLoading(true);
 
-    rows.forEach( function(number){
-      if (number.is_deleted_flag === false){
-        array.push(number._id);
-      }
-    }
-    )
+    const token = localStorage.getItem("token");
+
+    const vijayStockData = await fetchVijayStockList(1, Number.MAX_SAFE_INTEGER, token, "valid", issue_to_kareegar);
+    const docs = vijayStockData["data"];
+
+    const array = docs.map(({ _id }) => _id);
+
     setSelectedRowKeys(array);
+    setIsLoading(false);
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -702,7 +621,11 @@ const VijayKareegarBook = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount,
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (

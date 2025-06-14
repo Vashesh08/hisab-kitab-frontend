@@ -138,7 +138,9 @@ function VijayMeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance,
     setIssueActualWt(totalRoundedNumber.toFixed(2));
     (async () => {
       const token = localStorage.getItem("token");
-      const docs = await fetchVijayStockList(1, 100000000, token);
+      const vijayStockData = await fetchVijayStockList(1, 1, token, "valid");
+      const docs = vijayStockData["data"];
+
       // console.log(docs)
       if (docs.length > 0){
         const lastEntry = docs[docs.length - 1];

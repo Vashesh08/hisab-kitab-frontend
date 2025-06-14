@@ -408,6 +408,29 @@ const MeltingBook = () => {
         <div style={{textAlign:"right"}}>{eachText}</div>
         )
       ))
+    )  : dataIndex === "category" ?(
+        searchedColumn === "category" ? (text && text.map((eachText) => (
+            (eachText.toString().includes(searchText)? (
+            <div><Highlighter
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={eachText}
+          />
+          </div>
+        ) : (
+            <div style={{textAlign:"right"}}>{eachText}</div>
+          )
+          )
+        )
+      )): (
+        text && text.map((eachText) => (
+        <div style={{textAlign:"right"}}>{eachText}</div>
+        )
+      ))
     ) : dataIndex === "purity" ?(
       searchedColumn === "purity" ? (text && text.map((eachText) => (
             (eachText.toString().includes(searchText)? (
@@ -578,17 +601,6 @@ const MeltingBook = () => {
       ...getColumnSearchProps('conversion'),
       align: 'right',
     },
-    // {
-    //   title: "Issue Wt (F)",
-    //   dataIndex: "issue22k",
-    //   render: text => (
-    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   ...getColumnSearchProps('issue22k'),
-    // },
     {
       title: "Issue Wt",
       dataIndex: "issue22kActual",

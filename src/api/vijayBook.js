@@ -19,8 +19,8 @@ export async function getVijayStock(token) {
     return body;
 }
 
-export async function fetchVijayStockList(page, itemsPerPage, token) {
-    const response = await fetch(`${config.API_URL}/admin/vijayBook-list?page=${page}&itemsPerPage=${itemsPerPage}`, {
+export async function fetchVijayStockList(page, itemsPerPage, token, isDeleted, issue_to_kareegar, checkSolderChain, checkJointChain) {
+    const response = await fetch(`${config.API_URL}/admin/vijayBook-list?page=${page}&itemsPerPage=${itemsPerPage}&state=${isDeleted}&issue_to_kareegar=${issue_to_kareegar}&checkSolderChain=${checkSolderChain}&checkJointChain=${checkJointChain}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
