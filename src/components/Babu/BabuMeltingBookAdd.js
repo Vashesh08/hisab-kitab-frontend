@@ -143,7 +143,7 @@ function BabuMeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance, 
       // console.log(docs)
       if (docs.length > 0){
         const lastEntry = docs[docs.length - 1];
-        setLastDate(dayjs(lastEntry.date));
+        setLastDate(dayjs(lastEntry.meltingDate));
         // console.log(lastEntry, lastDate)
       }
       setForceUpdate(1);

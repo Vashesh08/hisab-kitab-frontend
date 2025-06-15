@@ -53,7 +53,7 @@ function GovindCapBookClose({handleOk}){
           const docs = GovindCapData["data"];    
           if (docs.length > 0){
             const lastEntry = docs[docs.length - 1];
-            setCurrentDate(dayjs(lastEntry.date));
+            setCurrentDate(dayjs(lastEntry.capAcctDate));
           }
           setForceUpdate(1);
         })();

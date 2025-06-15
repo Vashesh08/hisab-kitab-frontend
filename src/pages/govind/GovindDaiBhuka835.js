@@ -20,8 +20,10 @@ import GovindDaiBhuka835Update from "../../components/Govind/GovindDaiBhuka835Up
 
 const GovindDaiBhuka835 = () => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show all
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("valid");  
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [editModalData, setEditModalData] = useState([]);
@@ -31,6 +33,11 @@ const GovindDaiBhuka835 = () => {
   const [daiBhukaBhukaBalance, setDaiBhukaBhukaBalance] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
 
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
@@ -74,132 +81,39 @@ const GovindDaiBhuka835 = () => {
 
   async function updateRows (dataType){
 
+    if (searchText !== ""){
+      return;
+    };
+
     setIsLoading(true);
     const token = localStorage.getItem("token");
     // send request to check authenticated
-    const data = [];
-    const deleted_data = [];
-    // console.log("data", data)
+
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);
     
-    const allData = await fetchGovindStockList(page, itemsPerPage, token);
-    const filteredData = allData.filter(item => (item.machine835Issue.length > 0));
-    const docs = filteredData.filter(item => item.is_assigned_to === "83.50 + 75 A/C");
-    setFullData(docs);
+    const govindStockData = await fetchGovindStockList(page, itemsPerPage, token, dataType, "83.50%20%2B%2075%20A%2FC");
+    const docs = govindStockData["data"];
+    const count = govindStockData["count"];
+    const totalQty = govindStockData["totalQty"];
+    setTotalCount(count);
 
-    for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
-        data.push(docs[eachEntry]);
-      }
-    }
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-    }
-    else if (dataType === "valid"){
-      data.reverse();
-      setRows(data);
-    }
-    else{
-      deleted_data.reverse();
-      setRows(deleted_data);
-    }
+    setRows(docs);
 
-    let totalDaiBhukaDaiQty = 0.000;
-    let totalmachineIssueQty = 0.0;
-    let totalDaiBhukaBhukaQty = 0.000;
-    data.forEach(({ machine835Issue, daiBhuka835Dai, daiBhuka835Bhuka}) => {
-      // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-      // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
-      if (isNaN(parseFloat(daiBhuka835Dai))) {
-        daiBhuka835Dai = [0]; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(machine835Issue))) {
-        machine835Issue = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(daiBhuka835Bhuka))){
-        daiBhuka835Bhuka = [0] // Set it to zero if it's NaN
-      }
-      
-      const sumOfDaiBhukaDai = daiBhuka835Dai.map(Number).reduce((acc, curr) => acc + curr, 0)
-      const sumOfDaiBhukaBhuka = daiBhuka835Bhuka.map(Number).reduce((acc, curr) => acc + curr, 0)
-      const sumOfMachineIssue = machine835Issue.map(Number).reduce((acc, curr) => acc + curr, 0);
-      
-      totalDaiBhukaDaiQty += parseFloat(sumOfDaiBhukaDai);
-      totalDaiBhukaBhukaQty += parseFloat(sumOfDaiBhukaBhuka);
-      totalmachineIssueQty += parseFloat(sumOfMachineIssue);
-       
-    });
-    setMachineIssueBalance(totalmachineIssueQty);
-    setDaiBhukaDaiBalance(totalDaiBhukaDaiQty);
-    setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty);
+    setMachineIssueBalance(totalQty[0]["machine835Issue"][0]["machine835Issue"].toFixed(2));
+    setDaiBhukaDaiBalance(totalQty[0]["daiBhuka835Dai"][0]["daiBhuka835Dai"].toFixed(2));
+    setDaiBhukaBhukaBalance(totalQty[0]["daiBhuka835Bhuka"][0]["daiBhuka835Bhuka"].toFixed(2));
 
-    // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 
-    useEffect(() => {
-        (async () => {
-
-        setIsLoading(true);
-            const token = localStorage.getItem("token");
-        // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        // console.log("data", data)
-        
-        const allData = await fetchGovindStockList(page, itemsPerPage, token);
-        const filteredData = allData.filter(item => (item.machine835Issue.length > 0));
-        const docs = filteredData.filter(item => item.is_assigned_to === "83.50 + 75 A/C");
-        setFullData(docs);
-        //console.log("data", filteredData);
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
-              deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            data.push(docs[eachEntry]);
-          }
-        }
-        data.reverse();
-        setRows(data);
-
-        let totalDaiBhukaDaiQty = 0.000;
-        let totalmachineIssueQty = 0.0;
-        let totalDaiBhukaBhukaQty = 0.000;
-        data.forEach(({ machine835Issue, daiBhuka835Dai, daiBhuka835Bhuka}) => {
-          // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-          // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
-          if (isNaN(parseFloat(daiBhuka835Dai))) {
-            daiBhuka835Dai = [0]; // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(machine835Issue))) {
-            machine835Issue = [0]; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(daiBhuka835Bhuka))){
-            daiBhuka835Bhuka = [0] // Set it to zero if it's NaN
-          }
-          
-          const sumOfDaiBhukaDai = daiBhuka835Dai.map(Number).reduce((acc, curr) => acc + curr, 0)
-          const sumOfDaiBhukaBhuka = daiBhuka835Bhuka.map(Number).reduce((acc, curr) => acc + curr, 0)
-          const sumOfMachineIssue = machine835Issue.map(Number).reduce((acc, curr) => acc + curr, 0);
-          
-          totalDaiBhukaDaiQty += parseFloat(sumOfDaiBhukaDai);
-          totalDaiBhukaBhukaQty += parseFloat(sumOfDaiBhukaBhuka);
-          totalmachineIssueQty += parseFloat(sumOfMachineIssue);
-           
-        });
-        setMachineIssueBalance(totalmachineIssueQty);
-        setDaiBhukaDaiBalance(totalDaiBhukaDaiQty);
-        setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty);
-    
-        setIsLoading(false);
+  useEffect(() => {
+    (async () => {
+      updateRows(dataState);
     })();
-  
-    }, [page, itemsPerPage]);
-
+  }, [page, itemsPerPage]);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -226,11 +140,16 @@ const GovindDaiBhuka835 = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
+    setIsLoading(true);
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+    let array = [];
 
-    // updateRows("valid");
-    const array = [];
+    const token = localStorage.getItem("token");
+
+    let allData = await fetchGovindStockList(1, Number.MAX_SAFE_INTEGER, token, dataState, "83.50%20%2B%2075%20A%2FC");
+    let fullData = allData["data"];
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
@@ -246,17 +165,21 @@ const GovindDaiBhuka835 = () => {
         }
     }
     });
-    array.reverse();
     setRows(array);
-    // confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-    close()
+    setTotalCount(array.length);
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
+
   const handleReset = (clearFilters, close) => {
     clearFilters();
     updateRows("valid");
     setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 
@@ -338,54 +261,75 @@ const GovindDaiBhuka835 = () => {
         ) : (
           getFormattedDate(text)
         )
-      ) : dataIndex === "machineIssue" ?(
-        // searchedColumn === dataIndex ? (<Highlighter
-        //   highlightStyle={{
-        //     backgroundColor: '#ffc069',
-        //     padding: 0,
-        //   }}
-        //   searchWords={[searchText]}
-        //   autoEscape
-        //   textToHighlight={text ? (
-        //     text.join("\n")
-        //   ) : ''}
-        //   />
-        // ) : (
+      ) : dataIndex === "machine835Issue" ?(
+        searchedColumn === "machine835Issue" ? (text && text.map((eachText) => (
+              (eachText.toString().includes(searchText)? (
+              <div><Highlighter
+            highlightStyle={{
+              backgroundColor: '#ffc069',
+              padding: 0,
+            }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={eachText}
+            />
+            </div>
+          ) : (
+              <div style={{textAlign:"right"}}>{eachText}</div>
+            )
+            )
+          )
+        )): (
           text && text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
+          <div style={{textAlign:"right"}}>{eachText}</div>
           )
+        ))
+      ) : dataIndex === "daiBhuka835Dai" ?(
+        searchedColumn === "daiBhuka835Dai" ? (text && text.map((eachText) => (
+              (eachText.toString().includes(searchText)? (
+              <div><Highlighter
+            highlightStyle={{
+              backgroundColor: '#ffc069',
+              padding: 0,
+            }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={eachText}
+            />
+            </div>
+          ) : (
+              <div style={{textAlign:"right"}}>{eachText}</div>
+            )
+            )
           )
-        // )
-      ) : dataIndex === "tarpattaPurity" ?(
-        text && text.map((eachText) => (
+        )): (
+          text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ) : dataIndex === "tarpattaConversion" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ) : dataIndex === "tarpattaCategory" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"left"}}>{eachText}</div>
-        )
-        )
-      ): dataIndex === "daiBhuka835Dai" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
+          )
+        ))
       ): dataIndex === "daiBhuka835Bhuka" ?(
-        text && text.map((eachText) => (
+        searchedColumn === "daiBhuka835Bhuka" ? (text && text.map((eachText) => (
+              (eachText.toString().includes(searchText)? (
+              <div><Highlighter
+            highlightStyle={{
+              backgroundColor: '#ffc069',
+              padding: 0,
+            }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={eachText}
+            />
+            </div>
+          ) : (
+              <div style={{textAlign:"right"}}>{eachText}</div>
+            )
+            )
+          )
+        )): (
+          text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ): dataIndex === "machine835Issue" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
+          )
+        ))
       ):(
       searchedColumn === dataIndex ? (
         <Highlighter
@@ -492,16 +436,18 @@ const GovindDaiBhuka835 = () => {
     setSelectedRowKeys();
   }
 
-  const SelectAll = () => {
-    const array = [];
+  const SelectAll = async() => {
+    setIsLoading(true);
 
-    rows.forEach( function(number){
-      if (number.is_deleted_flag === false){
-        array.push(number._id);
-      }
-    }
-    )
+    const token = localStorage.getItem("token");
+
+    const govindStockData = await fetchGovindStockList(1, Number.MAX_SAFE_INTEGER, token, "valid", "Dai%20%2B%20Bhuka");
+    const docs = govindStockData["data"];
+
+    const array = docs.map(({ _id }) => _id);
+
     setSelectedRowKeys(array);
+    setIsLoading(false);
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -617,7 +563,11 @@ const GovindDaiBhuka835 = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount,
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (
@@ -630,8 +580,6 @@ const GovindDaiBhuka835 = () => {
             <>
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
                 <Table.Summary.Cell index={0} className="" colSpan={1}>Total</Table.Summary.Cell> 
-                {/* <Table.Summary.Cell index={1}></Table.Summary.Cell> */}
-                {/* <Table.Summary.Cell index={2}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={1}>
                   {machineIssueBalance}
                 </Table.Summary.Cell>
@@ -640,23 +588,12 @@ const GovindDaiBhuka835 = () => {
                 <Table.Summary.Cell index={3}>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={4}>
-                  {/* {totalWeightQuantity} */}
                   {daiBhukaDaiBalance}
                   </Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={5}>
-                  {totalIssueQuantity}
-                </Table.Summary.Cell> */}
                   <Table.Summary.Cell index={5}>
                   {daiBhukaBhukaBalance}
                 </Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={6}>
-                {bhukaBalance}
-                </Table.Summary.Cell> */}
-                {/* <Table.Summary.Cell index={7}>
-                  {lossBalance}
-                </Table.Summary.Cell> */}
                 <Table.Summary.Cell index={8}></Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={9}></Table.Summary.Cell> */}
                 
               </Table.Summary.Row>
             </>

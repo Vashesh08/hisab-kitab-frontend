@@ -20,8 +20,10 @@ import GovindDaiBhukaUpdate from "../../components/Govind/GovindDaiBhukaUpdate.j
 
 const GovindDaiBhuka = () => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(100000000); // Change this to show all
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show all
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("valid");  
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [editModalData, setEditModalData] = useState([]);
@@ -31,6 +33,11 @@ const GovindDaiBhuka = () => {
   const [daiBhukaBhukaBalance, setDaiBhukaBhukaBalance] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
 
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
@@ -74,132 +81,39 @@ const GovindDaiBhuka = () => {
 
   async function updateRows (dataType){
 
+    if (searchText !== ""){
+      return;
+    };
+
     setIsLoading(true);
     const token = localStorage.getItem("token");
     // send request to check authenticated
-    const data = [];
-    const deleted_data = [];
-    // console.log("data", data)
+
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);
     
-    const allData = await fetchGovindStockList(page, itemsPerPage, token);
-    const filteredData = allData.filter(item => item.machineIssue.length > 0);
-    const docs = filteredData.filter(item => item.is_assigned_to === "Dai + Bhuka");
-    setFullData(docs);
+    const govindStockData = await fetchGovindStockList(page, itemsPerPage, token, dataType, "Dai%20%2B%20Bhuka");
+    const docs = govindStockData["data"];
+    const count = govindStockData["count"];
+    const totalQty = govindStockData["totalQty"];
+    setTotalCount(count);
 
-    for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
-        data.push(docs[eachEntry]);
-      }
-    }
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-    }
-    else if (dataType === "valid"){
-      data.reverse();
-      setRows(data);
-    }
-    else{
-      deleted_data.reverse();
-      setRows(deleted_data);
-    }
+    setRows(docs);
 
-    let totalDaiBhukaDaiQty = 0.000;
-    let totalmachineIssueQty = 0.0;
-    let totalDaiBhukaBhukaQty = 0.000;
-    data.forEach(({ machineIssue, daiBhukaDai, daiBhukaBhuka}) => {
-      // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-      // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
-      if (isNaN(parseFloat(daiBhukaDai))) {
-        daiBhukaDai = [0]; // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(machineIssue))) {
-        machineIssue = [0]; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(daiBhukaBhuka))){
-        daiBhukaBhuka = [0] // Set it to zero if it's NaN
-      }
-      
-      const sumOfDaiBhukaDai = daiBhukaDai.map(Number).reduce((acc, curr) => acc + curr, 0)
-      const sumOfDaiBhukaBhuka = daiBhukaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0)
-      const sumOfMachineIssue = machineIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-      
-      totalDaiBhukaDaiQty += parseFloat(sumOfDaiBhukaDai);
-      totalDaiBhukaBhukaQty += parseFloat(sumOfDaiBhukaBhuka);
-      totalmachineIssueQty += parseFloat(sumOfMachineIssue);
-       
-    });
-    setMachineIssueBalance(totalmachineIssueQty.toFixed(2));
-    setDaiBhukaDaiBalance(totalDaiBhukaDaiQty.toFixed(2));
-    setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty.toFixed(2));
+    setMachineIssueBalance(totalQty[0]["machineIssue"][0]["machineIssue"].toFixed(2));
+    setDaiBhukaDaiBalance(totalQty[0]["daiBhukaDai"][0]["daiBhukaDai"].toFixed(2));
+    setDaiBhukaBhukaBalance(totalQty[0]["daiBhukaBhuka"][0]["daiBhukaBhuka"].toFixed(2));
 
-    // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 
-    useEffect(() => {
-        (async () => {
-
-        setIsLoading(true);
-            const token = localStorage.getItem("token");
-        // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        // console.log("data", data)
-        
-        const allData = await fetchGovindStockList(page, itemsPerPage, token);
-        const filteredData = allData.filter(item => item.machineIssue.length > 0);
-        const docs = filteredData.filter(item => item.is_assigned_to === "Dai + Bhuka");
-        setFullData(docs);
-        // console.log("data", docs);
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag || (isNaN(docs[eachEntry].meltingReceive))){
-              deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            data.push(docs[eachEntry]);
-          }
-        }
-        data.reverse();
-        setRows(data);
-
-        let totalDaiBhukaDaiQty = 0.000;
-        let totalmachineIssueQty = 0.0;
-        let totalDaiBhukaBhukaQty = 0.000;
-        data.forEach(({ machineIssue, daiBhukaDai, daiBhukaBhuka}) => {
-          // console.log(meltingWeight, meltingReceive, meltingIssue, meltingLoss);
-          // console.log( meltingReceive, tarpattaReceive, tarpattaIssue, tarpattaBhuka, tarpattaLoss);
-          if (isNaN(parseFloat(daiBhukaDai))) {
-            daiBhukaDai = [0]; // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(machineIssue))) {
-            machineIssue = [0]; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(daiBhukaBhuka))){
-            daiBhukaBhuka = [0] // Set it to zero if it's NaN
-          }
-          
-          const sumOfDaiBhukaDai = daiBhukaDai.map(Number).reduce((acc, curr) => acc + curr, 0)
-          const sumOfDaiBhukaBhuka = daiBhukaBhuka.map(Number).reduce((acc, curr) => acc + curr, 0)
-          const sumOfMachineIssue = machineIssue.map(Number).reduce((acc, curr) => acc + curr, 0);
-          
-          totalDaiBhukaDaiQty += parseFloat(sumOfDaiBhukaDai);
-          totalDaiBhukaBhukaQty += parseFloat(sumOfDaiBhukaBhuka);
-          totalmachineIssueQty += parseFloat(sumOfMachineIssue);
-           
-        });
-        setMachineIssueBalance(totalmachineIssueQty.toFixed(2));
-        setDaiBhukaDaiBalance(totalDaiBhukaDaiQty.toFixed(2));
-        setDaiBhukaBhukaBalance(totalDaiBhukaBhukaQty.toFixed(2));
-    
-        setIsLoading(false);
+  useEffect(() => {
+    (async () => {
+      updateRows(dataState);
     })();
-  
-    }, [page, itemsPerPage]);
-
+  }, [page, itemsPerPage]);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -226,11 +140,16 @@ const GovindDaiBhuka = () => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
+    setIsLoading(true);
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+    let array = [];
 
-    // updateRows("valid");
-    const array = [];
+    const token = localStorage.getItem("token");
+
+    let allData = await fetchGovindStockList(1, Number.MAX_SAFE_INTEGER, token, dataState, "Dai%20%2B%20Bhuka");
+    let fullData = allData["data"];
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
@@ -246,17 +165,21 @@ const GovindDaiBhuka = () => {
         }
     }
     });
-    array.reverse();
     setRows(array);
-    // confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-    close()
+    setTotalCount(array.length);
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
+
   const handleReset = (clearFilters, close) => {
     clearFilters();
     updateRows("valid");
     setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 
@@ -339,53 +262,74 @@ const GovindDaiBhuka = () => {
           getFormattedDate(text)
         )
       ) : dataIndex === "machineIssue" ?(
-        // searchedColumn === dataIndex ? (<Highlighter
-        //   highlightStyle={{
-        //     backgroundColor: '#ffc069',
-        //     padding: 0,
-        //   }}
-        //   searchWords={[searchText]}
-        //   autoEscape
-        //   textToHighlight={text ? (
-        //     text.join("\n")
-        //   ) : ''}
-        //   />
-        // ) : (
+        searchedColumn === "machineIssue" ? (text && text.map((eachText) => (
+              (eachText.toString().includes(searchText)? (
+              <div><Highlighter
+            highlightStyle={{
+              backgroundColor: '#ffc069',
+              padding: 0,
+            }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={eachText}
+            />
+            </div>
+          ) : (
+              <div style={{textAlign:"right"}}>{eachText}</div>
+            )
+            )
+          )
+        )): (
           text && text.map((eachText) => (
-            <div style={{textAlign:"right"}}>{eachText}</div>
+          <div style={{textAlign:"right"}}>{eachText}</div>
           )
+        ))
+      ) : dataIndex === "daiBhukaDai" ?(
+        searchedColumn === "daiBhukaDai" ? (text && text.map((eachText) => (
+              (eachText.toString().includes(searchText)? (
+              <div><Highlighter
+            highlightStyle={{
+              backgroundColor: '#ffc069',
+              padding: 0,
+            }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={eachText}
+            />
+            </div>
+          ) : (
+              <div style={{textAlign:"right"}}>{eachText}</div>
+            )
+            )
           )
-        // )
-      ) : dataIndex === "tarpattaPurity" ?(
-        text && text.map((eachText) => (
+        )): (
+          text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ) : dataIndex === "tarpattaConversion" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ) : dataIndex === "tarpattaCategory" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"left"}}>{eachText}</div>
-        )
-        )
-      ): dataIndex === "daiBhukaDai" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
+          )
+        ))
       ): dataIndex === "daiBhukaBhuka" ?(
-        text && text.map((eachText) => (
+        searchedColumn === "daiBhukaBhuka" ? (text && text.map((eachText) => (
+              (eachText.toString().includes(searchText)? (
+              <div><Highlighter
+            highlightStyle={{
+              backgroundColor: '#ffc069',
+              padding: 0,
+            }}
+            searchWords={[searchText]}
+            autoEscape
+            textToHighlight={eachText}
+            />
+            </div>
+          ) : (
+              <div style={{textAlign:"right"}}>{eachText}</div>
+            )
+            )
+          )
+        )): (
+          text && text.map((eachText) => (
           <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
-      ): dataIndex === "tarpattaBhuka" ?(
-        text && text.map((eachText) => (
-          <div style={{textAlign:"right"}}>{eachText}</div>
-        )
-        )
+          )
+        ))
       ):(
       searchedColumn === dataIndex ? (
         <Highlighter
@@ -471,56 +415,6 @@ const GovindDaiBhuka = () => {
       ...getColumnSearchProps('daiBhukaBhuka'),
       align: 'right',
     },
-    // {
-    //   title: "Bhuka",
-    //   dataIndex: "tarpattaBhuka",
-    //   render: text => (
-    //     <div style={{minWidth: '125px', maxWidth: '125px',  overflow: 'auto', textAlign: 'center'}}>
-    //       {text.map((eachText) => (
-    //         <div style={{textAlign:"right"}}>{eachText}</div>
-    //       )
-    //       )}
-    //     </div>
-    //   ),
-    //   width: '9%',
-    //   ...getColumnSearchProps('tarpattaBhuka'),
-    //   align: 'right',
-    // },
-    // {
-    //   title: "Issue Wt (F)",
-    //   dataIndex: "meltingIssue",
-    //   render: text => (
-    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   ...getColumnSearchProps('meltingIssue'),
-    // },
-    // {
-    //   title: "Loss",
-    //   dataIndex: "machineLoss",
-    //   render: text => (
-    //     <div style={{ minWidth: '120px', maxWidth: '120px', overflow: 'auto', textAlign: 'center'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   ...getColumnSearchProps('machineLoss'),
-    //   align: 'right',
-    // },
-    // {
-    //   title: "Assigned To",
-    //   dataIndex: "issue_to_kareegar",
-    //   render: text => (
-    //     <div style={{ minWidth:'140px', maxWidth: '140px', overflow: 'auto'}}>
-    //       {text}
-    //     </div>
-    //   ),
-    //   width: '10%',
-    //   align: 'center',
-    //   ...getColumnSearchProps('issue_to_kareegar'),
-    // },
     {
       title: "Action",
       key: "action",
@@ -542,16 +436,18 @@ const GovindDaiBhuka = () => {
     setSelectedRowKeys();
   }
 
-  const SelectAll = () => {
-    const array = [];
+  const SelectAll = async() => {
+    setIsLoading(true);
 
-    rows.forEach( function(number){
-      if (number.is_deleted_flag === false){
-        array.push(number._id);
-      }
-    }
-    )
+    const token = localStorage.getItem("token");
+
+    const govindStockData = await fetchGovindStockList(1, Number.MAX_SAFE_INTEGER, token, "valid", "Dai%20%2B%20Bhuka");
+    const docs = govindStockData["data"];
+
+    const array = docs.map(({ _id }) => _id);
+
     setSelectedRowKeys(array);
+    setIsLoading(false);
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -667,7 +563,11 @@ const GovindDaiBhuka = () => {
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount,
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (

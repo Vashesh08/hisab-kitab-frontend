@@ -138,12 +138,12 @@ function GovindMeltingBookAdd({handleOk, setClosingBalance, setClosing995Balance
     setIssueActualWt(totalRoundedNumber.toFixed(2));
     (async () => {
       const token = localStorage.getItem("token");
-      const docs = await fetchGovindStockList(1, 100000000, token);
-      // console.log(docs)
+      const govindStockData = await fetchGovindStockList(1, 1, token, "valid");
+      const docs = govindStockData["data"];
+
       if (docs.length > 0){
         const lastEntry = docs[docs.length - 1];
-        setLastDate(dayjs(lastEntry.date));
-        // console.log(lastEntry, lastDate)
+        setLastDate(dayjs(lastEntry.meltingDate));
       }
       setForceUpdate(1);
       // setForceUpdate(prev => prev + 1);
