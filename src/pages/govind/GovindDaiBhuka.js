@@ -27,7 +27,6 @@ const GovindDaiBhuka = () => {
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [editModalData, setEditModalData] = useState([]);
-  const [fullData, setFullData] = useState([]);
   const [machineIssueBalance, setMachineIssueBalance] = useState(0);
   const [daiBhukaDaiBalance, setDaiBhukaDaiBalance] = useState(0);
   const [daiBhukaBhukaBalance, setDaiBhukaBhukaBalance] = useState(0);

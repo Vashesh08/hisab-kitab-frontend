@@ -27,12 +27,6 @@ const Joint = () => {
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [editModalData, setEditModalData] = useState([]);
-  const [fullData, setFullData] = useState([]);
-  const [issueBalance, setIssueBalance] = useState(0);
-  const [receiveBalance, setReceiveBalance] = useState(0);
-  const [bhukaBalance, setBhukaBalance] = useState(0);
-  const [lossBalance, setLossBalance] = useState(0);
-  const [meltingWtBalance, setMeltingWtBalance] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
 

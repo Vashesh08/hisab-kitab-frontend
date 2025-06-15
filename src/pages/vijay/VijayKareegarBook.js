@@ -28,7 +28,6 @@ const VijayKareegarBook = () => {
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [editModalData, setEditModalData] = useState([]);
-  const [fullData, setFullData] = useState([]);
   const [issueBalance, setIssueBalance] = useState(0);
   const [receiveBalance, setReceiveBalance] = useState(0);
   const [bhukaBalance, setBhukaBalance] = useState(0);

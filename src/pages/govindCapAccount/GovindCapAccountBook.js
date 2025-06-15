@@ -30,7 +30,6 @@ const GovindCapAccountBook = () => {
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [updateData, setUpdateData] = useState([]);
-  const [fullData, setFullData] = useState([]);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
   const [totalLossQuantity, setTotalLossQty] = useState(0);
