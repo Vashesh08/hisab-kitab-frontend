@@ -102,9 +102,27 @@ const MasterStock = () => {
     setTotalCount(count);
 
     setRows(docs);
-    setTotalWeight(totalQty[0]["weight"].toFixed(2));
-    setTotalRecvQty(totalQty[0]["receive22k"].toFixed(2));
-    setTotalIssueQty(totalQty[0]["issue22k"].toFixed(2));
+    if (totalQty[0]["weight"] === null){
+      setTotalWeight(Number(0).toFixed(2));      
+    }
+    else{
+      setTotalWeight(totalQty[0]["weight"].toFixed(2));
+    }
+
+    if (totalQty[0]["receive22k"] === null){
+      setTotalRecvQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalRecvQty(totalQty[0]["receive22k"].toFixed(2));
+    }
+
+    if (totalQty[0]["issue22k"] === null){
+      setTotalIssueQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalIssueQty(totalQty[0]["issue22k"].toFixed(2));
+    }
+
     setIsLoading(false);
   };
  

@@ -101,9 +101,26 @@ const GovindDaiBhuka = () => {
 
     setRows(docs);
 
-    setMachineIssueBalance(totalQty[0]["machineIssue"][0]["machineIssue"].toFixed(2));
-    setDaiBhukaDaiBalance(totalQty[0]["daiBhukaDai"][0]["daiBhukaDai"].toFixed(2));
-    setDaiBhukaBhukaBalance(totalQty[0]["daiBhukaBhuka"][0]["daiBhukaBhuka"].toFixed(2));
+    if (totalQty[0]["machineIssue"][0]["machineIssue"] === null){
+        setMachineIssueBalance(Number(0).toFixed(2));
+    }
+    else{
+        setMachineIssueBalance(totalQty[0]["machineIssue"][0]["machineIssue"].toFixed(2));      
+    }
+
+    if (totalQty[0]["daiBhukaDai"][0]["daiBhukaDai"] === null){
+        setDaiBhukaDaiBalance(Number(0).toFixed(2));
+    }
+    else{
+        setDaiBhukaDaiBalance(totalQty[0]["daiBhukaDai"][0]["daiBhukaDai"].toFixed(2));      
+    }
+
+    if (totalQty[0]["daiBhukaBhuka"][0]["daiBhukaBhuka"] === null){
+        setDaiBhukaBhukaBalance(Number(0).toFixed(2));
+    }
+    else{
+        setDaiBhukaBhukaBalance(totalQty[0]["daiBhukaBhuka"][0]["daiBhukaBhuka"].toFixed(2));      
+    }
 
     setIsLoading(false);
   };

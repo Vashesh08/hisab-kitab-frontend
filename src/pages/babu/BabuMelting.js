@@ -120,12 +120,34 @@ const BabuMelting = () => {
     setTotalCount(count);
     setRows(docs);
 
-    setTotalWeight(totalQty[0]["meltingWeight"][0]["meltingWeight"].toFixed(2));
-    setTotalRecvQty(totalQty[0]["meltingReceive"][0]["meltingReceive"].toFixed(2));
-    setTotalIssueActualQty(totalQty[0]["meltingIssueActual"][0]["meltingIssueActual"].toFixed(2));
-    setTotalLossQty(totalQty[0]["meltingLoss"][0]["meltingLoss"].toFixed(2));
+    if (totalQty[0]["meltingWeight"][0]["meltingWeight"] === null){
+        setTotalWeight(Number(0).toFixed(2));
+    }
+    else{
+        setTotalWeight(totalQty[0]["meltingWeight"][0]["meltingWeight"].toFixed(2));      
+    }
+
+    if (totalQty[0]["meltingReceive"][0]["meltingReceive"] === null){
+        setTotalRecvQty(Number(0).toFixed(2));
+    }
+    else{
+        setTotalRecvQty(totalQty[0]["meltingReceive"][0]["meltingReceive"].toFixed(2));      
+    }
+
+    if (totalQty[0]["meltingIssueActual"][0]["meltingIssueActual"] === null){
+        setTotalIssueActualQty(Number(0).toFixed(2));
+    }
+    else{
+        setTotalIssueActualQty(totalQty[0]["meltingIssueActual"][0]["meltingIssueActual"].toFixed(2));      
+    }
+
+    if (totalQty[0]["meltingLoss"][0]["meltingLoss"] === null){
+        setTotalLossQty(Number(0).toFixed(2));
+    }
+    else{
+        setTotalLossQty(totalQty[0]["meltingLoss"][0]["meltingLoss"].toFixed(2));      
+    }
     
-    // setClosingBalance((openingBalance + totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
     setIsLoading(false);
   };
 

@@ -104,12 +104,41 @@ const GovindTarPattaBook = () => {
 
     setRows(docs);
 
-    setMeltingWtBalance(totalQty[0]["meltingWeight"][0]["meltingWeight"].toFixed(2));
-    setReceiveBalance(totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"].toFixed(2));
-    setIssueBalance(totalQty[0]["tarpattaIssue"][0]["tarpattaIssue"].toFixed(2));
-    setBhukaBalance(totalQty[0]["tarpattaBhuka"][0]["tarpattaBhuka"].toFixed(2));
-    setLossBalance(totalQty[0]["tarpattaLoss"][0]["tarpattaLoss"].toFixed(2));
-    
+    if (totalQty[0]["meltingWeight"][0]["meltingWeight"] === null){
+        setMeltingWtBalance(Number(0).toFixed(2));
+    }
+    else{
+        setMeltingWtBalance(totalQty[0]["meltingWeight"][0]["meltingWeight"].toFixed(2));      
+    }
+
+    if (totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"] === null){
+        setReceiveBalance(Number(0).toFixed(2));
+    }
+    else{
+        setReceiveBalance(totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"].toFixed(2));
+    }
+
+    if (totalQty[0]["tarpattaIssue"][0]["tarpattaIssue"] === null){
+        setIssueBalance(Number(0).toFixed(2));
+    }
+    else{
+        setIssueBalance(totalQty[0]["tarpattaIssue"][0]["tarpattaIssue"].toFixed(2));      
+    }
+
+    if (totalQty[0]["tarpattaBhuka"][0]["tarpattaBhuka"] === null){
+        setBhukaBalance(Number(0).toFixed(2));
+    }
+    else{
+        setBhukaBalance(totalQty[0]["tarpattaBhuka"][0]["tarpattaBhuka"].toFixed(2));      
+    }
+
+    if (totalQty[0]["tarpattaLoss"][0]["tarpattaLoss"] === null){
+        setLossBalance(Number(0).toFixed(2));
+    }
+    else{
+        setLossBalance(totalQty[0]["tarpattaLoss"][0]["tarpattaLoss"].toFixed(2));      
+    }
+   
     setIsLoading(false);
   };
 

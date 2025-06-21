@@ -103,9 +103,26 @@ const GovindCapAccountBook = () => {
 
     setRows(docs);
     
-    setTotalRecvQty(totalQty[0]["capAcctReceive"].toFixed(2));
-    setTotalIssueQty(totalQty[0]["capAcctIssue"].toFixed(2));
-    setTotalLossQty(totalQty[0]["capAcctLoss"].toFixed(2));
+    if (totalQty[0]["capAcctReceive"] === null){
+        setTotalRecvQty(Number(0).toFixed(2));
+    }
+    else{
+        setTotalRecvQty(totalQty[0]["capAcctReceive"].toFixed(2));      
+    }
+    
+    if (totalQty[0]["capAcctIssue"] === null){
+        setTotalIssueQty(Number(0).toFixed(2));
+    }
+    else{
+        setTotalIssueQty(totalQty[0]["capAcctIssue"].toFixed(2));      
+    }
+    
+    if (totalQty[0]["capAcctLoss"] === null){
+        setTotalLossQty(Number(0).toFixed(2));
+    }
+    else{
+        setTotalLossQty(totalQty[0]["capAcctLoss"].toFixed(2));      
+    }
 
     setIsLoading(false);
   };

@@ -107,12 +107,41 @@ const Tarpatta = () => {
 
     setRows(docs);
 
-    setTotalRecvQty(totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"].toFixed(2));
-    setTotalIssueQty(totalQty[0]["tarpattaIssue"][0]["tarpattaIssue"].toFixed(2));
-    setTotalLossQty(totalQty[0]["tarpattaLoss"][0]["tarpattaLoss"].toFixed(2));
-    setTotalBhukaQty(totalQty[0]["tarpattaBhuka"][0]["tarpattaBhuka"].toFixed(2));
-    setTotalMeltingReceiveQty(totalQty[0]["receive22k"][0]["receive22k"].toFixed(2));
-
+    if (totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"] === null){
+      setTotalRecvQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalRecvQty(totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"].toFixed(2));
+    }
+  
+    if (totalQty[0]["tarpattaIssue"][0]["tarpattaIssue"] === null){
+      setTotalIssueQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalIssueQty(totalQty[0]["tarpattaIssue"][0]["tarpattaIssue"].toFixed(2));
+    }
+  
+    if (totalQty[0]["tarpattaLoss"][0]["tarpattaLoss"] === null){
+      setTotalLossQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalLossQty(totalQty[0]["tarpattaLoss"][0]["tarpattaLoss"].toFixed(2));
+    }
+  
+    if (totalQty[0]["tarpattaBhuka"][0]["tarpattaBhuka"] === null){
+      setTotalBhukaQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalBhukaQty(totalQty[0]["tarpattaBhuka"][0]["tarpattaBhuka"].toFixed(2));
+    }
+  
+    if (totalQty[0]["receive22k"][0]["receive22k"] === null){
+      setTotalMeltingReceiveQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalMeltingReceiveQty(totalQty[0]["receive22k"][0]["receive22k"].toFixed(2));
+    }
+  
     setIsLoading(false);
   };
 

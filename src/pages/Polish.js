@@ -106,12 +106,47 @@ const Polish = () => {
     const totalQty = allPolishData["totalQty"];
     setTotalCount(count);
 
-    setTotalIssueQty(totalQty[0]["issueWeight"].toFixed(2));
-    setTotalRecvQty(totalQty[0]["recvWeight"].toFixed(2));
-    setTotalLossQty(totalQty[0]["lossWeight"].toFixed(2));
-    setTotalFineQty(totalQty[0]["fine"].toFixed(2));
-    setTotalChillQty(totalQty[0]["chill"].toFixed(2));
-    setTotalChatkaQty(totalQty[0]["chatka"].toFixed(2));
+    if (totalQty[0]["issueWeight"] === null){
+      setTotalIssueQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalIssueQty(totalQty[0]["issueWeight"].toFixed(2));
+    }
+
+    if (totalQty[0]["recvWeight"] === null){
+      setTotalRecvQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalRecvQty(totalQty[0]["recvWeight"].toFixed(2));    
+    }
+
+    if (totalQty[0]["lossWeight"] === null){
+      setTotalLossQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalLossQty(totalQty[0]["lossWeight"].toFixed(2));    
+    }
+
+    if (totalQty[0]["fine"] === null){
+      setTotalFineQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalFineQty(totalQty[0]["fine"].toFixed(2));    
+    }
+
+    if (totalQty[0]["chill"] === null){
+      setTotalChillQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalChillQty(totalQty[0]["chill"].toFixed(2));    
+    }
+
+    if (totalQty[0]["chatka"] === null){
+      setTotalChatkaQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalChatkaQty(totalQty[0]["chatka"].toFixed(2));    
+    }
 
     setFullData(docs);
     for (let eachEntry in docs) {
