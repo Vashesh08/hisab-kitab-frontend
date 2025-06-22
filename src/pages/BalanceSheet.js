@@ -52,7 +52,7 @@ export default function BalanceSheet() {
             setIsLoading(true);
 
             const token = localStorage.getItem("token");
-            const allKareegarDetails = await getKareegarData(1, 100000000, token);
+            const allKareegarDetails = await getKareegarData(1, Number.MAX_SAFE_INTEGER, token);
             const data = allKareegarDetails["data"];
             const KareegarBalanceDetails = allKareegarDetails["totalQty"];
             let kareegarDetails = [];

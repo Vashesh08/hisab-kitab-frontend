@@ -29,12 +29,14 @@ import { postLossAcct } from "../api/LossAcct.js";
 
 const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => {
   const screenWidth = window.innerWidth;
-  const [page] = useState(1);
-  const [itemsPerPage] = useState(1); // Change this to show all
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Change this to show allAdd commentMore actions
+  const [totalCount, setTotalCount] = useState(0);
+  const [dataState, setDataState] = useState("valid");
   const [rows, setRows] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fullData, setFullData] = useState([]);
-  // const [todayData, setTodayData] = useState([]);
   const [updateData, setUpdateData] = useState([]);
   const [totalIssueQuantity, setTotalIssueQty] = useState(0);
   const [totalRecvQuantity, setTotalRecvQty] = useState(0);
@@ -44,10 +46,14 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const [boxWt, setBoxWt] = useState(0);
   const [dateSelectOption, setDateSelectOption] = useState([]);
   const [currentSelectedDate, setCurrentSelectedDate] = useState(0);
-  // const [closingBalance, setClosingBalance] = useState(0);
   const latestDateValueRef = useRef();
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
+
+  const fetchRecords = async (page, pageSize) => {
+    setPage(page);
+    setItemsPerPage(pageSize);
+  };
 
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
@@ -90,201 +96,109 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     // console.log("value", value);
     if (!isNaN(parseFloat(value))){
       latestDateValueRef.current = value;
-      setCurrentSelectedDate(value);
-      updateRows("all");
+      setPage(1);
+      setItemsPerPage(20);
+      updateRows("valid", value);
     }
   };
 
   const handleOpeningChange = (event) => {
-    // console.log(event.target.value, isNaN(event.target.value))
     if (!isNaN(parseFloat(event.target.value))){
-      // console.log(event.target.value, parseFloat(event.target.value))
-      // setOpeningBalance(parseFloat(event.target.value));
-      // console.log(openingBalance);
-      // setClosingBalance((parseFloat(event.target.value) + parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(2));
-      // console.log((parseFloat(openingBalance) + parseFloat(totalRecvQuantity) - parseFloat(totalIssueQuantity)).toFixed(3));
-      // console.log(openingBalance, closingBalance);
     }
     else{
-      // setOpeningBalance(0);
-      // setClosingBalance((parseFloat(totalIssueQuantity) - parseFloat(totalRecvQuantity) - parseFloat(totalLossQuantity)).toFixed(2));
     }
   };
 
-  async function updateRows (dataType){
-
+  async function updateRows (dataType, cutoffDateNumber){
+    if (searchText !== ""){
+      return;
+    };
     setIsLoading(true);
+
+    if (dataState !== dataType){
+      setPage(1);
+    };
+    setDataState(dataType);
+
+    if (cutoffDateNumber !== currentSelectedDate){
+      setPage(1);
+    }
+    setCurrentSelectedDate(cutoffDateNumber);
+
     const token = localStorage.getItem("token");
-    const kareegarDetails =  await getKareegarData(page,itemsPerPage, token);
+    const kareegarDetails =  await getKareegarData(1,Number.MAX_SAFE_INTEGER, token);
     const kareegarUtilityData = kareegarDetails["data"];
     const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
     setBoxWt(kareegarData["boxWt"]);
 
     // send request to check authenticated
-    const data = [];
-    const deleted_data = [];
     const currentDateData = [];
     const today = dayjs();
-    // console.log("data", data)
 
-    const allData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
-    // const docs = allData.filter(item => item.is_editable_flag===true);
-    //console.log(allData, latestDateValueRef.current);
-    const docs = allData.filter(item => 
-      latestDateValueRef.current === dateSelectOption.length ? item.cutoffDateNumber === 0 : item.cutoffDateNumber === latestDateValueRef.current
-    );
-    //console.log("currentSelectedDate",allData, latestDateValueRef.current,dateSelectOption.length);
-    setFullData(docs);
+    const KareegarBookData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token, dataType, cutoffDateNumber);
+    const docs = KareegarBookData["data"];
+    const count = KareegarBookData["count"];
+    const totalQty = KareegarBookData["totalQty"];
+    setTotalCount(count);
 
-    for (let eachEntry in docs) {
-      if (docs[eachEntry].is_deleted_flag){
-        deleted_data.push(docs[eachEntry]);
-      }
-      else{
-        data.push(docs[eachEntry]);
-        if (today.isSame(dayjs(docs[eachEntry].date), 'day')){
-          currentDateData.push(docs[eachEntry]);
-        }
-      }
-    }
-    if (dataType === "all"){
-      docs.reverse();
-      setRows(docs);
-      let totalIssueQty = 0.0;
-      let totalRecvQty = 0.0;
-      let totalLossQty = 0.0;
-      let totalBeadsIssueQty = 0.0;
-      let totalBeadsRecvQty = 0.0;
-      data.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
-        // console.log(weight24k, receive22k, issue22k, loss22k);
-        if (isNaN(parseFloat(issue_wt))) {
-          issue_wt = 0; // Set it to zero if it's NaN
-        } 
-        if (isNaN(parseFloat(recv_wt))) {
-          recv_wt = 0; // Set it to zero if it's NaN
-        } 
-        if (isNaN(parseFloat(loss_wt))){
-          loss_wt = 0 // Set it to zero if it's NaN
-        }
-        if (isNaN(parseFloat(beads_issue_wt))){
-          beads_issue_wt = 0  // Set it to zero if it's NaN
-        }
-        if (isNaN(parseFloat(beads_recv_wt))){
-          beads_recv_wt = 0  // Set it to zero if it's NaN
-        }
-        totalIssueQty += parseFloat(issue_wt);
-        totalRecvQty += parseFloat(recv_wt);
-        totalLossQty += parseFloat(loss_wt);
-        totalBeadsIssueQty += parseFloat(beads_issue_wt);
-        totalBeadsRecvQty += parseFloat(beads_recv_wt);
-      });
-      // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-      setTotalIssueQty(totalIssueQty.toFixed(2));
-      setTotalRecvQty(totalRecvQty.toFixed(2));
-      setTotalLossQty(totalLossQty.toFixed(2));
-      setTotalBeadsIssueQty(totalBeadsIssueQty.toFixed(2));
-      setTotalBeadsRecvQty(totalBeadsRecvQty.toFixed(2));
-  
-    }
-    else if (dataType === "valid"){
-      data.reverse();
+    setRows(docs);
 
-      // setRows(currentDateData);
-      setRows(data);
-      let totalIssueQty = 0.0;
-      let totalRecvQty = 0.0;
-      let totalLossQty = 0.0;
-      let totalBeadsIssueQty = 0.0;
-      let totalBeadsRecvQty = 0.0;
-      data.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
-        // console.log(weight24k, receive22k, issue22k, loss22k);
-        if (isNaN(parseFloat(issue_wt))) {
-          issue_wt = 0; // Set it to zero if it's NaN
-        } 
-        if (isNaN(parseFloat(recv_wt))) {
-          recv_wt = 0; // Set it to zero if it's NaN
-        } 
-        if (isNaN(parseFloat(loss_wt))){
-          loss_wt = 0 // Set it to zero if it's NaN
-        }
-        if (isNaN(parseFloat(beads_issue_wt))){
-          beads_issue_wt = 0  // Set it to zero if it's NaN
-        }
-        if (isNaN(parseFloat(beads_recv_wt))){
-          beads_recv_wt = 0  // Set it to zero if it's NaN
-        }
-        totalIssueQty += parseFloat(issue_wt);
-        totalRecvQty += parseFloat(recv_wt);
-        totalLossQty += parseFloat(loss_wt);
-        totalBeadsIssueQty += parseFloat(beads_issue_wt);
-        totalBeadsRecvQty += parseFloat(beads_recv_wt);
-      });
-      // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-      setTotalIssueQty(totalIssueQty.toFixed(2));
-      setTotalRecvQty(totalRecvQty.toFixed(2));
-      setTotalLossQty(totalLossQty.toFixed(2));
-      setTotalBeadsIssueQty(totalBeadsIssueQty.toFixed(2));
-      setTotalBeadsRecvQty(totalBeadsRecvQty.toFixed(2));
-  
-    }
-    else if (dataType === "today"){
-      setRows(currentDateData);
-      let totalIssueQty = 0.0;
-      let totalRecvQty = 0.0;
-      let totalLossQty = 0.0;
-      let totalBeadsIssueQty = 0.0;
-      let totalBeadsRecvQty = 0.0;
-      currentDateData.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
-        // console.log(weight24k, receive22k, issue22k, loss22k);
-        if (isNaN(parseFloat(issue_wt))) {
-          issue_wt = 0; // Set it to zero if it's NaN
-        } 
-        if (isNaN(parseFloat(recv_wt))) {
-          recv_wt = 0; // Set it to zero if it's NaN
-        } 
-        if (isNaN(parseFloat(loss_wt))){
-          loss_wt = 0 // Set it to zero if it's NaN
-        }
-        if (isNaN(parseFloat(beads_issue_wt))){
-          beads_issue_wt = 0  // Set it to zero if it's NaN
-        }
-        if (isNaN(parseFloat(beads_recv_wt))){
-          beads_recv_wt = 0  // Set it to zero if it's NaN
-        }
-        totalIssueQty += parseFloat(issue_wt);
-        totalRecvQty += parseFloat(recv_wt);
-        totalLossQty += parseFloat(loss_wt);
-        totalBeadsIssueQty += parseFloat(beads_issue_wt);
-        totalBeadsRecvQty += parseFloat(beads_recv_wt);
-      });
-      // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-      setTotalIssueQty(totalIssueQty.toFixed(2));
-      setTotalRecvQty(totalRecvQty.toFixed(2));
-      setTotalLossQty(totalLossQty.toFixed(2));
-      setTotalBeadsIssueQty(totalBeadsIssueQty.toFixed(2));
-      setTotalBeadsRecvQty(totalBeadsRecvQty.toFixed(2));
-     
+    if (totalQty[0]["issue_wt"] === null){
+      setTotalIssueQty(Number(0).toFixed(2));
     }
     else{
-      deleted_data.reverse();
-      setRows(deleted_data);
-      let totalIssueQty = 0.0;
-      let totalRecvQty = 0.0;
-      let totalLossQty = 0.0;
-      let totalBeadsIssueQty = 0.0;
-      let totalBeadsRecvQty = 0.0;
-      // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-      setTotalIssueQty(totalIssueQty.toFixed(2));
-      setTotalRecvQty(totalRecvQty.toFixed(2));
-      setTotalLossQty(totalLossQty.toFixed(2));
-      setTotalBeadsIssueQty(totalBeadsIssueQty.toFixed(2));
-      setTotalBeadsRecvQty(totalBeadsRecvQty.toFixed(2));
-  
+      setTotalIssueQty(totalQty[0]["issue_wt"].toFixed(2));
     }
 
-    // setClosingBalance((totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+    if (totalQty[0]["recv_wt"] === null){
+      setTotalRecvQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalRecvQty(totalQty[0]["recv_wt"].toFixed(2));
+    }
+
+    if (totalQty[0]["loss_wt"] === null){
+      setTotalLossQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalLossQty(totalQty[0]["loss_wt"].toFixed(2));
+    }
+    
+    if (totalQty[0]["beads_issue_wt"] === null){
+      setTotalBeadsIssueQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalBeadsIssueQty(totalQty[0]["beads_issue_wt"].toFixed(2));
+    }
+    
+    if (totalQty[0]["beads_recv_wt"] === null){
+      setTotalBeadsRecvQty(Number(0).toFixed(2));
+    }
+    else{
+      setTotalBeadsRecvQty(totalQty[0]["beads_recv_wt"].toFixed(2));  
+    }
+    if (dataType === "today"){
+      for (let eachEntry in docs) {
+        if (!docs[eachEntry].is_deleted_flag){
+          if (today.isSame(dayjs(docs[eachEntry].date), 'day')){
+            currentDateData.push(docs[eachEntry]);
+          }
+        }
+      }
+
+      setRows(currentDateData);
+    }
+
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    (async () => {
+      if (!initialLoad){
+        updateRows(dataState, currentSelectedDate);
+      };
+    })();
+  }, [page, itemsPerPage]);
 
     useEffect(() => {
       const handleKeyDown = (event) => {
@@ -303,116 +217,37 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         window.addEventListener('keydown', handleKeyDown);
 
         (async () => {
-
+          if (searchText !== ""){
+            return;
+          };
         setIsLoading(true);
           
           const token = localStorage.getItem("token");
-          const kareegarDetails =  await getKareegarData(page,itemsPerPage, token);
+          const kareegarDetails =  await getKareegarData(1,Number.MAX_SAFE_INTEGER, token);
           const kareegarUtilityData = kareegarDetails["data"];
-          //console.log("kareegarUtilityData",kareegarUtilityData);
           const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
-          //console.log(kareegarId, kareegarData);
 
-          // console.log("kareegarUtilityData",kareegarData);
-
-          // console.log(typeof kareegarData.kareegarCutoffStartDate);
-          // const startDates = [...kareegarData.kareegarCutoffStartDate];
           const startDates = Array.isArray(kareegarData.kareegarCutoffStartDate) && kareegarData.kareegarCutoffStartDate.length > 0 
           ? [...kareegarData.kareegarCutoffStartDate] 
           : [dayjs("2000-01-01")];
 
           const endDates = [...kareegarData.kareegarCutoffEndDate];
 
-          // const startDates = kareegarData.kareegarCutoffStartDate || [dayjs("2000-01-01")];
-          // const endDates = kareegarData.kareegarCutoffEndDate || [];
           endDates.push("");
-          // console.log(startDates,endDates);
-          
-          // Example
-          // startDates = [2000, 2002, 2004, 2006]
-          // endDates = [2002, 2004, 2006]
-          // index = [1, 2, 3, 0]
           
           const combinedDates = [];
           for (let i = 0; i < startDates.length; i++) {
             combinedDates.push({ start: startDates[i], end: endDates[i] });
           }
-          // currentSelectedDate[-1]
-          //console.log(combinedDates);
           setDateSelectOption(combinedDates);
 
-          // console.log("combinedDates",combinedDates,kareegarData,startDates,endDates);
-          // let lastDate = combinedDates[combinedDates.length - 1];
-          // console.log("selectedDate",lastDate);
           latestDateValueRef.current = combinedDates.length;
           setCurrentSelectedDate(combinedDates.length);
+          setInitialLoad(false);
+          await updateRows(dataState, combinedDates.length);
+          
           setBoxWt(kareegarData["boxWt"]);
-    
-        // send request to check authenticated
-        const data = [];
-        const deleted_data = [];
-        const currentDateData = [];
-        const today = dayjs();
-        // console.log("data", data)
-
-        const allData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
-        const docs = allData.filter(item => item.is_editable_flag===true);
-        //console.log("filterData", docs);
-
-        setFullData(docs);
-
-        for (let eachEntry in docs) {
-          if (docs[eachEntry].is_deleted_flag){
-            deleted_data.push(docs[eachEntry]);
-          }
-          else{
-            data.push(docs[eachEntry]);
-            if (today.isSame(dayjs(docs[eachEntry].date), 'day')){
-              currentDateData.push(docs[eachEntry]);
-            }
-            // currentDateData.push()
-          }
-        }
-        // data.reverse();
-        currentDateData.reverse();
-        setRows(currentDateData);
-
-        let totalIssueQty = 0.0;
-        let totalRecvQty = 0.0;
-        let totalLossQty = 0.0;
-        let totalBeadsIssueQty = 0.0;
-        let totalBeadsRecvQty = 0.0;
-        currentDateData.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
-          // console.log(weight24k, receive22k, issue22k, loss22k);
-          if (isNaN(parseFloat(issue_wt))) {
-            issue_wt = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(recv_wt))) {
-            recv_wt = 0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(loss_wt))){
-            loss_wt = 0 // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(beads_issue_wt))){
-            beads_issue_wt = 0  // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(beads_recv_wt))){
-            beads_recv_wt = 0  // Set it to zero if it's NaN
-          }
-          totalIssueQty += parseFloat(issue_wt);
-          totalRecvQty += parseFloat(recv_wt);
-          totalLossQty += parseFloat(loss_wt);
-          totalBeadsIssueQty += parseFloat(beads_issue_wt);
-          totalBeadsRecvQty += parseFloat(beads_recv_wt);
-        });
-        // console.log(totalWeight, totalRecvQty, totalIssueQty,  totalLossQty)
-        setTotalIssueQty(totalIssueQty.toFixed(2));
-        setTotalRecvQty(totalRecvQty.toFixed(2));
-        setTotalLossQty(totalLossQty.toFixed(2));
-        setTotalBeadsIssueQty(totalBeadsIssueQty.toFixed(2));
-        setTotalBeadsRecvQty(totalBeadsRecvQty.toFixed(2));
-    
-        // setClosingBalance((totalIssueQty - totalRecvQty - totalLossQty).toFixed(2));
+        
         setIsLoading(false);
     })();
 
@@ -420,12 +255,9 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     return () => {
         window.removeEventListener('keydown', handleKeyDown);
     };
-    }, [page, itemsPerPage]);
-
+    }, []);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCutoffDateModalOpen, setIsCutoffDateModalOpen] = useState(false);
@@ -442,7 +274,6 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   }
 
   const showAddPopup = (text) => {
-    // console.log(text);
     setIsEditModalOpen(true);
     setUpdateData(text)
   };
@@ -466,11 +297,10 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     
     const data = [];
     const deleted_data = [];
-    // console.log("data", data)
 
-    const allData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
-    const docs = allData.filter(item => item.is_editable_flag===true);
-    //console.log("filterData", docs);
+    const allData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token, "valid", 0);
+    const docs = allData["data"];
+    const totalQty = allData["totalQty"];
 
     for (let eachEntry in docs) {
       if (docs[eachEntry].is_deleted_flag){
@@ -485,29 +315,41 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     let totalLossQty = 0.0;
     let totalBeadsIssueQty = 0.0;
     let totalBeadsRecvQty = 0.0;
-    data.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
-      // console.log(weight24k, receive22k, issue22k, loss22k);
-      if (isNaN(parseFloat(issue_wt))) {
-        issue_wt = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(recv_wt))) {
-        recv_wt = 0; // Set it to zero if it's NaN
-      } 
-      if (isNaN(parseFloat(loss_wt))){
-        loss_wt = 0 // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(beads_issue_wt))){
-        beads_issue_wt = 0  // Set it to zero if it's NaN
-      }
-      if (isNaN(parseFloat(beads_recv_wt))){
-        beads_recv_wt = 0  // Set it to zero if it's NaN
-      }
-      totalIssueQty += parseFloat(issue_wt);
-      totalRecvQty += parseFloat(recv_wt);
-      totalLossQty += parseFloat(loss_wt);
-      totalBeadsIssueQty += parseFloat(beads_issue_wt);
-      totalBeadsRecvQty += parseFloat(beads_recv_wt);
-    });
+
+    if (totalQty[0]["issue_wt"] === null){
+      totalIssueQty = Number(0).toFixed(2);
+    }
+    else{
+      totalIssueQty = totalQty[0]["issue_wt"].toFixed(2);
+    }
+
+    if (totalQty[0]["recv_wt"] === null){
+      totalRecvQty = Number(0).toFixed(2);
+    }
+    else{
+      totalRecvQty = totalQty[0]["recv_wt"].toFixed(2);
+    }
+
+    if (totalQty[0]["loss_wt"] === null){
+      totalLossQty = Number(0).toFixed(2);
+    }
+    else{
+      totalLossQty = totalQty[0]["loss_wt"].toFixed(2);
+    }
+    
+    if (totalQty[0]["beads_issue_wt"] === null){
+      totalBeadsIssueQty = Number(0).toFixed(2);
+    }
+    else{
+      totalBeadsIssueQty = totalQty[0]["beads_issue_wt"].toFixed(2);
+    }
+    
+    if (totalQty[0]["beads_recv_wt"] === null){
+      totalBeadsRecvQty = Number(0).toFixed(2);
+    }
+    else{
+      totalBeadsRecvQty = totalQty[0]["beads_recv_wt"].toFixed(2);  
+    }
 
     const backendData = {
       kareegar_id: kareegarId,
@@ -528,7 +370,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     }
     await postLossAcct(lossData, token)
 
-    const kareegarDetails =  await getKareegarData(page,itemsPerPage, token);
+    const kareegarDetails =  await getKareegarData(1,Number.MAX_SAFE_INTEGER, token);
     const kareegarUtilityData = kareegarDetails["data"];
     const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
     //console.log(kareegarUtilityData,kareegarData);
@@ -539,8 +381,6 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     }
     //console.log("updatedKareegarDetail",updatedKareegarDetail);
     await closeKareegarBook(updatedKareegarDetail, token);
-    
-    updateRows("today");
 
     const newKareegarCutoffStartDate = [...kareegarData.kareegarCutoffStartDate];
     let startDateLength = newKareegarCutoffStartDate.length;
@@ -568,6 +408,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     }
     // // console.log(balance);
     await updateKareegarDetail(kareegarBalanceData, token);
+    updateRows("today", currentSelectedDate);
     setKareegarDetailsPage(true);
     setIsCutoffDateModalOpen(false);
     setIsLoading(false);
@@ -576,23 +417,24 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const deleteModal = async () => {
     setIsLoading(true);
     const token = localStorage.getItem("token");
-    const kareegarDetails =  await getKareegarData(page,itemsPerPage, token);
+    const kareegarDetails =  await getKareegarData(1,Number.MAX_SAFE_INTEGER, token);
     const data = kareegarDetails["data"];
     const kareegarData = data.find(item => item._id === kareegarId);
     let balance = parseFloat(kareegarData["balance"]);
     let beads_balance = parseFloat(kareegarData["beads_balance"]);
-    // console.log(kareegarData, balance);
     const lossAcctData = await fetchLossAcctList(page, itemsPerPage, token);
     const lossIds = [];
-    // console.log(lossAcctData);
-    // console.log(selectedRowKeys);
 
-    const docs = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
+    const kareegarDetail =  await getKareegarData(1,Number.MAX_SAFE_INTEGER, token);
+    const kareegarUtilityData = kareegarDetail["data"];
+    const kareegarDetailData = kareegarUtilityData.find(item => item._id === kareegarId);
+
+    const allData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token, "valid", kareegarDetailData.kareegarCutoffStartDate.length);
+    const docs = allData["data"];
 
     selectedRowKeys.map((item, index) => {
       for (let i = 0; i < docs.length; i++) {
         if (docs[i]["_id"] === item && !docs[i]["is_deleted_flag"]){
-          // console.log("row", docs[i]);
           if (docs[i]["type"] === "Issue"){
               balance -= parseFloat(docs[i]["issue_wt"]);
               if (docs[i]["beads_issue_wt"] !== "" && !isNaN(docs[i]["beads_issue_wt"])){
@@ -626,17 +468,14 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           if (!isNaN(docs[i]["loss_wt"]) && docs[i]["loss_wt"] !== "") {
             balance += parseFloat(docs[i]["loss_wt"]);
             const matchedData = lossAcctData.find(row => row.transactionId === item && row.type === "Kareegar")
-            // console.log(item, matchedData, docs[i]);
             if (matchedData){
               lossIds.push(matchedData._id);  
             }
           }
-          // console.log("balance", balance, beads_balance);
         }
       }
     })
 
-    // console.log(lossIds);
     const deleteFromLossAcct = {
       lossId: lossIds,
     }
@@ -647,23 +486,21 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       "balance": balance.toFixed(2),
       "beads_balance": beads_balance.toFixed(2)
     }
-    // console.log(balance);
     await updateKareegarBalance(kareegarBalanceData, token);
 
     const kareegarBookId = {
       "kareegarBookId": selectedRowKeys
     }
     
-    // console.log(meltingBookId);
     await deleteKareegarBookList(kareegarBookId, token);
 
-    updateRows("today");
     setSelectedRowKeys([]);
+    await updateRows("today", currentSelectedDate);
     setIsDeleteModalOpen(false);
     setIsLoading(false);
   }
+  
   const handleCancel = () => {
-    // updateRows("valid");
     setIsBoxWtModalOpen(false);
     setIsEditModalOpen(false);
     setIsModalOpen(false);
@@ -673,7 +510,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   };
 
   const handleUpdateClose = () => {
-    updateRows("today");
+    updateRows("today", currentSelectedDate);
     setIsBoxWtModalOpen(false);
     setIsModalOpen(false);
     setIsEditModalOpen(false);
@@ -685,11 +522,16 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const handleSearch = (selectedKeys, confirm, dataIndex, close) => {
-    // console.log(selectedKeys, confirm, dataIndex)
+  const handleSearch = async(selectedKeys, confirm, dataIndex, close) => {
+    setIsLoading(true);
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+    let array = [];
 
-    // updateRows("valid");
-    const array = [];
+    const token = localStorage.getItem("token");
+
+    let allData = await fetchKareegarBookList(1, Number.MAX_SAFE_INTEGER, kareegarId, token, dataState, currentSelectedDate);
+    let fullData = allData["data"];
 
     fullData.forEach(function (user){
       if (user[dataIndex]){
@@ -705,17 +547,22 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         }
     }
     });
-    array.reverse();
+
     setRows(array);
-    // confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-    close()
+    setTotalCount(array.length);
+    setPage(1);
+    setItemsPerPage(array.length);
+    close();
+    setIsLoading(false);
   };
+
   const handleReset = (clearFilters, close) => {
     clearFilters();
-    updateRows("valid");
+    updateRows("valid", currentSelectedDate);
     setSearchText('');
+    setSearchedColumn('');
+    setDataState("valid");
+    setItemsPerPage(20);
     close();
   };
 
@@ -874,7 +721,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
             </div>
           ),
           width: '10%',
-          ...getColumnSearchProps('issue22k'),
+          ...getColumnSearchProps('issue_wt'),
           align: 'right',
         },
         {
@@ -886,7 +733,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
             </div>
           ),
           width: '10%',
-          ...getColumnSearchProps('receive22k'),    
+          ...getColumnSearchProps('recv_wt'),    
           align: 'right',
         },
         {
@@ -898,7 +745,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
             </div>
           ),
           width: '10%',
-          ...getColumnSearchProps('loss22k'),
+          ...getColumnSearchProps('loss_wt'),
           align: 'right',
         }
       ]
@@ -915,7 +762,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
             </div>
           ),
           width: '10%',
-          ...getColumnSearchProps('issue22k'),
+          ...getColumnSearchProps('beads_issue_wt'),
           align: 'right',
         },
         {
@@ -927,7 +774,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
             </div>
           ),
           width: '10%',
-          ...getColumnSearchProps('receive22k'),  
+          ...getColumnSearchProps('beads_recv_wt'),  
           align: 'right',  
         }
       ]
@@ -957,20 +804,21 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     setSelectedRowKeys();
   }
 
-  const SelectAll = () => {
-    const array = [];
+  const SelectAll = async() => {
+    setIsLoading(true);
 
-    rows.forEach( function(number){
-      if (number.is_deleted_flag === false){
-        array.push(number._id);
-      }
-    }
-    )
+    const token = localStorage.getItem("token");
+
+    const allKareegarData = await fetchKareegarBookList(1, Number.MAX_SAFE_INTEGER, kareegarId, token, "valid", currentSelectedDate);
+    const docs = allKareegarData["data"];
+
+    const array = docs.map(({ _id }) => _id);
+
     setSelectedRowKeys(array);
+    setIsLoading(false);
   }
 
   const onSelectChange = (newSelectedRowKeys) => {
-    // console.log('selectedRowKeys changed: ', newSelectedRowKeys);
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
@@ -995,19 +843,19 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       {
         key: 'deleted',
         text: 'Show Deleted',
-        onSelect: ()=> {updateRows("deleted")},
+        onSelect: ()=> {updateRows("deleted", currentSelectedDate)},
         
       },
       {
         key: 'all_entries',
         text: 'Show All',
-        onSelect: ()=> {updateRows("all")},
+        onSelect: ()=> {updateRows("all", currentSelectedDate)},
         
       },
       {
         key: 'valid',
         text: 'Show Valid',
-        onSelect: ()=> {updateRows("valid")},
+        onSelect: ()=> {updateRows("valid", currentSelectedDate)},
       }
     ],
   };
@@ -1060,7 +908,6 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
                 <div className="mt-1 flex justify-between items-center h-12">
                   <span className="text-[#00203FFF] whitespace-nowrap w-76 font-medium bg-[#ABD6DFFF] h-12 p-2">
                   Close Daily Account: <PlusCircleOutlined className="ml-12 float-end" style={{ fontSize:"125%"}} onClick={showCompleteModal}/> 
-                   {/* <input className="ml-3 text-[#00203FFF] text-lg	h-7 text-right px-2 w-32 border-current border-0 bg-[#ABD6DFFF] outline-blue-50 outline focus:ring-offset-white focus:ring-white focus:shadow-white " readOnly={true} value={closingBalance}/> */}
                     </span>
                     <Tooltip title="Delete" placement="bottomRight">
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
@@ -1072,8 +919,6 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
                   <Select
                   selectorBg="#ABD6DF"
                   value={currentSelectedDate}
-                  //value={`${getFormattedDate(dateSelectOption[dateSelectOption.length - 1].start)} - ${dateSelectOption[dateSelectOption.length - 1].end && dateSelectOption[dateSelectOption.length - 1].end !== "" ? getFormattedDate(dateSelectOption[dateSelectOption.length - 1].end) : 'Current'}`}
-                    //String(getFormattedDate(dateSelectOption[dateSelectOption.length-1].start) + " - " + "Present")}
                   onChange={handleDateChange}
                   style={{
                     width: '180px',
@@ -1146,7 +991,6 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       >
               Are you sure you want to make today cutoff date? <br />
               This will hide all previous entries. <br />
-              {/* Total Loss for this month = {(totalIssueQuantity-totalRecvQuantity-totalLossQuantity).toFixed(2)} */}
         <div className="flex justify-center	">
         <Button className="bg-[#ABD6DFFF] mr-2 text-black hover:!bg-gray-800 hover:!text-white active:!bg-gray-800 active:!text-white focus-visible:!outline-none" onClick={enterCutoffDate}>
             Yes
@@ -1233,7 +1077,11 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         rowKey="_id"
         scroll={{ x: 'calc(100vh - 4em)' }}
         pagination={isPaginationEnabled ? 
-          { defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000']} : 
+          { defaultPageSize: itemsPerPage, current: page ,showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100', '1000'], total:totalCount, 
+            onChange: (page, pageSize) => {
+              fetchRecords(page, pageSize);
+            }
+          } : 
           false
         }
         footer={isPaginationEnabled ? false : () => (
@@ -1246,9 +1094,6 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
             <>
               <Table.Summary.Row className="footer-row font-bold	text-center text-lg bg-[#ABD6DFFF]">
                 <Table.Summary.Cell index={0} className="" colSpan={4}>Total</Table.Summary.Cell>
-                {/* <Table.Summary.Cell index={4}></Table.Summary.Cell> */}
-                {/* <Table.Summary.Cell index={5}></Table.Summary.Cell> */}
-                {/* <Table.Summary.Cell index={6}></Table.Summary.Cell> */}
                 <Table.Summary.Cell index={7}></Table.Summary.Cell>
                 <Table.Summary.Cell index={8}>
                   {totalIssueQuantity}

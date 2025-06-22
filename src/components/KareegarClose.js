@@ -10,8 +10,6 @@ import { fetchKareegarBookList } from "../api/kareegarBook.js";
 
 function KareegarClose({ kareegarId, handleOk}){
     const [form] = Form.useForm();
-    const [page] = useState(1);
-    const [itemsPerPage] = useState(10000000000);
     const [isLoading, setIsLoading] = useState(false);
     const [currentDate] = useState(dayjs()); // Initialize with Day.js
 
@@ -69,50 +67,57 @@ function KareegarClose({ kareegarId, handleOk}){
         } = user;
 
 
-        const currentKareegarAllData = await fetchKareegarBookList(page, itemsPerPage, kareegarId, token);
-        //console.log("test",currentKareegarAllData);
-        let currentKareegarData = [];
+        const kareegarDetails =  await getKareegarData(1,Number.MAX_SAFE_INTEGER, token);
+        const kareegarUtilityData = kareegarDetails["data"];
+        const thiskareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
 
-        for (let eachEntry in currentKareegarAllData) {
-          // console.log(allData[eachEntry].is_editable_flag);
-          if (currentKareegarAllData[eachEntry].is_deleted_flag === false && (currentKareegarAllData[eachEntry].is_editable_flag === true)){
-            currentKareegarData.push(currentKareegarAllData[eachEntry]);
-          }
-        }
+        const allKareegarData = await fetchKareegarBookList(1,Number.MAX_SAFE_INTEGER, kareegarId, token, "valid", thiskareegarData.kareegarCutoffStartDate.length);
+        const totalQty = allKareegarData["totalQty"];
 
         let currentKareegarIssueQty = 0.0;
         let currentKareegarRecvQty = 0.0;
         let currentKareegarLossQty = 0.0;
         let currentKareegarBeadsIssueQty = 0.0;
         let currentKareegarBeadsRecvQty = 0.0;
-        currentKareegarData.forEach(({ issue_wt, recv_wt, loss_wt, beads_issue_wt, beads_recv_wt}) => {
-          // console.log(weight24k, receive22k, issue22k, loss22k);
-          if (isNaN(parseFloat(issue_wt))) {
-            issue_wt = 0.0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(recv_wt))) {
-            recv_wt = 0.0; // Set it to zero if it's NaN
-          } 
-          if (isNaN(parseFloat(loss_wt))){
-            loss_wt = 0.0; // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(beads_issue_wt))){
-            beads_issue_wt = 0.0;  // Set it to zero if it's NaN
-          }
-          if (isNaN(parseFloat(beads_recv_wt))){
-            beads_recv_wt = 0.0; // Set it to zero if it's NaN
-          }
-          currentKareegarIssueQty += parseFloat(issue_wt);
-          currentKareegarRecvQty += parseFloat(recv_wt);
-          currentKareegarLossQty += parseFloat(loss_wt);
-          currentKareegarBeadsIssueQty += parseFloat(beads_issue_wt);
-          currentKareegarBeadsRecvQty += parseFloat(beads_recv_wt);
-        });
+        if (totalQty[0]["issue_wt"] === null){
+          currentKareegarIssueQty = Number(0).toFixed(2);
+        }
+        else{
+          currentKareegarIssueQty = totalQty[0]["issue_wt"].toFixed(2);
+        }
+
+        if (totalQty[0]["recv_wt"] === null){
+          currentKareegarRecvQty = Number(0).toFixed(2);
+        }
+        else{
+          currentKareegarRecvQty = totalQty[0]["recv_wt"].toFixed(2);
+        }
+
+        if (totalQty[0]["loss_wt"] === null){
+          currentKareegarLossQty = Number(0).toFixed(2);
+        }
+        else{
+          currentKareegarLossQty = totalQty[0]["loss_wt"].toFixed(2);
+        }
+        
+        if (totalQty[0]["beads_issue_wt"] === null){
+          currentKareegarBeadsIssueQty = Number(0).toFixed(2);
+        }
+        else{
+          currentKareegarBeadsIssueQty = totalQty[0]["beads_issue_wt"].toFixed(2);
+        }
+        
+        if (totalQty[0]["beads_recv_wt"] === null){
+          currentKareegarBeadsRecvQty = Number(0).toFixed(2);
+        }
+        else{
+          currentKareegarBeadsRecvQty = totalQty[0]["beads_recv_wt"].toFixed(2);  
+        }
 
         let balance = parseFloat(currentKareegarIssueQty - currentKareegarRecvQty - currentKareegarLossQty).toFixed(2);
         let beads_balance = parseFloat(currentKareegarBeadsIssueQty - currentKareegarBeadsRecvQty).toFixed(2);
 
-        const allKareegarDetails = await getKareegarData(1, 100000000, token);
+        const allKareegarDetails = await getKareegarData(1, Number.MAX_SAFE_INTEGER, token);
         const data = allKareegarDetails["data"];
         const kareegarData = data.find(item => item._id === kareegarId);
         let boxWt = parseFloat(kareegarData.boxWt);

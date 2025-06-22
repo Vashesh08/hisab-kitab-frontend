@@ -32,7 +32,12 @@ function KareegarAddItems({ kareegarId, handleOk}) {
   useEffect(() => {
     (async () => {
       const token = localStorage.getItem("token");
-      const docs =  await fetchKareegarBookList(1,100000000, kareegarId, token);
+      const kareegarDetails =  await getKareegarData(1,Number.MAX_SAFE_INTEGER, token);
+      const kareegarUtilityData = kareegarDetails["data"];
+      const kareegarData = kareegarUtilityData.find(item => item._id === kareegarId);
+
+      const allKareegarData = await fetchKareegarBookList(1,1, kareegarId, token, "valid", kareegarData.kareegarCutoffStartDate.length);
+      const docs = allKareegarData["data"];
       // console.log(docs)
       if (docs.length > 0){
         const lastEntry = docs[docs.length - 1];
@@ -98,7 +103,7 @@ function KareegarAddItems({ kareegarId, handleOk}) {
       beads_recv_wt,
     } = user;
 
-    const allKareegarDetails = await getKareegarData(1, 100000000, token);
+    const allKareegarDetails = await getKareegarData(1, Number.MAX_SAFE_INTEGER, token);
     const data = allKareegarDetails["data"];
     const kareegarData = data.find(item => item._id === kareegarId);
     

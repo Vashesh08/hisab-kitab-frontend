@@ -2,8 +2,8 @@
 import convertObjectToFormData from "../utils/convertObjectToFormData";
 import config from '../config';
 
-export async function fetchKareegarBookList(page, itemsPerPage, kareegar_id, token) {
-    const response = await fetch(`${config.API_URL}/admin/kareegarBook-list?page=${page}&itemsPerPage=${itemsPerPage}&kareegar_id=${kareegar_id}`, {
+export async function fetchKareegarBookList(page, itemsPerPage, kareegar_id, token, isDeleted, cutoffDateNumber) {
+    const response = await fetch(`${config.API_URL}/admin/kareegarBook-list?page=${page}&itemsPerPage=${itemsPerPage}&kareegar_id=${kareegar_id}&state=${isDeleted}&cutoffDateNumber=${cutoffDateNumber}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,

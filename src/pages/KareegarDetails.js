@@ -21,7 +21,7 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         setIsLoading(true);
 
         const token = localStorage.getItem("token");
-        const allKareegarDetails = await getKareegarData(1, 100000000, token);
+        const allKareegarDetails = await getKareegarData(1, Number.MAX_SAFE_INTEGER, token);
         const data = allKareegarDetails["data"];
         const KareegarBalanceDetails = allKareegarDetails["totalQty"];
         let kareegarDetails = [];
@@ -89,8 +89,12 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
             "kareegarIds": selectedKareegarId
         }
 
-        const docs = await fetchKareegarBookList(1, 100000000, selectedKareegarId, token);
-        const allKareegarDetails = await getKareegarData(1, 100000000, token);
+        const allKareegarDetails =  await getKareegarData(1,Number.MAX_SAFE_INTEGER, token);
+        const kareegarUtilityData = allKareegarDetails["data"];
+        const kareegarDataDetail = kareegarUtilityData.find(item => item._id === selectedKareegarId);
+        const allKareegarData = await fetchKareegarBookList(1,Number.MAX_SAFE_INTEGER, selectedKareegarId, token, "valid", kareegarDataDetail.kareegarCutoffStartDate.length);
+        const docs = allKareegarData["data"];
+
         await deleteKareegarData(kareegarDataId, token);
         const data = allKareegarDetails["data"];
 
@@ -146,7 +150,7 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
           
           await deleteKareegarBookList(kareegarBookId, token);
 
-          const fullKareegarDetails = await getKareegarData(1, 100000000, token);
+          const fullKareegarDetails = await getKareegarData(1, Number.MAX_SAFE_INTEGER, token);
           const fullKareegarDetailsData = fullKareegarDetails["data"];
           const KareegarBalanceDetails = fullKareegarDetails["totalQty"];
           let kareegarDetails = [];
@@ -197,7 +201,7 @@ export default function KareegarDetails({ setKareegarId, setKareegarDetailsPage,
         (async () => {
             setIsLoading(true);
             const token = localStorage.getItem("token");
-            const allKareegarDetails = await getKareegarData(1, 100000000, token);
+            const allKareegarDetails = await getKareegarData(1, Number.MAX_SAFE_INTEGER, token);
             const data = allKareegarDetails["data"];
             const KareegarBalanceDetails = allKareegarDetails["totalQty"];
             let kareegarDetails = [];
