@@ -104,35 +104,35 @@ const ManishKareegarBook = () => {
 
     setRows(docs);
 
-    if (totalQty[0]["manishTarpattaReceive"][0]["manishTarpattaReceive"] === null){
+    if (totalQty[0]["manishTarpattaReceive"].length === 0 || totalQty[0]["manishTarpattaReceive"][0]["manishTarpattaReceive"] === null){
         setTarpattaRecvBalance(Number(0).toFixed(2));
     }
     else{
         setTarpattaRecvBalance(totalQty[0]["manishTarpattaReceive"][0]["manishTarpattaReceive"].toFixed(2));      
     }
 
-    if (totalQty[0]["manishReceive"][0]["manishReceive"] === null){
+    if (totalQty[0]["manishReceive"].length === 0 || totalQty[0]["manishReceive"][0]["manishReceive"] === null){
         setReceiveBalance(Number(0).toFixed(2));
     }
     else{
         setReceiveBalance(totalQty[0]["manishReceive"][0]["manishReceive"].toFixed(2));      
     }
 
-        if (totalQty[0]["manishIssue"][0]["manishIssue"] === null){
+    if (totalQty[0]["manishIssue"].length === 0 || totalQty[0]["manishIssue"][0]["manishIssue"] === null){
         setIssueBalance(Number(0).toFixed(2));
     }
     else{
         setIssueBalance(totalQty[0]["manishIssue"][0]["manishIssue"].toFixed(2));      
     }
 
-    if (totalQty[0]["manishBhuka"][0]["manishBhuka"] === null){
+    if (totalQty[0]["manishBhuka"].length === 0 || totalQty[0]["manishBhuka"][0]["manishBhuka"] === null){
         setBhukaBalance(Number(0).toFixed(2));
     }
     else{
         setBhukaBalance(totalQty[0]["manishBhuka"][0]["manishBhuka"].toFixed(2));      
     }
 
-    if (totalQty[0]["manishLoss"][0]["manishLoss"] === null){
+    if (totalQty[0]["manishLoss"].length === 0 || totalQty[0]["manishLoss"][0]["manishLoss"] === null){
         setLossBalance(Number(0).toFixed(2));
     }
     else{

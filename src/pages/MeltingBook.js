@@ -117,35 +117,35 @@ const MeltingBook = () => {
 
     setRows(docs);
 
-    if (totalQty[0]["weight24k"][0]["weight24k"] === null){
+    if (totalQty[0]["weight24k"].length === 0 || totalQty[0]["weight24k"][0]["weight24k"] === null){
         setTotalWeight(Number(0).toFixed(2));
     }
     else{
         setTotalWeight(totalQty[0]["weight24k"][0]["weight24k"].toFixed(2));      
     }
 
-    if (totalQty[0]["issue22k"][0]["issue22k"] === null){
+    if (totalQty[0]["issue22k"].length === 0 || totalQty[0]["issue22k"][0]["issue22k"] === null){
         setTotalIssueQty(Number(0).toFixed(2));
     }
     else{
         setTotalIssueQty(totalQty[0]["issue22k"][0]["issue22k"].toFixed(2));
     }
     
-    if (totalQty[0]["issue22kActual"][0]["issue22kActual"] === null){
+    if (totalQty[0]["issue22kActual"].length === 0 || totalQty[0]["issue22kActual"][0]["issue22kActual"] === null){
         setTotalIssueActualQty(Number(0).toFixed(2));
     }
     else{
         setTotalIssueActualQty(totalQty[0]["issue22kActual"][0]["issue22kActual"].toFixed(2));
     }
 
-    if (totalQty[0]["receive22k"][0]["receive22k"] === null){
+    if (totalQty[0]["receive22k"].length === 0 || totalQty[0]["receive22k"][0]["receive22k"] === null){
         setTotalRecvQty(Number(0).toFixed(2));
     }
     else{
         setTotalRecvQty(totalQty[0]["receive22k"][0]["receive22k"].toFixed(2));
     }
 
-    if (totalQty[0]["loss22k"][0]["loss22k"] === null){
+    if (totalQty[0]["loss22k"].length === 0 || totalQty[0]["loss22k"][0]["loss22k"] === null){
         setTotalLossQty(Number(0).toFixed(2));
     }
     else{

@@ -104,35 +104,35 @@ const GovindTarPattaBook = () => {
 
     setRows(docs);
 
-    if (totalQty[0]["meltingWeight"][0]["meltingWeight"] === null){
+    if (totalQty[0]["meltingWeight"].length === 0 || totalQty[0]["meltingWeight"][0]["meltingWeight"] === null){
         setMeltingWtBalance(Number(0).toFixed(2));
     }
     else{
         setMeltingWtBalance(totalQty[0]["meltingWeight"][0]["meltingWeight"].toFixed(2));      
     }
 
-    if (totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"] === null){
+    if (totalQty[0]["tarpattaReceive"].length === 0 || totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"] === null){
         setReceiveBalance(Number(0).toFixed(2));
     }
     else{
         setReceiveBalance(totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"].toFixed(2));
     }
 
-    if (totalQty[0]["tarpattaIssue"][0]["tarpattaIssue"] === null){
+    if (totalQty[0]["tarpattaIssue"].length === 0 || totalQty[0]["tarpattaIssue"][0]["tarpattaIssue"] === null){
         setIssueBalance(Number(0).toFixed(2));
     }
     else{
         setIssueBalance(totalQty[0]["tarpattaIssue"][0]["tarpattaIssue"].toFixed(2));      
     }
 
-    if (totalQty[0]["tarpattaBhuka"][0]["tarpattaBhuka"] === null){
+    if (totalQty[0]["tarpattaBhuka"].length === 0 || totalQty[0]["tarpattaBhuka"][0]["tarpattaBhuka"] === null){
         setBhukaBalance(Number(0).toFixed(2));
     }
     else{
         setBhukaBalance(totalQty[0]["tarpattaBhuka"][0]["tarpattaBhuka"].toFixed(2));      
     }
 
-    if (totalQty[0]["tarpattaLoss"][0]["tarpattaLoss"] === null){
+    if (totalQty[0]["tarpattaLoss"].length === 0 || totalQty[0]["tarpattaLoss"][0]["tarpattaLoss"] === null){
         setLossBalance(Number(0).toFixed(2));
     }
     else{

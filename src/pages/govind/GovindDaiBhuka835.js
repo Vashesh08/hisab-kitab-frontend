@@ -101,21 +101,21 @@ const GovindDaiBhuka835 = () => {
 
     setRows(docs);
 
-    if (totalQty[0]["machine835Issue"][0]["machine835Issue"] === null){
+    if (totalQty[0]["machine835Issue"].length === 0 || totalQty[0]["machine835Issue"][0]["machine835Issue"] === null){
         setMachineIssueBalance(Number(0).toFixed(2));
     }
     else{
         setMachineIssueBalance(totalQty[0]["machine835Issue"][0]["machine835Issue"].toFixed(2));      
     }
 
-    if (totalQty[0]["daiBhuka835Dai"][0]["daiBhuka835Dai"] === null){
+    if (totalQty[0]["daiBhuka835Dai"].length === 0 || totalQty[0]["daiBhuka835Dai"][0]["daiBhuka835Dai"] === null){
         setDaiBhukaDaiBalance(Number(0).toFixed(2));
     }
     else{
         setDaiBhukaDaiBalance(totalQty[0]["daiBhuka835Dai"][0]["daiBhuka835Dai"].toFixed(2));      
     }
 
-    if (totalQty[0]["daiBhuka835Bhuka"][0]["daiBhuka835Bhuka"] === null){
+    if (totalQty[0]["daiBhuka835Bhuka"].length === 0 || totalQty[0]["daiBhuka835Bhuka"][0]["daiBhuka835Bhuka"] === null){
         setDaiBhukaBhukaBalance(Number(0).toFixed(2));
     }
     else{

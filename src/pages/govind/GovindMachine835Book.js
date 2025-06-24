@@ -103,28 +103,28 @@ const GovindMachine835Book = () => {
 
     setRows(docs);
 
-    if (totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"] === null){
+    if (totalQty[0]["tarpattaReceive"].length === 0 || totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"] === null){
         setTarpattaRecvBalance(Number(0).toFixed(2));
     }
     else{
         setTarpattaRecvBalance(totalQty[0]["tarpattaReceive"][0]["tarpattaReceive"].toFixed(2));      
     }
 
-    if (totalQty[0]["machine835Receive"][0]["machine835Receive"] === null){
+    if (totalQty[0]["machine835Receive"].length === 0 || totalQty[0]["machine835Receive"][0]["machine835Receive"] === null){
         setReceiveBalance(Number(0).toFixed(2));
     }
     else{
         setReceiveBalance(totalQty[0]["machine835Receive"][0]["machine835Receive"].toFixed(2));      
     }
 
-    if (totalQty[0]["machine835Issue"][0]["machine835Issue"] === null){
+    if (totalQty[0]["machine835Issue"].length === 0 || totalQty[0]["machine835Issue"][0]["machine835Issue"] === null){
         setIssueBalance(Number(0).toFixed(2));
     }
     else{
         setIssueBalance(totalQty[0]["machine835Issue"][0]["machine835Issue"].toFixed(2));      
     }
 
-    if (totalQty[0]["machine835Loss"][0]["machine835Loss"] === null){
+    if (totalQty[0]["machine835Loss"].length === 0 || totalQty[0]["machine835Loss"][0]["machine835Loss"] === null){
         setLossBalance(Number(0).toFixed(2));
     }
     else{

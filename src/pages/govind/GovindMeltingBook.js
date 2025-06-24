@@ -116,35 +116,35 @@ const GovindMeltingBook = () => {
 
     setRows(docs);
 
-    if (totalQty[0]["meltingWeight"][0]["meltingWeight"] === null){
+    if (totalQty[0]["meltingWeight"].length === 0 || totalQty[0]["meltingWeight"][0]["meltingWeight"] === null){
         setTotalWeight(Number(0).toFixed(2));
     }
     else{
         setTotalWeight(totalQty[0]["meltingWeight"][0]["meltingWeight"].toFixed(2));      
     }
 
-    if (totalQty[0]["meltingReceive"][0]["meltingReceive"] === null){
+    if (totalQty[0]["meltingReceive"].length === 0 || totalQty[0]["meltingReceive"][0]["meltingReceive"] === null){
         setTotalRecvQty(Number(0).toFixed(2));
     }
     else{
         setTotalRecvQty(totalQty[0]["meltingReceive"][0]["meltingReceive"].toFixed(2));      
     }
 
-    if (totalQty[0]["meltingIssue"][0]["meltingIssue"] === null){
+    if (totalQty[0]["meltingIssue"].length === 0 || totalQty[0]["meltingIssue"][0]["meltingIssue"] === null){
         setTotalIssueQty(Number(0).toFixed(2));
     }
     else{
         setTotalIssueQty(totalQty[0]["meltingIssue"][0]["meltingIssue"].toFixed(2));      
     }
 
-    if (totalQty[0]["meltingIssueActual"][0]["meltingIssueActual"] === null){
+    if (totalQty[0]["meltingIssueActual"].length === 0 || totalQty[0]["meltingIssueActual"][0]["meltingIssueActual"] === null){
         setTotalIssueActualQty(Number(0).toFixed(2));
     }
     else{
         setTotalIssueActualQty(totalQty[0]["meltingIssueActual"][0]["meltingIssueActual"].toFixed(2));      
     }
 
-    if (totalQty[0]["meltingLoss"][0]["meltingLoss"] === null){
+    if (totalQty[0]["meltingLoss"].length === 0 || totalQty[0]["meltingLoss"][0]["meltingLoss"] === null){
         setTotalLossQty(Number(0).toFixed(2));
     }
     else{
