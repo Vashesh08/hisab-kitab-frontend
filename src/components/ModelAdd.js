@@ -117,6 +117,7 @@ function ModelAdd({handleOk}) {
         type: "Issue",
         date: dayjs(date, "YYYY-MM-DD"),
         // category: goodsType,
+        category: metal,
         description,
         weight: issueweight,
         issuer: issuerName,
@@ -125,11 +126,43 @@ function ModelAdd({handleOk}) {
         issue22k: (issueWtRounded).toFixed(2)
       };
       await postMasterStock(backendData, token);
-      const utilityData = {
-        _id: balanceData[0]["_id"],
-        masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2)
-      }
-      await updateUtility(utilityData, token);
+
+      //Add Here
+      if (metal === "metal"){
+          // console.log(purity, typeof purity, purity === "99.50");
+          if (parseFloat(issuePurity) === 99.5){
+            const utilityData = {
+              _id: balanceData[0]["_id"],
+              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2),
+              meltingBookClosing995Balance: (parseFloat(balanceData[0]["meltingBookClosing995Balance"]) - parseFloat(issueweight)).toFixed(2)
+            }
+            await updateUtility(utilityData, token);
+          }
+          else if (parseFloat(issuePurity) === 100){
+            const utilityData = {
+              _id: balanceData[0]["_id"],
+              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2),
+              meltingBookClosing100Balance: (parseFloat(balanceData[0]["meltingBookClosing100Balance"]) - parseFloat(issueweight)).toFixed(2)
+            }
+            await updateUtility(utilityData, token);
+          }
+          else{
+            const utilityData = {
+              _id: balanceData[0]["_id"],
+              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2),
+              meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) - parseFloat(issueweight)).toFixed(2)
+            }
+            await updateUtility(utilityData, token);
+          }
+        }
+        else{
+          const utilityData = {
+            _id: balanceData[0]["_id"],
+            masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2)
+          }
+          await updateUtility(utilityData, token);
+        }
+  
       // const updated = await postMasterStock(backendData, token);
       // console.log("Added ",updated);
     }
@@ -391,7 +424,25 @@ function ModelAdd({handleOk}) {
       </>
       
         ) : transactionType === "issue" ?(
-          <>      
+          <>
+          <Form.Item
+            name={["user", "metal"]}
+            label="Category"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+            initialValue="metal"
+          >
+            <Select
+              options={[
+                { value: "metal", label: "Metal" },
+                { value: "non-metal", label: "Non-Metal" },
+              ]}
+            />
+          </Form.Item>
+      
           <Form.Item name={["user", "description"]} label="Description">
             <Input />
           </Form.Item>
