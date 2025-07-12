@@ -194,6 +194,20 @@ const MasterStock = () => {
           //console.log(docs[i])
           if (docs[i]["type"] === "Issue"){
               curMasterStockClosingBalance += parseFloat(docs[i]["issue22k"])
+              if (docs[i]["category"] === "metal"){
+                if (docs[i]["purity"] === 99.5){
+                  curMeltingBookClosing995Balance += parseFloat(docs[i]["weight"])
+                }
+                else if (docs[i]["purity"] === 100){
+                  curMeltingBookClosing100Balance += parseFloat(docs[i]["weight"])
+                }
+                else{
+                  curMeltingBookClosingBalance += parseFloat(docs[i]["weight"])
+                }                
+              }
+              else{
+                curMasterStockClosingBalance += parseFloat(docs[i]["issue22k"])
+              }
           }
           else if (docs[i]["type"] === "Receive"){
               if (docs[i]["category"] === "metal"){

@@ -13,6 +13,7 @@ function ModelAdd({handleOk}) {
   // const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
   const [lastDate, setLastDate] = useState(dayjs());
   const [forceUpdate, setForceUpdate] = useState(0);
+  const [error, setError] = useState(false);
   
   const purityOptions = [
     {
@@ -112,7 +113,72 @@ function ModelAdd({handleOk}) {
       
       const issueWt = (issueweight * issuePurity)  / 91.8;
       const issueWtRounded = Math.round(issueWt * 100) / 100;
-      
+
+      if (metal === "metal"){
+          // console.log(purity, typeof purity, purity === "99.50");
+          if (parseFloat(issuePurity) === 99.5){
+            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2) < 0) ||
+              ((parseFloat(balanceData[0]["meltingBookClosing995Balance"]) - parseFloat(issueweight)).toFixed(2) < 0)){
+                setError(true);
+                setIsLoading(false);
+              return
+            };
+
+            const utilityData = {
+              _id: balanceData[0]["_id"],
+              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2),
+              meltingBookClosing995Balance: (parseFloat(balanceData[0]["meltingBookClosing995Balance"]) - parseFloat(issueweight)).toFixed(2)
+            }
+            await updateUtility(utilityData, token);
+          }
+          else if (parseFloat(issuePurity) === 100){
+            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2) < 0) ||
+              ((parseFloat(balanceData[0]["meltingBookClosing100Balance"]) - parseFloat(issueweight)).toFixed(2) < 0)){
+                setError(true);
+                setIsLoading(false);
+              return
+            };
+
+            const utilityData = {
+              _id: balanceData[0]["_id"],
+              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2),
+              meltingBookClosing100Balance: (parseFloat(balanceData[0]["meltingBookClosing100Balance"]) - parseFloat(issueweight)).toFixed(2)
+            }
+            await updateUtility(utilityData, token);
+          }
+          else{
+            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2) < 0) ||
+              ((parseFloat(balanceData[0]["meltingBookClosingBalance"]) - parseFloat(issueweight)).toFixed(2) < 0)){
+                setError(true);
+                setIsLoading(false);
+              return
+            };
+
+            const utilityData = {
+              _id: balanceData[0]["_id"],
+              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2),
+              meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) - parseFloat(issueweight)).toFixed(2)
+            }
+            await updateUtility(utilityData, token);
+          }
+        }
+        else{
+            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2) < 0)){
+                setError(true);
+                setIsLoading(false);
+              return
+            };
+
+          const utilityData = {
+            _id: balanceData[0]["_id"],
+            masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2)
+          }
+          await updateUtility(utilityData, token);
+        }
+  
+      // const updated = await postMasterStock(backendData, token);
+      // console.log("Added ",updated);
+            
       const backendData = {
         type: "Issue",
         date: dayjs(date, "YYYY-MM-DD"),
@@ -127,44 +193,6 @@ function ModelAdd({handleOk}) {
       };
       await postMasterStock(backendData, token);
 
-      //Add Here
-      if (metal === "metal"){
-          // console.log(purity, typeof purity, purity === "99.50");
-          if (parseFloat(issuePurity) === 99.5){
-            const utilityData = {
-              _id: balanceData[0]["_id"],
-              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2),
-              meltingBookClosing995Balance: (parseFloat(balanceData[0]["meltingBookClosing995Balance"]) - parseFloat(issueweight)).toFixed(2)
-            }
-            await updateUtility(utilityData, token);
-          }
-          else if (parseFloat(issuePurity) === 100){
-            const utilityData = {
-              _id: balanceData[0]["_id"],
-              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2),
-              meltingBookClosing100Balance: (parseFloat(balanceData[0]["meltingBookClosing100Balance"]) - parseFloat(issueweight)).toFixed(2)
-            }
-            await updateUtility(utilityData, token);
-          }
-          else{
-            const utilityData = {
-              _id: balanceData[0]["_id"],
-              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2),
-              meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) - parseFloat(issueweight)).toFixed(2)
-            }
-            await updateUtility(utilityData, token);
-          }
-        }
-        else{
-          const utilityData = {
-            _id: balanceData[0]["_id"],
-            masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2)
-          }
-          await updateUtility(utilityData, token);
-        }
-  
-      // const updated = await postMasterStock(backendData, token);
-      // console.log("Added ",updated);
     }
     else if (issueReceive === "issuereceive"){
 
@@ -327,6 +355,13 @@ function ModelAdd({handleOk}) {
       }}
       validateMessages={validateMessages}
     >
+      {error ? (
+        <>
+        <div className="text-red-600 text-center py-3"> Issue Weight is more than Available Stock</div>
+        </>
+      ) : (
+        <></>
+      )}
             <Form.Item
         name={["user", "date"]}
         label="Date"
