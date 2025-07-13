@@ -76,8 +76,7 @@ function PolishAdd({handleOk}) {
 
     let fineWt = 0;
     let chatkaWt = 0;
-    console.log(fine,  isNaN(fine), !isNaN(fine))
-    console.log(chatka,  isNaN(chatka), !isNaN(chatka))
+
     if (!isNaN(fine)){
       fineWt = parseFloat(fine).toFixed(2);
     }

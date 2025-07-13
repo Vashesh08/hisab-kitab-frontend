@@ -20,6 +20,7 @@ import { fetchPolishList, deletePolishList } from "../api/polishBook.js";
 import { getUtilityData, updateUtility } from "../api/utility.js";
 import { deleteLossAcctList, fetchLossAcctList } from "../api/LossAcct.js";
 import PolishClose from "../components/PolishClose.js";
+import PolishChillClose from "../components/PolishChillClose.js";
 
 const Polish = () => {
   const screenWidth = window.innerWidth;
@@ -37,6 +38,7 @@ const Polish = () => {
   const [totalChatkaQuantity, setTotalChatkaQty] = useState(0);
   const [totalLossQuantity, setTotalLossQty] = useState(0);
   const [totalChillQuantity, setTotalChillQty] = useState(0);
+  const [totalMeltingQuantity, setTotalMeltingQuantity] = useState(0);
   const componentRef = useRef(null);
   const [isPaginationEnabled, setIsPaginationEnabled] = useState(true);
 
@@ -96,9 +98,6 @@ const Polish = () => {
       setPage(1);
     };
     setDataState(dataType);
-
-    const currentDateData = [];
-    const today = dayjs();
     
     const allPolishData = await fetchPolishList(page, itemsPerPage, token, dataType);
     const docs = allPolishData["data"];
@@ -148,19 +147,16 @@ const Polish = () => {
       setTotalChatkaQty(totalQty[0]["chatka"].toFixed(2));    
     }
 
-    setFullData(docs);
-    for (let eachEntry in docs) {
-        if (today.isSame(dayjs(docs[eachEntry].date), 'day')){
-            currentDateData.push(docs[eachEntry]);
-        }
-    }
-
-    if (dataType === "today"){
-      setRows(currentDateData);
+    if (totalQty[0]["melting"] === null){
+      setTotalMeltingQuantity(Number(0).toFixed(2));
     }
     else{
-      setRows(docs);
+      setTotalMeltingQuantity(totalQty[0]["melting"].toFixed(2));    
     }
+    
+    setFullData(docs);
+
+    setRows(docs);
         
     setIsLoading(false);
   };
@@ -197,6 +193,7 @@ const Polish = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAcctClosingModalOpen, setIsAcctClosingModalOpen] = useState(false);
+  const [isChillCloseModalOpen, setIsChillCloseModalOpen] = useState(false);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -205,6 +202,10 @@ const Polish = () => {
   const showAcctClosingModal = () => {
     setIsAcctClosingModalOpen(true);
   };
+
+  const showChillCloseModal = () => {
+    setIsChillCloseModalOpen(true);
+  }
 
   const showDeletePopup = (text) => {
     setIsDeleteModalOpen(true)
@@ -219,9 +220,10 @@ const Polish = () => {
     //console.log(selectedRowKeys, rows);
     const lossIds = [];
     const balanceData = await getUtilityData(token)
-    let curPolishLoss = parseFloat(balanceData[0]["polishLoss"])
-    let curPolishChatkaLoss = parseFloat(balanceData[0]["polishChatkaLoss"])
-    let curPolishFineLoss = parseFloat(balanceData[0]["polishFineLoss"])
+    let curPolishLoss = parseFloat(balanceData[0]["polishLoss"]);
+    let curPolishChatkaLoss = parseFloat(balanceData[0]["polishChatkaLoss"]);
+    let curPolishFineLoss = parseFloat(balanceData[0]["polishFineLoss"]);
+    let curPolishChill = parseFloat(balanceData[0]["polishChill"]);
 
     const allPolishData = await fetchPolishList(page, itemsPerPage, token, dataState);
     const docs = allPolishData["data"];
@@ -242,6 +244,11 @@ const Polish = () => {
 
       for (let i = 0; i < docs.length; i++) {
         if (docs[i]["_id"] === item && !docs[i]["is_deleted_flag"]) {
+          if (!isNaN(docs[i]["melting"])){
+            curPolishChill += parseFloat(docs[i]["lossWeight"]);
+            curPolishChill += parseFloat(docs[i]["melting"]);
+            continue
+          }
           if (!isNaN(docs[i]["chatka"])){
             curPolishChatkaLoss -= parseFloat(docs[i]["chatka"]);
           }
@@ -253,6 +260,7 @@ const Polish = () => {
           }
           if (!isNaN(docs[i]["chill"])){
             curPolishLoss += parseFloat(docs[i]["chill"]);
+            curPolishChill -= parseFloat(docs[i]["chill"])
           }
         }
       }
@@ -265,7 +273,7 @@ const Polish = () => {
           if (lossAcctData[i].description.toLowerCase().includes("fine")){
             curPolishFineLoss += parseFloat(lossAcctData[i].lossWt);
           }
-          if (lossAcctData[i].description.toLowerCase().includes("chill")){
+          if (lossAcctData[i].description.toLowerCase().includes("chill loss")){
             curPolishLoss += parseFloat(lossAcctData[i].lossWt);
           }
         }
@@ -283,7 +291,8 @@ const Polish = () => {
       _id: balanceData[0]["_id"],
       polishLoss: curPolishLoss.toFixed(2),
       polishChatkaLoss: curPolishChatkaLoss.toFixed(2),
-      polishFineLoss: curPolishFineLoss.toFixed(2)
+      polishFineLoss: curPolishFineLoss.toFixed(2),
+      polishChill: curPolishChill.toFixed(2)
     }
     await updateUtility(utilityData, token);
 
@@ -300,6 +309,7 @@ const Polish = () => {
     setIsModalOpen(false);
     setIsDeleteModalOpen(false);
     setIsAcctClosingModalOpen(false);
+    setIsChillCloseModalOpen(false);
   };
 
   const handleUpdateClose = () => {
@@ -307,6 +317,7 @@ const Polish = () => {
     setIsModalOpen(false);
     setIsDeleteModalOpen(false);  
     setIsAcctClosingModalOpen(false);
+    setIsChillCloseModalOpen(false);
   }
 
   const [searchText, setSearchText] = useState('');
@@ -552,6 +563,17 @@ const Polish = () => {
       width: '10%',
       ...getColumnSearchProps('chill'),
     },
+    {
+      title: "Melting",
+      dataIndex: "melting",
+      render: text => (
+        <div style={{ minWidth: '100px', maxWidth: '200px', overflow: 'auto'}}>
+          {text}
+        </div>
+      ),
+      width: '10%',
+      ...getColumnSearchProps('melting'),
+    },
   ];
 
   const SelectNone = () => {
@@ -647,8 +669,8 @@ const Polish = () => {
 
               <div className="flex flex-col">
                 <div className="mb-1 flex justify-between items-center h-12">
-                  <span className="text-[#00203FFF] whitespace-nowrap w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
-                    Close Daily Acct:
+                  <span className="text-[#00203FFF] whitespace-nowrap !w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
+                    Close&nbsp; Daily&nbsp; Acct&nbsp;&nbsp;&nbsp;:
                     <Tooltip title="Close Daily Acct" placement="topRight">
                     <EnterOutlined style={{ fontSize: '125%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showAcctClosingModal} />
                   </Tooltip>
@@ -658,8 +680,14 @@ const Polish = () => {
                     <PlusCircleOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showModal} />
                   </Tooltip>
                 </div>
-                <div className="mt-1 flex justify-end items-right h-12">
-                    <Tooltip title="Delete" placement="bottomRight">
+                <div className="mt-1 flex justify-between items-right h-12">
+                  <span className="text-[#00203FFF] whitespace-nowrap !w-76 h-12 font-medium bg-[#ABD6DFFF] p-2">
+                    Receive Chill Acct :
+                    <Tooltip title="Close Chill Acct" placement="topRight">
+                    <EnterOutlined style={{ fontSize: '125%', color:"#1f2937"}} className="w-12 place-content-end" onClick={showChillCloseModal} />
+                  </Tooltip>
+                  </span>
+                  <Tooltip title="Delete" placement="bottomRight">
                     <DeleteOutlined style={{ fontSize: '150%', color:"#1f2937"}} className="place-content-end	w-12" onClick={showDeletePopup}/>
                   </Tooltip>
                 </div>
@@ -702,6 +730,18 @@ const Polish = () => {
         footer={null}
       >
         <PolishAdd
+          handleOk={handleUpdateClose}
+          />
+      </Modal>
+
+
+      <Modal
+        title="Polish Chill Receive"
+        open={isChillCloseModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <PolishChillClose
           handleOk={handleUpdateClose}
           />
       </Modal>
@@ -778,6 +818,9 @@ const Polish = () => {
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={9}>
                     {totalChillQuantity}
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={10}>
+                  {totalMeltingQuantity}
                 </Table.Summary.Cell>
               </Table.Summary.Row>
             </>

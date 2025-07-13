@@ -117,8 +117,8 @@ function ModelAdd({handleOk}) {
       if (metal === "metal"){
           // console.log(purity, typeof purity, purity === "99.50");
           if (parseFloat(issuePurity) === 99.5){
-            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2) < 0) ||
-              ((parseFloat(balanceData[0]["meltingBookClosing995Balance"]) - parseFloat(issueweight)).toFixed(2) < 0)){
+            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))) < 0) ||
+              ((parseFloat(balanceData[0]["meltingBookClosing995Balance"]) - parseFloat(issueweight)) < 0)){
                 setError(true);
                 setIsLoading(false);
               return
@@ -132,8 +132,8 @@ function ModelAdd({handleOk}) {
             await updateUtility(utilityData, token);
           }
           else if (parseFloat(issuePurity) === 100){
-            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2) < 0) ||
-              ((parseFloat(balanceData[0]["meltingBookClosing100Balance"]) - parseFloat(issueweight)).toFixed(2) < 0)){
+            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))) < 0) ||
+              ((parseFloat(balanceData[0]["meltingBookClosing100Balance"]) - parseFloat(issueweight)) < 0)){
                 setError(true);
                 setIsLoading(false);
               return
@@ -147,8 +147,8 @@ function ModelAdd({handleOk}) {
             await updateUtility(utilityData, token);
           }
           else{
-            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2) < 0) ||
-              ((parseFloat(balanceData[0]["meltingBookClosingBalance"]) - parseFloat(issueweight)).toFixed(2) < 0)){
+            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))) < 0) ||
+              ((parseFloat(balanceData[0]["meltingBookClosingBalance"]) - parseFloat(issueweight)) < 0)){
                 setError(true);
                 setIsLoading(false);
               return
@@ -163,7 +163,7 @@ function ModelAdd({handleOk}) {
           }
         }
         else{
-            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))).toFixed(2) < 0)){
+            if (((parseFloat(balanceData[0]["masterStockClosingBalance"]) - (parseFloat(issueWtRounded))) < 0)){
                 setError(true);
                 setIsLoading(false);
               return
@@ -230,7 +230,7 @@ function ModelAdd({handleOk}) {
             const utilityData = {
               _id: balanceData[0]["_id"],
               masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
-              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2) - (parseFloat(issueWtRounded)).toFixed(2),
+              masterStockClosingBalance: ((parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))) - (parseFloat(issueWtRounded))).toFixed(2),
               meltingBookOpening995Balance: (parseFloat(balanceData[0]["meltingBookOpening995Balance"]) + parseFloat(weight)).toFixed(2) ,
               meltingBookClosing995Balance: (parseFloat(balanceData[0]["meltingBookClosing995Balance"]) + parseFloat(weight)).toFixed(2)
             }
@@ -240,7 +240,7 @@ function ModelAdd({handleOk}) {
             const utilityData = {
               _id: balanceData[0]["_id"],
               masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
-              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2) - (parseFloat(issueWtRounded)).toFixed(2),
+              masterStockClosingBalance: ((parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))) - (parseFloat(issueWtRounded))).toFixed(2),
               meltingBookOpening100Balance: (parseFloat(balanceData[0]["meltingBookOpening100Balance"]) + parseFloat(weight)).toFixed(2) ,
               meltingBookClosing100Balance: (parseFloat(balanceData[0]["meltingBookClosing100Balance"]) + parseFloat(weight)).toFixed(2)
             }
@@ -250,7 +250,7 @@ function ModelAdd({handleOk}) {
             const utilityData = {
               _id: balanceData[0]["_id"],
               masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
-              masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2) - (parseFloat(issueWtRounded)).toFixed(2),
+              masterStockClosingBalance: ((parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))) - (parseFloat(issueWtRounded))).toFixed(2),
               meltingBookOpeningBalance: (parseFloat(balanceData[0]["meltingBookOpeningBalance"]) + parseFloat(weight)).toFixed(2) ,
               meltingBookClosingBalance: (parseFloat(balanceData[0]["meltingBookClosingBalance"]) + parseFloat(weight)).toFixed(2)
             }
@@ -261,7 +261,7 @@ function ModelAdd({handleOk}) {
           const utilityData = {
             _id: balanceData[0]["_id"],
             masterStockOpeningBalance: (parseFloat(balanceData[0]["masterStockOpeningBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2),
-            masterStockClosingBalance: (parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))).toFixed(2) - (parseFloat(issueWtRounded)).toFixed(2)
+            masterStockClosingBalance: ((parseFloat(balanceData[0]["masterStockClosingBalance"]) + (parseFloat(roundedNumber.toFixed(2)))) - (parseFloat(issueWtRounded))).toFixed(2)
           }
         await updateUtility(utilityData, token);
         }

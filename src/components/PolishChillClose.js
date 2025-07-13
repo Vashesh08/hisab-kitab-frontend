@@ -1,5 +1,4 @@
-import { useState } from "react";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import dayjs from 'dayjs'; // Import Day.js
 import Loading from "./Loading.js";
 import { Button, Form, InputNumber, DatePicker } from "antd";
@@ -7,12 +6,13 @@ import { postPolishStock } from "../api/polishBook.js";
 import { getUtilityData, updateUtility } from "../api/utility.js";
 import { postLossAcct } from "../api/LossAcct.js";
 
-function PolishClose({handleOk}) {
+function PolishChillClose({handleOk}) {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   // const [currentDate, setCurrentDate] = useState(dayjs()); // Initialize with Day.js
   const currentDate = dayjs(); // Initialize with Day.js
-  // const [lastDate, setLastDate] = useState(dayjs());
+  const [lossWeight, setLossWeight] = useState(0);
+  const [chillWeight, setChillWeight] = useState(0);
   // const [forceUpdate, setForceUpdate] = useState(0);
 
   const getFormattedDate = (date) => {
@@ -57,18 +57,20 @@ function PolishClose({handleOk}) {
       span: 16,
     },
   };
+  
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const token = localStorage.getItem("token");
-  //     const docs = await fetchPolishList(1,100000000, token);
-  //     const lastEntry = docs[docs.length - 1];
-  //     setLastDate(dayjs(lastEntry.date));
-  //     form.setFieldsValue({ user: { date: dayjs(lastEntry.date) } });
-  //     console.log(lastEntry, lastDate)
-  //     setForceUpdate(prev => prev + 1);
-  //   })();
-  // }, [form]);
+  useEffect(() => {
+    (async () => {
+        const token = localStorage.getItem("token");
+        const utilityData = await getUtilityData(token);
+        const chillWeight = parseFloat(utilityData[0]["polishChill"]).toFixed(2);
+        setChillWeight(chillWeight);
+    })();
+  }, []);
+
+  const onChangeWt = (value) => {
+    setLossWeight((chillWeight - parseFloat(value)).toFixed(2));
+  };
 
   const onFinish = async ({ user }) => {
     const token = localStorage.getItem("token");
@@ -78,65 +80,37 @@ function PolishClose({handleOk}) {
     
     const {
       date,
-      chill
+      melting
     } = user;
     
     const utilityData = await getUtilityData(token);
-    const polishChatkaLoss = utilityData[0]["polishChatkaLoss"];
-    const polishLoss = utilityData[0]["polishLoss"];
-    const polishFineLoss = utilityData[0]["polishFineLoss"];
-    const polishChill = utilityData[0]["polishChill"];
-
+    
     // console.log("Vashesh",polishChatkaLoss, polishFineLoss, polishLoss);
     const data = {
       date: dayjs(date, "YYYY-MM-DD"),
-      goods: "Acct Closing For Day " + getFormattedDate(dayjs(date, "YYYY-MM-DD")),
+      goods: "Chill Melting and Loss",
       // fine: parseFloat(polishFineLoss).toFixed(2),
       // chatka: parseFloat(polishChatkaLoss).toFixed(2),
-      chill: parseFloat(chill).toFixed(2) 
+      melting: parseFloat(melting).toFixed(2),
+      lossWeight: parseFloat(lossWeight).toFixed(2) 
     }
     const updatedData = await postPolishStock(data, token);
     // console.log(updatedData)
 
-    if ((parseFloat(polishChatkaLoss)) > 0){
+    if ((parseFloat(lossWeight)) > 0){
       const lossData = {
         "type": "Polish",
         "date": date,
-        "lossWt": parseFloat(polishChatkaLoss).toFixed(2),
+        "lossWt": parseFloat(lossWeight).toFixed(2),
         "transactionId": updatedData.polish_id, 
-        "description": " Polish Chatka Loss for " + getFormattedDate(date)
-      }
-      await postLossAcct(lossData, token)
-    }
-
-    if ((parseFloat(polishFineLoss)) > 0){
-      const lossData = {
-        "type": "Polish",
-        "date": date,
-        "lossWt": parseFloat(polishFineLoss).toFixed(2),
-        "transactionId": updatedData.polish_id, 
-        "description": " Polish Fine Loss for " + getFormattedDate(date)
-      }
-      await postLossAcct(lossData, token)
-    }
-
-    if (((parseFloat(polishLoss) - parseFloat(chill))) > 0){
-      const lossData = {
-        "type": "Polish",
-        "date": date,
-        "lossWt": ((parseFloat(polishLoss) - parseFloat(chill)).toFixed(2)),
-        "transactionId": updatedData.polish_id, 
-        "description": " Polish Chill Loss for " + getFormattedDate(date)
+        "description": " Polish Chill Melting and Loss for " + getFormattedDate(date)
       }
       await postLossAcct(lossData, token)
     }
 
     const utilityBackendData = {
       _id: utilityData[0]["_id"],
-      polishChatkaLoss: 0,
-      polishLoss: 0,
-      polishFineLoss: 0,
-      polishChill: (parseFloat(polishChill) + parseFloat(chill)).toFixed(2)
+      polishChill: 0
     }
     await updateUtility(utilityBackendData, token);
 
@@ -174,16 +148,30 @@ function PolishClose({handleOk}) {
         <DatePicker format="DD MMM, YYYY" disabledDate={disabledDate} />
       </Form.Item>
 
+          <Form.Item
+          name={["user", "chill"]}
+          label="Chill Balance"
+          >
+            {chillWeight}
+          </Form.Item>
+
       <Form.Item
-        name={["user", "chill"]}
-        label="Chill Wt (gm)"
+        name={["user", "melting"]}
+        label="Melting Wt (gm)"
         rules={[{ type: "number", min: 0, required: true}]}
       >
         <InputNumber
-        // precision={4}
-        // step={0.01}
+        onChange={onChangeWt}
       />
       </Form.Item>
+
+        <Form.Item
+        name={["user", "lossWeight"]}
+        label="Loss"
+        >
+        {lossWeight}
+        </Form.Item>
+
 
       <Form.Item
         wrapperCol={{
@@ -199,4 +187,4 @@ function PolishClose({handleOk}) {
   );
 }
 
-export default PolishClose;
+export default PolishChillClose;
