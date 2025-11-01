@@ -205,9 +205,6 @@ const MasterStock = () => {
                   curMeltingBookClosingBalance += parseFloat(docs[i]["weight"])
                 }                
               }
-              else{
-                curMasterStockClosingBalance += parseFloat(docs[i]["issue22k"])
-              }
           }
           else if (docs[i]["type"] === "Receive"){
               if (docs[i]["category"] === "metal"){
