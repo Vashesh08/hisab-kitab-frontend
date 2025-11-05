@@ -69,7 +69,11 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     //     setIsPaginationEnabled(false); // Disable pagination
     //   });
     // },
-    onAfterPrint: () => setIsPaginationEnabled(true),
+    onAfterPrint: () => {
+      setItemsPerPage(20);
+      setIsPaginationEnabled(true);
+      updateRows("valid",currentSelectedDate);
+    }
   });
 
   const handlePrintNowCallback = useCallback(handlePrintNow, [handlePrintNow]);
@@ -1232,7 +1236,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
             </>
       )
       }
-      
+
       </div>
 
       <Divider />
