@@ -26,6 +26,12 @@ import KareegarBookUpdate from "../components/KareegarBookUpdate.js";
 import { Select } from 'antd';
 import { postKareegarBook } from "../api/kareegarBook.js";
 import { postLossAcct } from "../api/LossAcct.js";
+import PrintModel from "../components/PrintModel.js";
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => {
   const screenWidth = window.innerWidth;
@@ -57,7 +63,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
 
   const handlePrintNow = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: kareegarName + ' Kareegar Book - ' + dayjs().format("DD-MM-YYYY"),
+    documentTitle: kareegarName + ' Kareegar Book',
     // onBeforeGetContent: () => {
     //   return new Promise((resolve) => {
     //     setIsPaginationEnabled(false); // Disable pagination
@@ -74,9 +80,19 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     }
   }, [isPaginationEnabled, handlePrintNowCallback]); // Runs when `isPaginationEnabled` changes
 
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+
+  const handlePrintUpdate = async(startDate, endDate) => {
+    setIsLoading(true);
+    setPage(1);
+    await updateRows("valid", currentSelectedDate, startDate, endDate);
+    setIsPaginationEnabled(false); // Disable pagination
+    setIsPrintModalOpen(false);
+  };
+  
   // Handle Print Click
   const handlePrint = () => {
-    setIsPaginationEnabled(false); // Disable pagination
+    setIsPrintModalOpen(true);
   };
 
   const getFormattedDate = (date) => {
@@ -109,7 +125,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     }
   };
 
-  async function updateRows (dataType, cutoffDateNumber){
+  async function updateRows (dataType, cutoffDateNumber, printStartDate = null, printEndDate = null){
     if (searchText !== ""){
       return;
     };
@@ -189,13 +205,71 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       setRows(currentDateData);
     }
 
+    if (printStartDate !== null && printEndDate !== null && printStartDate <= printEndDate) {
+        const KareegarBookData = await fetchKareegarBookList(page, Number.MAX_SAFE_INTEGER, kareegarId, token, dataType, cutoffDateNumber);
+        const docs = KareegarBookData["data"];
+        const count = KareegarBookData["count"];
+        const totalQty = KareegarBookData["totalQty"];
+        setTotalCount(count);
+
+        setRows(docs);
+
+        if (totalQty[0]["issue_wt"] === null){
+          setTotalIssueQty(Number(0).toFixed(2));
+        }
+        else{
+          setTotalIssueQty(totalQty[0]["issue_wt"].toFixed(2));
+        }
+
+        if (totalQty[0]["recv_wt"] === null){
+          setTotalRecvQty(Number(0).toFixed(2));
+        }
+        else{
+          setTotalRecvQty(totalQty[0]["recv_wt"].toFixed(2));
+        }
+
+        if (totalQty[0]["loss_wt"] === null){
+          setTotalLossQty(Number(0).toFixed(2));
+        }
+        else{
+          setTotalLossQty(totalQty[0]["loss_wt"].toFixed(2));
+        }
+        
+        if (totalQty[0]["beads_issue_wt"] === null){
+          setTotalBeadsIssueQty(Number(0).toFixed(2));
+        }
+        else{
+          setTotalBeadsIssueQty(totalQty[0]["beads_issue_wt"].toFixed(2));
+        }
+        
+        if (totalQty[0]["beads_recv_wt"] === null){
+          setTotalBeadsRecvQty(Number(0).toFixed(2));
+        }
+        else{
+          setTotalBeadsRecvQty(totalQty[0]["beads_recv_wt"].toFixed(2));  
+        }
+        
+      const printData = [];
+      for (let eachEntry in docs) {
+        if (
+        dayjs(docs[eachEntry].date).isSameOrAfter(dayjs(printStartDate), 'day') &&
+        dayjs(docs[eachEntry].date).isSameOrBefore(dayjs(printEndDate), 'day')
+        ){
+              printData.push(docs[eachEntry]);
+          }
+      }
+      setRows(printData);
+    };
+
     setIsLoading(false);
   };
 
   useEffect(() => {
     (async () => {
       if (!initialLoad){
-        updateRows(dataState, currentSelectedDate);
+        if (!isPrintModalOpen){
+          updateRows(dataState, currentSelectedDate);
+        };
       };
     })();
   }, [page, itemsPerPage]);
@@ -504,6 +578,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
     setIsBoxWtModalOpen(false);
     setIsEditModalOpen(false);
     setIsModalOpen(false);
+    setIsPrintModalOpen(false);
     setIsCutoffDateModalOpen(false);
     setIsCompleteModalOpen(false);
     setIsDeleteModalOpen(false);
@@ -1002,6 +1077,17 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
       </Modal> 
 
       <Modal
+        title="Print Table"
+        open={isPrintModalOpen}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <PrintModel
+          handlePrintUpdate={handlePrintUpdate}
+          />
+      </Modal>
+
+      <Modal
         title="Add Item"
         open={isModalOpen}
         onCancel={handleCancel}
@@ -1086,7 +1172,7 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
         }
         footer={isPaginationEnabled ? false : () => (
           <div className="print-footer">
-            {kareegarName} Kareegar Book - {dayjs().format("DD-MMMM-YYYY")}
+            {kareegarName} Kareegar Book
           </div>
         )}
         summary={() => {
