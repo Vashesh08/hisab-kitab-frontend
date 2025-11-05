@@ -109,18 +109,22 @@ const MasterStock = () => {
       setTotalWeight(totalQty[0]["weight"].toFixed(2));
     }
 
-    if (totalQty[0]["receive22k"] === null){
+     if (totalQty[0]["receive22k"] === null){
       setTotalRecvQty(Number(0).toFixed(2));
+      setOpeningBalance(Number(0).toFixed(2));
     }
     else{
       setTotalRecvQty(totalQty[0]["receive22k"].toFixed(2));
+      setOpeningBalance(totalQty[0]["receive22k"].toFixed(2));
     }
 
     if (totalQty[0]["issue22k"] === null){
       setTotalIssueQty(Number(0).toFixed(2));
+      setClosingBalance(Number(0).toFixed(2));
     }
     else{
       setTotalIssueQty(totalQty[0]["issue22k"].toFixed(2));
+      setClosingBalance(totalQty[0]["issue22k"].toFixed(2));
     }
 
     setIsLoading(false);
