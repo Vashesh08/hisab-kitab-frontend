@@ -1116,7 +1116,37 @@ const KareegarBook = ({ kareegarId , kareegarName, setKareegarDetailsPage }) => 
           );
         }}
       />
+      {isPaginationEnabled?(
+        <div></div>
+      ):(
+                    <>
+            <div className="text-xl border-transparent flex justify-between items-center">
+            <div className="flex flex-col mt-5">
+              
+              </div>
 
+              <div className="flex flex-col">
+                <div className="mb-1 flex justify-end items-center h-6">
+                  <span className="text-[#00203FFF] whitespace-nowrap w-76 h-6 font-medium p-2 flex items-center">
+                  Balance: {(Number(totalIssueQuantity) - Number(totalRecvQuantity) - Number(totalLossQuantity)).toFixed(2)}
+                  </span>
+                </div>
+                <div className="mb-1 flex justify-end items-center h-6">
+                  <span className="text-[#00203FFF] whitespace-nowrap w-76 h-6 font-medium p-2 flex items-center">
+                  Box Weight: {Number(boxWt).toFixed(2)}
+                  </span>
+                </div>
+                <div className="mb-1 flex justify-end items-center h-6">
+                  <span className="text-[#00203FFF] whitespace-nowrap w-76 h-6 font-medium p-2 flex items-center">
+                  Balance + Box Weight: {(Number(boxWt) + Number(totalIssueQuantity) - Number(totalRecvQuantity) - Number(totalLossQuantity)).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+            </>
+      )
+      }
+      
       </div>
 
       <Divider />
